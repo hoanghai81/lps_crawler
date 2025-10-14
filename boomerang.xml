@@ -1,5 +1,2 @@
-Fetching: https://info.msky.vn/vn/Boomerang.html?date=14/10/2025
-Fetching: https://info.msky.vn/vn/Boomerang.html?date=15/10/2025
-✅ Xuất thành công boomerang.xml
-Hôm nay: 0 chương trình
-Ngày mai: 0 chương trình
+<?xml version='1.0' encoding='utf-8'?>
+<tv><channel id="boomerang.vn"><display-name>Boomerang</display-name><icon src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Boomerang_tv_logo.png" /></channel></tv>
