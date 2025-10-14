@@ -1,118 +1,96 @@
-#!/usr/bin/env python3
 import requests
 from bs4 import BeautifulSoup
-import re
-from datetime import datetime, timedelta
-import xml.sax.saxutils as sax
-import sys
+from datetime import datetime, timedelta, date
+import xml.etree.ElementTree as ET
+import os
 
-BASE_URL = "https://info.msky.vn/vn/Boomerang.html"
-CHANNEL_XMLTV_ID = "boomerang.msky"
-DISPLAY_NAME = "BOOMERANG"
-TZ_OFFSET = "+0700"
-
-def fetch(url):
-    resp = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
-    resp.raise_for_status()
-    return resp.text
+# URL gốc của trang lịch phát sóng
+BASE_URL = "https://info.msky.vn/vn/Boomerang.html?date={}"
 
 def parse_date_str(s):
     """Chuyển 'dd/mm/yyyy' -> datetime.date"""
     return datetime.strptime(s, "%d/%m/%Y").date()
 
-def extract_date(soup):
-    text = soup.get_text(" ")
-    m = re.search(r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})', text)
-    if m:
-        return parse_date_str(f"{m.group(1)}/{m.group(2)}/{m.group(3)}")
-    return datetime.utcnow().date()
+def fetch_schedule(date_str):
+    """Tải và parse HTML theo ngày"""
+    url = BASE_URL.format(date_str)
+    print(f"Fetching: {url}")
+    resp = requests.get(url)
+    resp.raise_for_status()
 
-def parse_schedule(html):
-    soup = BeautifulSoup(html, "html.parser")
-    date = extract_date(soup)
-    table = soup.find("table")
-    if not table:
-        return [], date
+    soup = BeautifulSoup(resp.text, "html.parser")
+    rows = soup.select("table tbody tr")
 
-    items = []
-    for tr in table.find_all("tr"):
-        tds = [td.get_text(strip=True) for td in tr.find_all("td")]
-        if len(tds) < 2:
-            continue
-        time_str = tds[0]
-        title_vn = tds[1]
-        title_orig = tds[2] if len(tds) >= 3 else ""
-        duration = ""
-        if len(tds) >= 4 and re.match(r'^\d+:\d{2}$', tds[3]):
-            duration = tds[3]
-        if re.match(r'^\d{1,2}:\d{2}$', time_str):
-            items.append({
-                "time": time_str,
-                "title_vn": title_vn,
-                "title_orig": title_orig,
-                "duration": duration,
-                "date": date
-            })
-    return items, date
+    programs = []
+    for r in rows:
+        cols = r.find_all("td")
+        if len(cols) >= 2:
+            time_str = cols[0].get_text(strip=True)
+            title = cols[1].get_text(strip=True)
+            programs.append((time_str, title))
+    return programs
 
-def parse_duration(s):
-    if not s:
-        return 30
-    m = re.match(r'(\d+):(\d{2})', s)
-    if m:
-        return int(m.group(1)) * 60 + int(m.group(2))
-    try:
-        return int(s)
-    except:
-        return 30
+def to_xmltv(programs_today, programs_tomorrow):
+    """Tạo XMLTV"""
+    tv = ET.Element("tv")
 
-def fmt_dt(dt):
-    return dt.strftime("%Y%m%d%H%M%S") + " " + TZ_OFFSET
+    ch = ET.SubElement(tv, "channel", id="boomerang.vn")
+    ET.SubElement(ch, "display-name").text = "Boomerang"
+    ET.SubElement(ch, "icon", src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Boomerang_tv_logo.png")
 
-def build_xml(all_items):
-    lines = []
-    lines.append('<?xml version="1.0" encoding="UTF-8"?>')
-    lines.append('<tv source-info-name="msky" generator-info-name="lps_crawler">')
-    lines.append(f'  <channel id="{sax.escape(CHANNEL_XMLTV_ID)}"><display-name>{sax.escape(DISPLAY_NAME)}</display-name></channel>')
+    tz_offset = "+0700"
+    all_programs = [("today", programs_today), ("tomorrow", programs_tomorrow)]
 
-    for it in all_items:
-        hh, mm = map(int, it["time"].split(":"))
-        start = datetime.combine(it["date"], datetime.min.time()) + timedelta(hours=hh, minutes=mm)
-        dur = parse_duration(it.get("duration", ""))
-        stop = start + timedelta(minutes=dur)
-        lines.append(f'  <programme start="{fmt_dt(start)}" stop="{fmt_dt(stop)}" channel="{sax.escape(CHANNEL_XMLTV_ID)}">')
-        lines.append(f'    <title lang="vi">{sax.escape(it.get("title_vn",""))}</title>')
-        if it.get("title_orig"):
-            lines.append(f'    <title lang="en">{sax.escape(it.get("title_orig",""))}</title>')
-        lines.append('  </programme>')
+    for label, (date_str, programs) in all_programs:
+        current_date = date_str  # ví dụ: "14/10/2025"
+        for i, (start_time, title) in enumerate(programs):
+            # ✅ FIX: Chuyển đúng định dạng dd/mm/yyyy
+            start_dt = datetime.strptime(f"{current_date} {start_time}", "%d/%m/%Y %H:%M")
+            if i + 1 < len(programs):
+                next_time = programs[i + 1][0]
+                stop_dt = datetime.strptime(f"{current_date} {next_time}", "%d/%m/%Y %H:%M")
+                if stop_dt <= start_dt:
+                    stop_dt += timedelta(days=1)
+            else:
+                stop_dt = start_dt + timedelta(hours=1)
 
-    lines.append('</tv>')
-    return "\n".join(lines)
+            prog = ET.SubElement(
+                tv,
+                "programme",
+                start=start_dt.strftime("%Y%m%d%H%M%S ") + tz_offset,
+                stop=stop_dt.strftime("%Y%m%d%H%M%S ") + tz_offset,
+                channel="boomerang.vn"
+            )
+            ET.SubElement(prog, "title", lang="vi").text = title
+
+    return tv
+
 
 def main():
-    today = datetime.now().date()
+    today = date.today()
     tomorrow = today + timedelta(days=1)
-    dates = [today, tomorrow]
-    all_items = []
 
-    for d in dates:
-        date_str = d.strftime("%d/%m/%Y")
-        url = f"{BASE_URL}?date={date_str}"
-        print(f"Fetching schedule for {date_str}...", file=sys.stderr)
-        html = fetch(url)
-        items, date = parse_schedule(html)
-        if items:
-            all_items.extend(items)
-        else:
-            print(f"No items found for {date_str}", file=sys.stderr)
+    date_today_str = today.strftime("%d/%m/%Y")
+    date_tomorrow_str = tomorrow.strftime("%d/%m/%Y")
 
-    if not all_items:
-        print("No schedule items parsed", file=sys.stderr)
-        sys.exit(1)
+    progs_today = fetch_schedule(date_today_str)
+    progs_tomorrow = fetch_schedule(date_tomorrow_str)
 
-    xml = build_xml(all_items)
-    print(xml)
+    tv = to_xmltv((date_today_str, progs_today), (date_tomorrow_str, progs_tomorrow))
+    tree = ET.ElementTree(tv)
+
+    output_file = "boomerang.xml"
+    tree.write(output_file, encoding="utf-8", xml_declaration=True)
+
+    print(f"✅ Xuất thành công {output_file}")
+    print(f"Hôm nay: {len(progs_today)} chương trình")
+    print(f"Ngày mai: {len(progs_tomorrow)} chương trình")
+
+    # Ghi thêm file thống kê
+    with open("counts.txt", "w", encoding="utf-8") as f:
+        f.write(f"Today: {len(progs_today)}\n")
+        f.write(f"Tomorrow: {len(progs_tomorrow)}\n")
+
 
 if __name__ == "__main__":
     main()
-        
