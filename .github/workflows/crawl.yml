@@ -3,7 +3,8 @@ name: Crawl EPG Boomerang
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"
+    # Chạy lúc 18:00 UTC = 01:00 sáng Hà Nội (UTC+7)
+    - cron: "0 18 * * *"
 
 permissions:
   contents: write   # 👈 cần có dòng này
