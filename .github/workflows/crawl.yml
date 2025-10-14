@@ -1,17 +1,16 @@
-name: 🕒 Crawl Boomerang EPG
+name: Crawl EPG Boomerang
 
 on:
-  schedule:
-    - cron: '0 18 * * *'  # 1h sáng Hà Nội (UTC+7 = 18h UTC ngày trước)
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
 
 permissions:
-  contents: write
+  contents: write   # 👈 cần có dòng này
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -22,92 +21,16 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install requests beautifulsoup4
+        run: pip install -r requirements.txt
 
-      - name: 🕷️ Crawl Boomerang EPG
-        run: |
-          python << 'EOF'
-          import requests, re, datetime, xml.etree.ElementTree as ET
-          from bs4 import BeautifulSoup
+      - name: Crawl EPG
+        run: python crawl_boomerang.py > boomerang.xml
 
-          today = datetime.date.today()
-          tomorrow = today + datetime.timedelta(days=1)
-          base_url = "https://info.msky.vn/vn/Boomerang.html?date="
-          dates = [today, tomorrow]
-
-          programmes = []
-          counts = []
-
-          for d in dates:
-              date_str = d.strftime("%d/%m/%Y")
-              url = f"{base_url}{date_str}"
-              html = requests.get(url, timeout=10).text
-              soup = BeautifulSoup(html, "html.parser")
-
-              items = soup.select(".schedule-item")
-              count = 0
-
-              for item in items:
-                  title = item.select_one(".title").get_text(strip=True) if item.select_one(".title") else ""
-                  time = item.select_one(".time").get_text(strip=True) if item.select_one(".time") else ""
-                  if not title or not time:
-                      continue
-                  start_dt = datetime.datetime.strptime(f"{d} {time}", "%Y-%m-%d %H:%M")
-                  start = start_dt.strftime("%Y%m%d%H%M%S +0700")
-                  stop_dt = start_dt + datetime.timedelta(minutes=30)
-                  stop = stop_dt.strftime("%Y%m%d%H%M%S +0700")
-
-                  prog = ET.Element("programme", start=start, stop=stop, channel="Boomerang")
-                  title_tag = ET.SubElement(prog, "title", lang="vi")
-                  title_tag.text = title
-                  programmes.append(prog)
-                  count += 1
-
-              counts.append((d.strftime("%Y-%m-%d"), count))
-
-          tv = ET.Element("tv")
-          channel = ET.SubElement(tv, "channel", id="Boomerang")
-          display_name = ET.SubElement(channel, "display-name", lang="vi")
-          display_name.text = "Boomerang"
-          for p in programmes:
-              tv.append(p)
-
-          ET.ElementTree(tv).write("boomerang.xml", encoding="utf-8", xml_declaration=True)
-
-          with open("counts.txt", "w") as f:
-              for date, c in counts:
-                  f.write(f"{date}={c}\n")
-
-          print("✅ EPG file created successfully.")
-          EOF
-
-      - name: Commit and push XML
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add boomerang.xml counts.txt
-          git commit -m "Update boomerang.xml: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git add boomerang.xml
+          git commit -m "Update boomerang.xml: $(date +'%Y-%m-%d')" || echo "No changes"
           git push
-
-      - name: 🧾 Report summary
-        run: |
-          TODAY=$(date '+%Y-%m-%d')
-          TOMORROW=$(date -d "+1 day" '+%Y-%m-%d')
-
-          COUNT_TODAY=$(grep "$TODAY" counts.txt | cut -d'=' -f2)
-          COUNT_TOMORROW=$(grep "$TOMORROW" counts.txt | cut -d'=' -f2)
-          TOTAL=$((COUNT_TODAY + COUNT_TOMORROW))
-
-          {
-            echo "## 🕒 EPG Crawl Summary"
-            echo ""
-            echo "- **Date (Hanoi):** $(TZ='Asia/Ho_Chi_Minh' date '+%Y-%m-%d %H:%M:%S')"
-            echo "- **Today ($TODAY):** $COUNT_TODAY programmes"
-            echo "- **Tomorrow ($TOMORROW):** $COUNT_TOMORROW programmes"
-            echo "- **Total parsed:** $TOTAL"
-            echo "- **Source:** [info.msky.vn](https://info.msky.vn/vn/Boomerang.html)"
-            echo ""
-            echo "✅ **[EPG file updated successfully](https://github.com/hoanghai81/lps_crawler/blob/main/boomerang.xml)**"
-          } >> $GITHUB_STEP_SUMMARY
           
