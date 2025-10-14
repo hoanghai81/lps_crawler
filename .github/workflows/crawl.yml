@@ -3,7 +3,7 @@ name: Crawl EPG Boomerang
 on:
   workflow_dispatch:
   schedule:
-    # Chạy lúc 18:00 UTC = 01:00 sáng Hà Nội (UTC+7)
+    # Chạy tự động lúc 01:00 sáng giờ Hà Nội (18:00 UTC)
     - cron: "0 18 * * *"
 
 permissions:
@@ -42,14 +42,16 @@ jobs:
           git push
 
       - name: Report summary
+        shell: bash
         run: |
-          echo "## 🕒 EPG Crawl Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- Date (Hanoi): $(TZ='Asia/Ho_Chi_Minh' date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
-          echo "- Total programmes parsed: **$COUNT_TODAY**" >> $GITHUB_STEP_SUMMARY
-          echo "- Source: [info.msky.vn](https://info.msky.vn/vn/Boomerang.html)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ [EPG file updated successfully](https://github.com/${{ github.repository }}/blob/main/boomerang.xml)" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## 🕒 EPG Crawl Summary"
+            echo "- Date (Hanoi): $(TZ='Asia/Ho_Chi_Minh' date '+%Y-%m-%d %H:%M:%S')"
+            echo ""
+            COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
+            echo "- Total programmes parsed: **$COUNT_TODAY**"
+            echo "- Source: [info.msky.vn](https://info.msky.vn/vn/Boomerang.html)"
+            echo ""
+            echo "✅ [EPG file updated successfully](https://github.com/${{ github.repository }}/blob/main/boomerang.xml)"
+          } >> $GITHUB_STEP_SUMMARY
           
