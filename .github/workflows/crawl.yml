@@ -41,17 +41,18 @@ jobs:
           git commit -m "Auto update EPG: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
           git push
 
-      - name: Report summary
+      - name: 🧾 Report summary
         shell: bash
         run: |
+          COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
+
           {
             echo "## 🕒 EPG Crawl Summary"
-            echo "- Date (Hanoi): $(TZ='Asia/Ho_Chi_Minh' date '+%Y-%m-%d %H:%M:%S')"
             echo ""
-            COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
-            echo "- Total programmes parsed: **$COUNT_TODAY**"
-            echo "- Source: [info.msky.vn](https://info.msky.vn/vn/Boomerang.html)"
+            echo "- **Date (Hanoi):** $(TZ='Asia/Ho_Chi_Minh' date '+%Y-%m-%d %H:%M:%S')"
+            echo "- **Total programmes parsed:** $COUNT_TODAY"
+            echo "- **Source:** [info.msky.vn](https://info.msky.vn/vn/Boomerang.html)"
             echo ""
-            echo "✅ [EPG file updated successfully](https://github.com/${{ github.repository }}/blob/main/boomerang.xml)"
+            echo "✅ **[EPG file updated successfully](https://github.com/${{ github.repository }}/blob/main/boomerang.xml)**"
           } >> $GITHUB_STEP_SUMMARY
           
