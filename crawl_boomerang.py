@@ -1,77 +1,97 @@
 import requests
-import datetime
+from bs4 import BeautifulSoup
+from datetime import datetime, date, timedelta
 import xml.etree.ElementTree as ET
 
-# Kênh cần crawl
 CHANNEL_ID = "boomerang"
 CHANNEL_NAME = "Boomerang"
 CHANNEL_LOGO = "https://info.msky.vn/images/logo/Boomerang.png"
 
-# Hàm lấy dữ liệu EPG từ API JSON
-def fetch_epg(date_str):
-    url = f"https://info.msky.vn/ajax/getepg.php?channel=Boomerang&date={date_str}"
+def fetch_html(date_str):
+    url = f"https://info.msky.vn/vn/Boomerang.html?date={date_str}"
     print(f"Fetching: {url}")
     resp = requests.get(url, timeout=15)
     resp.raise_for_status()
-    return resp.json() if resp.text.strip() else []
+    return resp.text
 
-# Hàm tạo XMLTV
-def build_xmltv(programs_today, programs_tomorrow):
+def parse_schedule(html, current_date):
+    soup = BeautifulSoup(html, "html.parser")
+    rows = soup.select(".lichphatsong tbody tr")
+    programs = []
+
+    for row in rows:
+        cols = row.find_all("td")
+        if len(cols) < 2:
+            continue
+        time_str = cols[0].get_text(strip=True)
+        title = cols[1].get_text(strip=True)
+        desc = cols[1].get("title", "") or ""
+
+        # Parse thời gian HH:MM
+        try:
+            t = datetime.strptime(time_str, "%H:%M").time()
+        except ValueError:
+            continue
+
+        programs.append({
+            "datetime": datetime.combine(current_date, t),
+            "title": title,
+            "desc": desc
+        })
+
+    return programs
+
+def build_xmltv(progs_today, progs_tomorrow):
     tv = ET.Element("tv")
     channel = ET.SubElement(tv, "channel", id=CHANNEL_ID)
     ET.SubElement(channel, "display-name").text = CHANNEL_NAME
     ET.SubElement(channel, "icon", src=CHANNEL_LOGO)
 
-    def add_programs(progs):
-        for p in progs:
-            start_time = p["time_start"]
-            stop_time = p["time_end"]
+    all_progs = progs_today + progs_tomorrow
 
-            # Chuẩn hóa ngày giờ dạng XMLTV
-            today = datetime.datetime.strptime(p["date"], "%d/%m/%Y").date()
-            s_h, s_m = map(int, start_time.split(":"))
-            e_h, e_m = map(int, stop_time.split(":"))
+    for i, p in enumerate(all_progs):
+        start_dt = p["datetime"]
+        if i + 1 < len(all_progs):
+            end_dt = all_progs[i + 1]["datetime"]
+        else:
+            end_dt = start_dt + timedelta(hours=1)
 
-            start_dt = datetime.datetime.combine(today, datetime.time(s_h, s_m))
-            end_dt = datetime.datetime.combine(today, datetime.time(e_h, e_m))
+        start_fmt = start_dt.strftime("%Y%m%d%H%M%S +0700")
+        end_fmt = end_dt.strftime("%Y%m%d%H%M%S +0700")
 
-            start_fmt = start_dt.strftime("%Y%m%d%H%M%S +0700")
-            end_fmt = end_dt.strftime("%Y%m%d%H%M%S +0700")
-
-            programme = ET.SubElement(tv, "programme", {
-                "start": start_fmt,
-                "stop": end_fmt,
-                "channel": CHANNEL_ID
-            })
-
-            ET.SubElement(programme, "title").text = p.get("title", "").strip()
-            desc_text = p.get("desc", "").strip() or p.get("description", "")
-            if desc_text:
-                ET.SubElement(programme, "desc").text = desc_text
-
-    add_programs(programs_today)
-    add_programs(programs_tomorrow)
+        prog = ET.SubElement(tv, "programme", {
+            "start": start_fmt,
+            "stop": end_fmt,
+            "channel": CHANNEL_ID
+        })
+        ET.SubElement(prog, "title").text = p["title"]
+        if p["desc"]:
+            ET.SubElement(prog, "desc").text = p["desc"]
 
     tree = ET.ElementTree(tv)
     tree.write("boomerang.xml", encoding="utf-8", xml_declaration=True)
     print("✅ Xuất thành công boomerang.xml")
 
-# === Main ===
-today = datetime.date.today()
-tomorrow = today + datetime.timedelta(days=1)
+def main():
+    today = date.today()
+    tomorrow = today + timedelta(days=1)
 
-today_str = today.strftime("%d/%m/%Y")
-tomorrow_str = tomorrow.strftime("%d/%m/%Y")
+    dates = [today.strftime("%d/%m/%Y"), tomorrow.strftime("%d/%m/%Y")]
+    all_progs_today, all_progs_tomorrow = [], []
 
-programs_today = fetch_epg(today_str)
-programs_tomorrow = fetch_epg(tomorrow_str)
+    for idx, d in enumerate(dates):
+        html = fetch_html(d)
+        parsed = parse_schedule(html, today if idx == 0 else tomorrow)
+        if idx == 0:
+            all_progs_today = parsed
+        else:
+            all_progs_tomorrow = parsed
 
-count_today = len(programs_today)
-count_tomorrow = len(programs_tomorrow)
+    build_xmltv(all_progs_today, all_progs_tomorrow)
+    print(f"Hôm nay: {len(all_progs_today)} chương trình")
+    print(f"Ngày mai: {len(all_progs_tomorrow)} chương trình")
+    print("=== DONE ===")
 
-build_xmltv(programs_today, programs_tomorrow)
-
-print(f"Hôm nay: {count_today} chương trình")
-print(f"Ngày mai: {count_tomorrow} chương trình")
-print("=== DONE ===")
-            
+if __name__ == "__main__":
+    main()
+        
