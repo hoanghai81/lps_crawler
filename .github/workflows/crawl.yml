@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests pandas openpyxl lxml
+          pip install requests xlrd pandas openpyxl lxml
 
       - name: Run crawler
         run: |
