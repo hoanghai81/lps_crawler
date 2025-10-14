@@ -12,61 +12,60 @@ DISPLAY_NAME = "Boomerang"
 TZ_OFFSET = "+0700"
 
 def fetch(url):
-    resp = requests.get(url, timeout=15)
+    resp = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
     resp.raise_for_status()
     return resp.text
 
-def extract_date(text):
+def extract_date(soup):
+    """Tìm ngày trong tiêu đề trang, ví dụ 'Thứ ba, 14/10/2025'."""
+    text = soup.get_text(" ")
     m = re.search(r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})', text)
     if m:
-        d, m_, y = m.group(1), m.group(2), m.group(3)
-        return datetime.strptime(f"{d}/{m_}/{y}", "%d/%m/%Y").date()
+        return datetime.strptime(f"{m.group(1)}/{m.group(2)}/{m.group(3)}", "%d/%m/%Y").date()
     return datetime.utcnow().date()
 
 def parse_schedule(html):
     soup = BeautifulSoup(html, "html.parser")
-    full = soup.get_text("\n")
-    idx = full.find("Thời gian Tên chương trình")
-    if idx < 0:
-        return []
-    end = full.find("Tin NÓNG", idx)
-    if end < 0:
-        end = len(full)
-    block = full[idx:end]
-    lines = [ln.strip() for ln in block.splitlines() if ln.strip()]
+    date = extract_date(soup)
+
+    # tìm bảng lịch phát
+    table = soup.find("table")
+    if not table:
+        return [], date
+
     items = []
-    i = 0
-    while i < len(lines):
-        if re.match(r'^\d{1,2}:\d{2}$', lines[i]):
-            time = lines[i]
-            title_vn = lines[i+1] if i+1 < len(lines) else ""
-            title_orig = lines[i+2] if i+2 < len(lines) else ""
-            duration = ""
-            # try a few next lines for duration
-            for j in range(i+3, min(i+6, len(lines))):
-                if re.match(r'^\d{1,2}:\d{2}$', lines[j]):
-                    duration = lines[j]
-                    break
+    rows = table.find_all("tr")
+    for tr in rows:
+        tds = [td.get_text(strip=True) for td in tr.find_all("td")]
+        if len(tds) < 3:
+            continue
+        time_str = tds[0]
+        title_vn = tds[1]
+        title_orig = tds[2] if len(tds) >= 3 else ""
+        duration = ""
+        # cột thứ 4 (nếu có) là thời lượng
+        if len(tds) >= 4 and re.match(r'^\d+:\d{2}$', tds[3]):
+            duration = tds[3]
+        # chỉ lấy những dòng có giờ bắt đầu hợp lệ
+        if re.match(r'^\d{1,2}:\d{2}$', time_str):
             items.append({
-                "time": time,
+                "time": time_str,
                 "title_vn": title_vn,
                 "title_orig": title_orig,
                 "duration": duration
             })
-        i += 1
-    return items
+    return items, date
 
 def parse_duration(s):
     if not s:
         return 30
-    s = s.strip()
     m = re.match(r'(\d+):(\d{2})', s)
-    if not m:
-        try:
-            return int(s)
-        except:
-            return 30
-    return int(m.group(1)) * 60 + int(m.group(2))
+    if m:
+        return int(m.group(1)) * 60 + int(m.group(2))
+    try:
+        return int(s)
+    except:
+        return 30
 
 def fmt_dt(dt):
     return dt.strftime("%Y%m%d%H%M%S") + " " + TZ_OFFSET
@@ -90,19 +89,14 @@ def build_xml(items, date):
     return "\n".join(lines)
 
 def main():
-    try:
-        html = fetch(URL)
-    except Exception as e:
-        print(f"Error fetching URL: {e}", file=sys.stderr)
-        sys.exit(1)
-    dt = extract_date(html)
-    items = parse_schedule(html)
+    html = fetch(URL)
+    items, date = parse_schedule(html)
     if not items:
         print("No schedule items parsed", file=sys.stderr)
         sys.exit(1)
-    xml = build_xml(items, dt)
+    xml = build_xml(items, date)
     print(xml)
 
 if __name__ == "__main__":
     main()
-  
+        
