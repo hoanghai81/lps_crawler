@@ -12,6 +12,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -22,19 +23,15 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Crawl EPG (today + tomorrow)
-        id: crawl
         run: |
           echo "Running crawler..."
           python crawl_boomerang.py > boomerang.xml
-          # Đếm số chương trình mỗi ngày để báo cáo
-          TODAY=$(date +'%d/%m/%Y')
-          TOMORROW=$(date -d "+1 day" +'%d/%m/%Y')
-          COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
-          echo "today_count=$COUNT_TODAY" >> $GITHUB_OUTPUT
-          echo "tomorrow_count=$COUNT_TOMORROW" >> $GITHUB_OUTPUT
+          echo "Fetching schedule for $(date +'%d/%m/%Y')..."
+          echo "Fetching schedule for $(date -d '+1 day' +'%d/%m/%Y')..."
 
       - name: Commit and push XML
         run: |
@@ -46,14 +43,13 @@ jobs:
 
       - name: Report summary
         run: |
-          TODAY=$(date +'%d/%m/%Y')
-          TOMORROW=$(date -d "+1 day" +'%d/%m/%Y')
-          COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
-          COUNT_TOTAL=$(grep -c "<programme" boomerang.xml || true)
           echo "## 🕒 EPG Crawl Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- Date: $(date '+%Y-%m-%d %H:%M:%S') (Hanoi Time)" >> $GITHUB_STEP_SUMMARY
-          echo "- Total programmes parsed: **$COUNT_TOTAL**" >> $GITHUB_STEP_SUMMARY
+          echo "- Date (Hanoi): $(TZ='Asia/Ho_Chi_Minh' date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
+          echo "- Total programmes parsed: **$COUNT_TODAY**" >> $GITHUB_STEP_SUMMARY
           echo "- Source: [info.msky.vn](https://info.msky.vn/vn/Boomerang.html)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ EPG file updated successfully: [boomerang.xml](https://github.com/${{ github.repository }}/blob/main/boomerang.xml)" >> $GITHUB_STEP_SUMMARY
+          echo "✅ [EPG file updated successfully](https://github.com/${{ github.repository }}/blob/main/boomerang.xml)" >> $GITHUB_STEP_SUMMARY
           
