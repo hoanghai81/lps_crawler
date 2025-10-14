@@ -2,9 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, date
 import xml.etree.ElementTree as ET
-import os
 
-# URL gốc của trang lịch phát sóng
 BASE_URL = "https://info.msky.vn/vn/Boomerang.html?date={}"
 
 def parse_date_str(s):
@@ -12,7 +10,7 @@ def parse_date_str(s):
     return datetime.strptime(s, "%d/%m/%Y").date()
 
 def fetch_schedule(date_str):
-    """Tải và parse HTML theo ngày"""
+    """Tải và phân tích HTML theo ngày"""
     url = BASE_URL.format(date_str)
     print(f"Fetching: {url}")
     resp = requests.get(url)
@@ -27,11 +25,14 @@ def fetch_schedule(date_str):
         if len(cols) >= 2:
             time_str = cols[0].get_text(strip=True)
             title = cols[1].get_text(strip=True)
+            # Bỏ qua dòng không có giờ hoặc tên
+            if not time_str or not title:
+                continue
             programs.append((time_str, title))
     return programs
 
 def to_xmltv(programs_today, programs_tomorrow):
-    """Tạo XMLTV"""
+    """Tạo file XMLTV chuẩn"""
     tv = ET.Element("tv")
 
     ch = ET.SubElement(tv, "channel", id="boomerang.vn")
@@ -42,15 +43,31 @@ def to_xmltv(programs_today, programs_tomorrow):
     all_programs = [("today", programs_today), ("tomorrow", programs_tomorrow)]
 
     for label, (date_str, programs) in all_programs:
-        current_date = date_str  # ví dụ: "14/10/2025"
+        current_date = date_str  # ví dụ "14/10/2025"
         for i, (start_time, title) in enumerate(programs):
-            # ✅ FIX: Chuyển đúng định dạng dd/mm/yyyy
-            start_dt = datetime.strptime(f"{current_date} {start_time}", "%d/%m/%Y %H:%M")
+            if not start_time.strip():
+                continue
+
+            # Chuẩn hóa giờ (ví dụ "9:00" → "09:00")
+            if len(start_time) == 4:
+                start_time = "0" + start_time
+
+            try:
+                start_dt = datetime.strptime(f"{current_date} {start_time}", "%d/%m/%Y %H:%M")
+            except ValueError:
+                print(f"⚠️ Bỏ qua dòng lỗi: {current_date} {start_time}")
+                continue
+
             if i + 1 < len(programs):
                 next_time = programs[i + 1][0]
-                stop_dt = datetime.strptime(f"{current_date} {next_time}", "%d/%m/%Y %H:%M")
-                if stop_dt <= start_dt:
-                    stop_dt += timedelta(days=1)
+                if len(next_time) == 4:
+                    next_time = "0" + next_time
+                try:
+                    stop_dt = datetime.strptime(f"{current_date} {next_time}", "%d/%m/%Y %H:%M")
+                    if stop_dt <= start_dt:
+                        stop_dt += timedelta(days=1)
+                except ValueError:
+                    stop_dt = start_dt + timedelta(hours=1)
             else:
                 stop_dt = start_dt + timedelta(hours=1)
 
@@ -86,7 +103,6 @@ def main():
     print(f"Hôm nay: {len(progs_today)} chương trình")
     print(f"Ngày mai: {len(progs_tomorrow)} chương trình")
 
-    # Ghi thêm file thống kê
     with open("counts.txt", "w", encoding="utf-8") as f:
         f.write(f"Today: {len(progs_today)}\n")
         f.write(f"Tomorrow: {len(progs_tomorrow)}\n")
@@ -94,3 +110,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
