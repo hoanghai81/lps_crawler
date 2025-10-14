@@ -1,96 +1,81 @@
 import requests
-from bs4 import BeautifulSoup
-from datetime import datetime, date, timedelta
+import pandas as pd
+from datetime import datetime, timedelta, date
 import xml.etree.ElementTree as ET
 
-CHANNEL_ID = "boomerang"
+# ---- CONFIG ----
+CHANNEL_ID = "Boomerang"
 CHANNEL_NAME = "Boomerang"
-CHANNEL_LOGO = "https://info.msky.vn/images/logo/Boomerang.png"
+TZ = "+0700"
+BASE_URL = "https://info.msky.vn/vn/export.php?iCat=162&iName=Boomerang&date={}"
 
-def fetch_html(date_str):
-    url = f"https://info.msky.vn/vn/Boomerang.html?date={date_str}"
-    print(f"Fetching: {url}")
-    resp = requests.get(url, timeout=15)
+# ----------------
+
+def fetch_excel(date_str):
+    """Tải file Excel export theo ngày (dd/mm/yyyy)"""
+    url = BASE_URL.format(date_str)
+    print("Fetching:", url)
+    resp = requests.get(url, timeout=30)
     resp.raise_for_status()
-    return resp.text
+    return resp.content
 
-def parse_schedule(html, current_date):
-    soup = BeautifulSoup(html, "html.parser")
-    rows = soup.select(".lichphatsong tbody tr")
-    programs = []
+def parse_excel(data):
+    """Đọc Excel thành DataFrame"""
+    df = pd.read_excel(data)
+    df = df.dropna(subset=["Giờ", "Tên chương trình", "Thời lượng"])
+    return df
 
-    for row in rows:
-        cols = row.find_all("td")
-        if len(cols) < 2:
-            continue
-        time_str = cols[0].get_text(strip=True)
-        title = cols[1].get_text(strip=True)
-        desc = cols[1].get("title", "") or ""
+def parse_duration(dur_str):
+    """Chuyển '1:00' hoặc '0:25' thành số phút"""
+    try:
+        h, m = map(int, dur_str.split(":"))
+        return h * 60 + m
+    except Exception:
+        return 30
 
-        # Parse thời gian HH:MM
-        try:
-            t = datetime.strptime(time_str, "%H:%M").time()
-        except ValueError:
-            continue
+def build_xmltv(df_list, days):
+    """Ghép nhiều ngày thành XMLTV"""
+    tv = ET.Element("tv", {"generator-info-name": "lps_crawler"})
+    ch = ET.SubElement(tv, "channel", id=CHANNEL_ID)
+    ET.SubElement(ch, "display-name").text = CHANNEL_NAME
 
-        programs.append({
-            "datetime": datetime.combine(current_date, t),
-            "title": title,
-            "desc": desc
-        })
+    for df, day in zip(df_list, days):
+        for _, row in df.iterrows():
+            time_str = str(row["Giờ"]).strip()
+            title = str(row["Tên chương trình"]).strip()
+            duration_str = str(row["Thời lượng"]).strip()
+            # Parse giờ bắt đầu
+            try:
+                hh, mm = map(int, time_str.split(":"))
+            except:
+                continue
+            start_dt = datetime.combine(day, datetime.min.time()) + timedelta(hours=hh, minutes=mm)
+            # Thêm duration
+            dur = parse_duration(duration_str)
+            stop_dt = start_dt + timedelta(minutes=dur)
+            # Ghi XML
+            prog = ET.SubElement(tv, "programme", {
+                "start": start_dt.strftime("%Y%m%d%H%M%S ") + TZ,
+                "stop": stop_dt.strftime("%Y%m%d%H%M%S ") + TZ,
+                "channel": CHANNEL_ID
+            })
+            ET.SubElement(prog, "title", {"lang": "vi"}).text = title
 
-    return programs
-
-def build_xmltv(progs_today, progs_tomorrow):
-    tv = ET.Element("tv")
-    channel = ET.SubElement(tv, "channel", id=CHANNEL_ID)
-    ET.SubElement(channel, "display-name").text = CHANNEL_NAME
-    ET.SubElement(channel, "icon", src=CHANNEL_LOGO)
-
-    all_progs = progs_today + progs_tomorrow
-
-    for i, p in enumerate(all_progs):
-        start_dt = p["datetime"]
-        if i + 1 < len(all_progs):
-            end_dt = all_progs[i + 1]["datetime"]
-        else:
-            end_dt = start_dt + timedelta(hours=1)
-
-        start_fmt = start_dt.strftime("%Y%m%d%H%M%S +0700")
-        end_fmt = end_dt.strftime("%Y%m%d%H%M%S +0700")
-
-        prog = ET.SubElement(tv, "programme", {
-            "start": start_fmt,
-            "stop": end_fmt,
-            "channel": CHANNEL_ID
-        })
-        ET.SubElement(prog, "title").text = p["title"]
-        if p["desc"]:
-            ET.SubElement(prog, "desc").text = p["desc"]
-
-    tree = ET.ElementTree(tv)
-    tree.write("boomerang.xml", encoding="utf-8", xml_declaration=True)
-    print("✅ Xuất thành công boomerang.xml")
+    return tv
 
 def main():
     today = date.today()
     tomorrow = today + timedelta(days=1)
 
-    dates = [today.strftime("%d/%m/%Y"), tomorrow.strftime("%d/%m/%Y")]
-    all_progs_today, all_progs_tomorrow = [], []
+    df_today = parse_excel(fetch_excel(today.strftime("%d/%m/%Y")))
+    df_tomorrow = parse_excel(fetch_excel(tomorrow.strftime("%d/%m/%Y")))
 
-    for idx, d in enumerate(dates):
-        html = fetch_html(d)
-        parsed = parse_schedule(html, today if idx == 0 else tomorrow)
-        if idx == 0:
-            all_progs_today = parsed
-        else:
-            all_progs_tomorrow = parsed
+    tv = build_xmltv([df_today, df_tomorrow], [today, tomorrow])
+    ET.ElementTree(tv).write("boomerang.xml", encoding="utf-8", xml_declaration=True)
 
-    build_xmltv(all_progs_today, all_progs_tomorrow)
-    print(f"Hôm nay: {len(all_progs_today)} chương trình")
-    print(f"Ngày mai: {len(all_progs_tomorrow)} chương trình")
-    print("=== DONE ===")
+    print("✅ Xuất thành công boomerang.xml")
+    print(f"Hôm nay: {len(df_today)} chương trình")
+    print(f"Ngày mai: {len(df_tomorrow)} chương trình")
 
 if __name__ == "__main__":
     main()
