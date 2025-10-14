@@ -2,8 +2,8 @@ name: 📺 EPG Crawler (Boomerang)
 
 on:
   schedule:
-    - cron: "0 18 * * *"  # 01:00 Hà Nội (UTC+7)
-  workflow_dispatch:      # Cho phép anh chạy thủ công
+    - cron: "0 18 * * *"  # 01:00 sáng giờ Hà Nội (UTC+7)
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
       - name: 🕸️ Crawl Boomerang EPG
         run: |
           python << 'EOF'
-          import requests, datetime
+          import requests, datetime, re
           from bs4 import BeautifulSoup
 
           def fetch_epg(date_str):
@@ -38,20 +38,25 @@ jobs:
               for tr in soup.select("table tbody tr"):
                   tds = tr.find_all("td")
                   if len(tds) >= 2:
-                      start, title = tds[0].get_text(strip=True), tds[1].get_text(strip=True)
+                      start = tds[0].get_text(strip=True)
+                      title = tds[1].get_text(strip=True)
+                      if not re.match(r'^\d{2}:\d{2}$', start):
+                          continue
                       programmes.append((start, title))
               return programmes
 
           today = datetime.date.today()
           nextday = today + datetime.timedelta(days=1)
 
-          days = [today, nextday]
+          all_counts = {}
           xml = ['<?xml version="1.0" encoding="utf-8"?>',
                  '<tv generator-info-name="lps_crawler">']
 
-          for d in days:
+          for d in [today, nextday]:
               date_str = d.strftime("%d/%m/%Y")
               progs = fetch_epg(date_str)
+              all_counts[d.strftime("%Y-%m-%d")] = len(progs)
+
               for start, title in progs:
                   start_fmt = datetime.datetime.strptime(
                       f"{d.strftime('%Y-%m-%d')} {start}", "%Y-%m-%d %H:%M"
@@ -64,6 +69,11 @@ jobs:
           with open("boomerang.xml", "w", encoding="utf-8") as f:
               f.write("\n".join(xml))
 
+          # Lưu số lượng chương trình từng ngày để hiển thị
+          with open("counts.txt", "w") as f:
+              for k, v in all_counts.items():
+                  f.write(f"{k}={v}\n")
+
           print("✅ EPG file created successfully.")
           EOF
 
@@ -71,19 +81,25 @@ jobs:
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git add boomerang.xml
+          git add boomerang.xml counts.txt
           git commit -m "Update boomerang.xml: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
 
       - name: 🧾 Report summary
         shell: bash
         run: |
-          COUNT_TODAY=$(grep -c "<programme" boomerang.xml || true)
+          TODAY=$(date '+%Y-%m-%d')
+          TOMORROW=$(date -d "+1 day" '+%Y-%m-%d')
+          COUNT_TODAY=$(grep "$TODAY" counts.txt | cut -d'=' -f2)
+          COUNT_TOMORROW=$(grep "$TOMORROW" counts.txt | cut -d'=' -f2)
+          TOTAL=$((COUNT_TODAY + COUNT_TOMORROW))
 
           echo "## 🕒 EPG Crawl Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Date (Hanoi):** $(TZ='Asia/Ho_Chi_Minh' date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Total programmes parsed:** $COUNT_TODAY" >> $GITHUB_STEP_SUMMARY
+          echo "- **Today ($TODAY):** $COUNT_TODAY programmes" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tomorrow ($TOMORROW):** $COUNT_TOMORROW programmes" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total parsed:** $TOTAL" >> $GITHUB_STEP_SUMMARY
           echo "- **Source:** [info.msky.vn](https://info.msky.vn/vn/Boomerang.html)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ **[EPG file updated successfully](https://github.com/${{ github.repository }}/blob/main/boomerang.xml)**" >> $GITHUB_STEP_SUMMARY
