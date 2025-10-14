@@ -1,37 +1,57 @@
-name: Crawl EPG Boomerang
+name: Crawl Boomerang EPG
 
 on:
-  workflow_dispatch:
   schedule:
-    # Chạy lúc 18:00 UTC = 01:00 sáng Hà Nội (UTC+7)
-    - cron: "0 18 * * *"
-
-permissions:
-  contents: write   # 👈 cần có dòng này
+    - cron: "0 18 * * *"  # 1h sáng Hà Nội (UTC+7)
+  workflow_dispatch:       # Cho phép chạy thủ công từ tab Actions
 
 jobs:
-  build:
+  crawl:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install requests beautifulsoup4
 
-      - name: Crawl EPG
-        run: python crawl_boomerang.py > boomerang.xml
+      - name: Crawl EPG (today + tomorrow)
+        run: |
+          echo "=== RUNNING CRAWLER ==="
+          python crawl_boomerang.py
+          echo "=== DONE ==="
 
-      - name: Commit and push
+      - name: Show counts.txt content
+        if: always()
+        run: |
+          echo "------ COUNTS ------"
+          cat counts.txt || echo "counts.txt not found"
+
+      - name: Commit and push XML
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add boomerang.xml
-          git commit -m "Update boomerang.xml: $(date +'%Y-%m-%d')" || echo "No changes"
+          git add boomerang.xml counts.txt
+          git commit -m "Update boomerang.xml: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
           git push
+
+      - name: Add summary to job
+        if: always()
+        run: |
+          echo "### 📺 Boomerang EPG Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f counts.txt ]; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat counts.txt >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "_counts.txt not found_" >> $GITHUB_STEP_SUMMARY
+          fi
           
