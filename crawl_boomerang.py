@@ -7,8 +7,8 @@ import xml.sax.saxutils as sax
 import sys
 
 BASE_URL = "https://info.msky.vn/vn/Boomerang.html"
-CHANNEL_XMLTV_ID = "Boomerang.msky"
-DISPLAY_NAME = "Boomerang"
+CHANNEL_XMLTV_ID = "boomerang.msky"
+DISPLAY_NAME = "BOOMERANG"
 TZ_OFFSET = "+0700"
 
 def fetch(url):
