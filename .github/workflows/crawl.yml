@@ -2,56 +2,37 @@ name: Crawl Boomerang EPG
 
 on:
   schedule:
-    - cron: "0 18 * * *"  # 1h sáng Hà Nội (UTC+7)
-  workflow_dispatch:       # Cho phép chạy thủ công từ tab Actions
+    - cron: "0 9 * * *"   # Chạy hàng ngày 16:00 (VN)
+  workflow_dispatch:
 
 jobs:
   crawl:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4
+          pip install requests pandas openpyxl lxml
 
-      - name: Crawl EPG (today + tomorrow)
+      - name: Run crawler
         run: |
           echo "=== RUNNING CRAWLER ==="
           python crawl_boomerang.py
-          echo "=== DONE ==="
 
-      - name: Show counts.txt content
-        if: always()
-        run: |
-          echo "------ COUNTS ------"
-          cat counts.txt || echo "counts.txt not found"
-
-      - name: Commit and push XML
+      - name: Commit & Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add boomerang.xml counts.txt
-          git commit -m "Update boomerang.xml: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-          git push
 
-      - name: Add summary to job
-        if: always()
-        run: |
-          echo "### 📺 Boomerang EPG Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f counts.txt ]; then
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            cat counts.txt >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "_counts.txt not found_" >> $GITHUB_STEP_SUMMARY
-          fi
+          git add boomerang.xml
+          git commit -m "Update boomerang.xml: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes"
+          git push
           
