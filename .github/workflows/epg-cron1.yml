@@ -2,7 +2,8 @@ name: daily-epg1-crawl
 
 on:
   schedule:
-    - cron: '0 18 * * *' # 01:00 Asia/Ho_Chi_Minh (UTC+7)
+    # Run at 01:00 Asia/Ho_Chi_Minh each day -> 18:00 UTC previous day
+    - cron: '0 18 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -14,6 +15,11 @@ jobs:
     outputs:
       channels_processed: ${{ steps.stats.outputs.channels_processed }}
       programmes_total: ${{ steps.stats.outputs.programmes_total }}
+    env:
+      # Number of days to fetch starting from "today in Hanoi"
+      # Default behavior in craw1.py is to fetch 2 days (0 and 1).
+      # You can override days by setting EPG_DAY_OFFSETS like "0,1,2"
+      EPG_DAY_OFFSETS: "0,1"
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -106,7 +112,6 @@ jobs:
           name: debug-and-stats
           path: |
             debug_*.html
-            angiang_debug.html
             channels_processed.txt
             programmes_count.txt
           if-no-files-found: ignore
