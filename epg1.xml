@@ -6,6 +6,9 @@
   <channel id="angiang2test">
     <display-name>AN GIANG 2 TEST</display-name>
   </channel>
+  <channel id="antv1">
+    <display-name>ANTV 1</display-name>
+  </channel>
   <programme start="20251015000000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">ella giữa những vì sao xa interstellar ella 1:00</title>
   </programme>
@@ -821,5 +824,461 @@
   </programme>
   <programme start="20251015231500 +0700" stop="20251015234500 +0700" channel="angiang2test">
     <title lang="vi">Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015000000 +0700" stop="20251015005500 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 17h05 Tình yêu tồi tệ, tập 20/27</title>
+  </programme>
+  <programme start="20251015005500 +0700" stop="20251015010000 +0700" channel="antv1">
+    <title lang="vi">Lệnh truy nã</title>
+  </programme>
+  <programme start="20251015010000 +0700" stop="20251015012000 +0700" channel="antv1">
+    <title lang="vi">Phía sau bản án (20) Gieo những mùa xanh sau ngày lầm lỗi</title>
+  </programme>
+  <programme start="20251015012000 +0700" stop="20251015013000 +0700" channel="antv1">
+    <title lang="vi">An ninh với cuộc sống (10)</title>
+  </programme>
+  <programme start="20251015013000 +0700" stop="20251015014000 +0700" channel="antv1">
+    <title lang="vi">Câu chuyện giao thông Câu chuyện giao thông 14/10/25</title>
+  </programme>
+  <programme start="20251015014000 +0700" stop="20251015020000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Người anh hùng mang hai bản án tử hình</title>
+  </programme>
+  <programme start="20251015020000 +0700" stop="20251015023000 +0700" channel="antv1">
+    <title lang="vi">Hành trình phá án Vạch trần thủ đoạn mua bán trẻ sơ sinh</title>
+  </programme>
+  <programme start="20251015023000 +0700" stop="20251015031500 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 13h00 Nữ hoàng mặt nạ, tập 23/24</title>
+  </programme>
+  <programme start="20251015031500 +0700" stop="20251015034500 +0700" channel="antv1">
+    <title lang="vi">CÂU CHUYỆN CUỐI TUẦN Nghị quyết mở đường cho y tế Việt Nam cất cánh</title>
+  </programme>
+  <programme start="20251015034500 +0700" stop="20251015040000 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Cà phê Khe Sanh – Hương vị đặc sản Hướng Hóa</title>
+  </programme>
+  <programme start="20251015040000 +0700" stop="20251015040700 +0700" channel="antv1">
+    <title lang="vi">Nhật ký an ninh (30)</title>
+  </programme>
+  <programme start="20251015040700 +0700" stop="20251015040700 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251015040700 +0700" stop="20251015043000 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251015043000 +0700" stop="20251015050000 +0700" channel="antv1">
+    <title lang="vi">Phim tài liệu Nơi hội tụ và tiếp nối truyền thống Công an nhân dân</title>
+  </programme>
+  <programme start="20251015050000 +0700" stop="20251015051500 +0700" channel="antv1">
+    <title lang="vi">Chào cờ và Võ thể dục CAND Số 10</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015054500 +0700" channel="antv1">
+    <title lang="vi">Phim tài liệu Lằn ranh trắng</title>
+  </programme>
+  <programme start="20251015054500 +0700" stop="20251015060000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) NSƯT Phạm Hồng Linh: “Chỉ cần được làm nghề đã là hạnh phúc”</title>
+  </programme>
+  <programme start="20251015060000 +0700" stop="20251015061000 +0700" channel="antv1">
+    <title lang="vi">Yoga &amp; Phong cách Số 100: Yoga trẻ hóa cơ thể</title>
+  </programme>
+  <programme start="20251015061000 +0700" stop="20251015062500 +0700" channel="antv1">
+    <title lang="vi">Bảo vệ pháp  luật Bản lĩnh Kiểm sát viên thông qua phiên toà rút kinh nghiệm</title>
+  </programme>
+  <programme start="20251015062500 +0700" stop="20251015070000 +0700" channel="antv1">
+    <title lang="vi">An ninh ngày mới</title>
+  </programme>
+  <programme start="20251015070000 +0700" stop="20251015070000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 7h00 Thính tuyết lâu, tập 36/56</title>
+  </programme>
+  <programme start="20251015070000 +0700" stop="20251015075000 +0700" channel="antv1">
+    <title lang="vi">Thính tuyết lâu, tập 36/56</title>
+  </programme>
+  <programme start="20251015075000 +0700" stop="20251015080000 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Bảo tàng Đà Nẵng – Hành trình ký ức giữa lòng thành phố</title>
+  </programme>
+  <programme start="20251015080000 +0700" stop="20251015080900 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Người được Bác Hồ gửi bức thư lịch sử</title>
+  </programme>
+  <programme start="20251015080900 +0700" stop="20251015081000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251015081000 +0700" stop="20251015084000 +0700" channel="antv1">
+    <title lang="vi">Hành trình phá án Vỏ bọc hoàn hảo</title>
+  </programme>
+  <programme start="20251015084000 +0700" stop="20251015090000 +0700" channel="antv1">
+    <title lang="vi">An ninh văn hóa (20) Phim ngắn mạng xã hội: bùng nổ hay bế tắc?</title>
+  </programme>
+  <programme start="20251015090000 +0700" stop="20251015090500 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251015090500 +0700" stop="20251015092500 +0700" channel="antv1">
+    <title lang="vi">Xây dựng Đảng (20) Niềm tin từ cải cách</title>
+  </programme>
+  <programme start="20251015092500 +0700" stop="20251015093500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Trên tuyến lửa giao liên</title>
+  </programme>
+  <programme start="20251015093500 +0700" stop="20251015095000 +0700" channel="antv1">
+    <title lang="vi">An ninh với cuộc sống (10)</title>
+  </programme>
+  <programme start="20251015095000 +0700" stop="20251015100200 +0700" channel="antv1">
+    <title lang="vi">An ninh thế giới</title>
+  </programme>
+  <programme start="20251015100200 +0700" stop="20251015100500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251015100500 +0700" stop="20251015100600 +0700" channel="antv1">
+    <title lang="vi">Khát vọng vươn mình Việt Nam – Khát vọng vươn xa, phần 2: Thúc đẩy chuyển đổi số trong khu vực kinh tế tư nhân</title>
+  </programme>
+  <programme start="20251015100600 +0700" stop="20251015102500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251015102500 +0700" stop="20251015110000 +0700" channel="antv1">
+    <title lang="vi">Phim tài liệu Bình dân học vụ số</title>
+  </programme>
+  <programme start="20251015110000 +0700" stop="20251015110500 +0700" channel="antv1">
+    <title lang="vi">An ninh toàn cảnh</title>
+  </programme>
+  <programme start="20251015110500 +0700" stop="20251015113000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251015113000 +0700" stop="20251015120000 +0700" channel="antv1">
+    <title lang="vi">113 online</title>
+  </programme>
+  <programme start="20251015120000 +0700" stop="20251015120000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 12h00 Bản sao tội lỗi, tập 9/34</title>
+  </programme>
+  <programme start="20251015120000 +0700" stop="20251015125000 +0700" channel="antv1">
+    <title lang="vi">Bản sao tội lỗi, tập 9/34</title>
+  </programme>
+  <programme start="20251015125000 +0700" stop="20251015130000 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Dệt chiếu Kim Bồng - Hơi thở mới của làng nghề xưa</title>
+  </programme>
+  <programme start="20251015130000 +0700" stop="20251015130000 +0700" channel="antv1">
+    <title lang="vi">Nữ hoàng mặt nạ, tập 23/24</title>
+  </programme>
+  <programme start="20251015130000 +0700" stop="20251015130000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 13h00 Nữ hoàng mặt nạ, tập 24/24</title>
+  </programme>
+  <programme start="20251015130000 +0700" stop="20251015135000 +0700" channel="antv1">
+    <title lang="vi">Nữ hoàng mặt nạ, tập 24/24</title>
+  </programme>
+  <programme start="20251015135000 +0700" stop="20251015140000 +0700" channel="antv1">
+    <title lang="vi">Câu chuyện giao thông Câu chuyện giao thông 15/10/25</title>
+  </programme>
+  <programme start="20251015140000 +0700" stop="20251015140000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 14h00 Nằm vùng, tập 16/36</title>
+  </programme>
+  <programme start="20251015140000 +0700" stop="20251015142800 +0700" channel="antv1">
+    <title lang="vi">Nằm vùng, tập 16/36</title>
+  </programme>
+  <programme start="20251015142800 +0700" stop="20251015142800 +0700" channel="antv1">
+    <title lang="vi">113 Online</title>
+  </programme>
+  <programme start="20251015142800 +0700" stop="20251015150000 +0700" channel="antv1">
+    <title lang="vi">113 Online</title>
+  </programme>
+  <programme start="20251015150000 +0700" stop="20251015151500 +0700" channel="antv1">
+    <title lang="vi">113 online (2)</title>
+  </programme>
+  <programme start="20251015151500 +0700" stop="20251015153500 +0700" channel="antv1">
+    <title lang="vi">Vì nhân dân phục vụ (20) Hoa nở trong màu áo xanh</title>
+  </programme>
+  <programme start="20251015153500 +0700" stop="20251015160500 +0700" channel="antv1">
+    <title lang="vi">Hồ sơ vụ án Bà trùm ma túy và “boong ke” tại nhà</title>
+  </programme>
+  <programme start="20251015160500 +0700" stop="20251015163500 +0700" channel="antv1">
+    <title lang="vi">Hành trình phá án Những vụ trộm bí ẩn</title>
+  </programme>
+  <programme start="20251015163500 +0700" stop="20251015165500 +0700" channel="antv1">
+    <title lang="vi">Kinh tế &amp; Tiêu dùng</title>
+  </programme>
+  <programme start="20251015165500 +0700" stop="20251015170500 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Hương quê trong mỗi tấm bánh</title>
+  </programme>
+  <programme start="20251015170500 +0700" stop="20251015170500 +0700" channel="antv1">
+    <title lang="vi">Tình yêu tồi tệ, tập 20/27</title>
+  </programme>
+  <programme start="20251015170500 +0700" stop="20251015170500 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 17h05 Tình yêu tồi tệ, tập 21/27</title>
+  </programme>
+  <programme start="20251015170500 +0700" stop="20251015180000 +0700" channel="antv1">
+    <title lang="vi">Tình yêu tồi tệ, tập 21/27</title>
+  </programme>
+  <programme start="20251015180000 +0700" stop="20251015190000 +0700" channel="antv1">
+    <title lang="vi">An ninh 24h (55)</title>
+  </programme>
+  <programme start="20251015190000 +0700" stop="20251015194300 +0700" channel="antv1">
+    <title lang="vi">Thời sự VTV (Tiếp sóng)</title>
+  </programme>
+  <programme start="20251015194300 +0700" stop="20251015194500 +0700" channel="antv1">
+    <title lang="vi">Vì nhân dân phục vụ</title>
+  </programme>
+  <programme start="20251015194500 +0700" stop="20251015200000 +0700" channel="antv1">
+    <title lang="vi">An ninh với cuộc sống (10)</title>
+  </programme>
+  <programme start="20251015200000 +0700" stop="20251015201000 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251015201000 +0700" stop="20251015201100 +0700" channel="antv1">
+    <title lang="vi">Góc nhìn sự thật (20) Người Kito hữu và sự đồng hành bền bỉ cùng dân tộc</title>
+  </programme>
+  <programme start="20251015201100 +0700" stop="20251015201100 +0700" channel="antv1">
+    <title lang="vi">Kinh tế tiêu dùng</title>
+  </programme>
+  <programme start="20251015201100 +0700" stop="20251015203500 +0700" channel="antv1">
+    <title lang="vi">Kinh tế tiêu dùng</title>
+  </programme>
+  <programme start="20251015203500 +0700" stop="20251015204500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Những chiến sĩ đặc nhiệm của đơn vị Anh hùng</title>
+  </programme>
+  <programme start="20251015204500 +0700" stop="20251015211000 +0700" channel="antv1">
+    <title lang="vi">Phóng sự (20) Bắc Ninh: Mỏ đất, giấy phép và những chuyến xe nặng lợi nhuận</title>
+  </programme>
+  <programme start="20251015211000 +0700" stop="20251015211000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 21h10 Người đuổi bắt sự sống, tập 7/32</title>
+  </programme>
+  <programme start="20251015211000 +0700" stop="20251015213200 +0700" channel="antv1">
+    <title lang="vi">Người đuổi bắt sự sống, tập 7/32</title>
+  </programme>
+  <programme start="20251015213200 +0700" stop="20251015220500 +0700" channel="antv1">
+    <title lang="vi">ANTV Hotline: 0692324026 Email: news@antv.gov.vn</title>
+  </programme>
+  <programme start="20251015220500 +0700" stop="20251015224000 +0700" channel="antv1">
+    <title lang="vi">Nhật ký an ninh (30)</title>
+  </programme>
+  <programme start="20251015224000 +0700" stop="20251015224000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 22h40 Cặp đôi hoàn mỹ, tập 21/50</title>
+  </programme>
+  <programme start="20251015224000 +0700" stop="20251015233000 +0700" channel="antv1">
+    <title lang="vi">Cặp đôi hoàn mỹ, tập 21/50</title>
+  </programme>
+  <programme start="20251015233000 +0700" stop="20251016000000 +0700" channel="antv1">
+    <title lang="vi">Văn hóa - Thể thao CAND Ngày về trong sắc cờ hoa</title>
+  </programme>
+  <programme start="20251016000000 +0700" stop="20251016005500 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 17h05 Tình yêu tồi tệ, tập 20/27</title>
+  </programme>
+  <programme start="20251016005500 +0700" stop="20251016010000 +0700" channel="antv1">
+    <title lang="vi">Lệnh truy nã</title>
+  </programme>
+  <programme start="20251016010000 +0700" stop="20251016012000 +0700" channel="antv1">
+    <title lang="vi">Phía sau bản án (20) Gieo những mùa xanh sau ngày lầm lỗi</title>
+  </programme>
+  <programme start="20251016012000 +0700" stop="20251016013000 +0700" channel="antv1">
+    <title lang="vi">An ninh với cuộc sống (10)</title>
+  </programme>
+  <programme start="20251016013000 +0700" stop="20251016014000 +0700" channel="antv1">
+    <title lang="vi">Câu chuyện giao thông Câu chuyện giao thông 14/10/25</title>
+  </programme>
+  <programme start="20251016014000 +0700" stop="20251016020000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Người anh hùng mang hai bản án tử hình</title>
+  </programme>
+  <programme start="20251016020000 +0700" stop="20251016023000 +0700" channel="antv1">
+    <title lang="vi">Hành trình phá án Vạch trần thủ đoạn mua bán trẻ sơ sinh</title>
+  </programme>
+  <programme start="20251016023000 +0700" stop="20251016031500 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 13h00 Nữ hoàng mặt nạ, tập 23/24</title>
+  </programme>
+  <programme start="20251016031500 +0700" stop="20251016034500 +0700" channel="antv1">
+    <title lang="vi">CÂU CHUYỆN CUỐI TUẦN Nghị quyết mở đường cho y tế Việt Nam cất cánh</title>
+  </programme>
+  <programme start="20251016034500 +0700" stop="20251016040000 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Cà phê Khe Sanh – Hương vị đặc sản Hướng Hóa</title>
+  </programme>
+  <programme start="20251016040000 +0700" stop="20251016040700 +0700" channel="antv1">
+    <title lang="vi">Nhật ký an ninh (30)</title>
+  </programme>
+  <programme start="20251016040700 +0700" stop="20251016040700 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251016040700 +0700" stop="20251016043000 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251016043000 +0700" stop="20251016050000 +0700" channel="antv1">
+    <title lang="vi">Phim tài liệu Nơi hội tụ và tiếp nối truyền thống Công an nhân dân</title>
+  </programme>
+  <programme start="20251016050000 +0700" stop="20251016051500 +0700" channel="antv1">
+    <title lang="vi">Chào cờ và Võ thể dục CAND Số 10</title>
+  </programme>
+  <programme start="20251016051500 +0700" stop="20251016054500 +0700" channel="antv1">
+    <title lang="vi">Phim tài liệu Lằn ranh trắng</title>
+  </programme>
+  <programme start="20251016054500 +0700" stop="20251016060000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) NSƯT Phạm Hồng Linh: “Chỉ cần được làm nghề đã là hạnh phúc”</title>
+  </programme>
+  <programme start="20251016060000 +0700" stop="20251016061000 +0700" channel="antv1">
+    <title lang="vi">Yoga &amp; Phong cách Số 100: Yoga trẻ hóa cơ thể</title>
+  </programme>
+  <programme start="20251016061000 +0700" stop="20251016062500 +0700" channel="antv1">
+    <title lang="vi">Bảo vệ pháp  luật Bản lĩnh Kiểm sát viên thông qua phiên toà rút kinh nghiệm</title>
+  </programme>
+  <programme start="20251016062500 +0700" stop="20251016070000 +0700" channel="antv1">
+    <title lang="vi">An ninh ngày mới</title>
+  </programme>
+  <programme start="20251016070000 +0700" stop="20251016070000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 7h00 Thính tuyết lâu, tập 36/56</title>
+  </programme>
+  <programme start="20251016070000 +0700" stop="20251016075000 +0700" channel="antv1">
+    <title lang="vi">Thính tuyết lâu, tập 36/56</title>
+  </programme>
+  <programme start="20251016075000 +0700" stop="20251016080000 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Bảo tàng Đà Nẵng – Hành trình ký ức giữa lòng thành phố</title>
+  </programme>
+  <programme start="20251016080000 +0700" stop="20251016080900 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Người được Bác Hồ gửi bức thư lịch sử</title>
+  </programme>
+  <programme start="20251016080900 +0700" stop="20251016081000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251016081000 +0700" stop="20251016084000 +0700" channel="antv1">
+    <title lang="vi">Hành trình phá án Vỏ bọc hoàn hảo</title>
+  </programme>
+  <programme start="20251016084000 +0700" stop="20251016090000 +0700" channel="antv1">
+    <title lang="vi">An ninh văn hóa (20) Phim ngắn mạng xã hội: bùng nổ hay bế tắc?</title>
+  </programme>
+  <programme start="20251016090000 +0700" stop="20251016090500 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251016090500 +0700" stop="20251016092500 +0700" channel="antv1">
+    <title lang="vi">Xây dựng Đảng (20) Niềm tin từ cải cách</title>
+  </programme>
+  <programme start="20251016092500 +0700" stop="20251016093500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Trên tuyến lửa giao liên</title>
+  </programme>
+  <programme start="20251016093500 +0700" stop="20251016095000 +0700" channel="antv1">
+    <title lang="vi">An ninh với cuộc sống (10)</title>
+  </programme>
+  <programme start="20251016095000 +0700" stop="20251016100200 +0700" channel="antv1">
+    <title lang="vi">An ninh thế giới</title>
+  </programme>
+  <programme start="20251016100200 +0700" stop="20251016100500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251016100500 +0700" stop="20251016100600 +0700" channel="antv1">
+    <title lang="vi">Khát vọng vươn mình Việt Nam – Khát vọng vươn xa, phần 2: Thúc đẩy chuyển đổi số trong khu vực kinh tế tư nhân</title>
+  </programme>
+  <programme start="20251016100600 +0700" stop="20251016102500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251016102500 +0700" stop="20251016110000 +0700" channel="antv1">
+    <title lang="vi">Phim tài liệu Bình dân học vụ số</title>
+  </programme>
+  <programme start="20251016110000 +0700" stop="20251016110500 +0700" channel="antv1">
+    <title lang="vi">An ninh toàn cảnh</title>
+  </programme>
+  <programme start="20251016110500 +0700" stop="20251016113000 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251016113000 +0700" stop="20251016120000 +0700" channel="antv1">
+    <title lang="vi">113 online</title>
+  </programme>
+  <programme start="20251016120000 +0700" stop="20251016120000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 12h00 Bản sao tội lỗi, tập 9/34</title>
+  </programme>
+  <programme start="20251016120000 +0700" stop="20251016125000 +0700" channel="antv1">
+    <title lang="vi">Bản sao tội lỗi, tập 9/34</title>
+  </programme>
+  <programme start="20251016125000 +0700" stop="20251016130000 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Dệt chiếu Kim Bồng - Hơi thở mới của làng nghề xưa</title>
+  </programme>
+  <programme start="20251016130000 +0700" stop="20251016130000 +0700" channel="antv1">
+    <title lang="vi">Nữ hoàng mặt nạ, tập 23/24</title>
+  </programme>
+  <programme start="20251016130000 +0700" stop="20251016130000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 13h00 Nữ hoàng mặt nạ, tập 24/24</title>
+  </programme>
+  <programme start="20251016130000 +0700" stop="20251016135000 +0700" channel="antv1">
+    <title lang="vi">Nữ hoàng mặt nạ, tập 24/24</title>
+  </programme>
+  <programme start="20251016135000 +0700" stop="20251016140000 +0700" channel="antv1">
+    <title lang="vi">Câu chuyện giao thông Câu chuyện giao thông 15/10/25</title>
+  </programme>
+  <programme start="20251016140000 +0700" stop="20251016140000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 14h00 Nằm vùng, tập 16/36</title>
+  </programme>
+  <programme start="20251016140000 +0700" stop="20251016142800 +0700" channel="antv1">
+    <title lang="vi">Nằm vùng, tập 16/36</title>
+  </programme>
+  <programme start="20251016142800 +0700" stop="20251016142800 +0700" channel="antv1">
+    <title lang="vi">113 Online</title>
+  </programme>
+  <programme start="20251016142800 +0700" stop="20251016150000 +0700" channel="antv1">
+    <title lang="vi">113 Online</title>
+  </programme>
+  <programme start="20251016150000 +0700" stop="20251016151500 +0700" channel="antv1">
+    <title lang="vi">113 online (2)</title>
+  </programme>
+  <programme start="20251016151500 +0700" stop="20251016153500 +0700" channel="antv1">
+    <title lang="vi">Vì nhân dân phục vụ (20) Hoa nở trong màu áo xanh</title>
+  </programme>
+  <programme start="20251016153500 +0700" stop="20251016160500 +0700" channel="antv1">
+    <title lang="vi">Hồ sơ vụ án Bà trùm ma túy và “boong ke” tại nhà</title>
+  </programme>
+  <programme start="20251016160500 +0700" stop="20251016163500 +0700" channel="antv1">
+    <title lang="vi">Hành trình phá án Những vụ trộm bí ẩn</title>
+  </programme>
+  <programme start="20251016163500 +0700" stop="20251016165500 +0700" channel="antv1">
+    <title lang="vi">Kinh tế &amp; Tiêu dùng</title>
+  </programme>
+  <programme start="20251016165500 +0700" stop="20251016170500 +0700" channel="antv1">
+    <title lang="vi">Việt Nam quê hương tôi (10) Hương quê trong mỗi tấm bánh</title>
+  </programme>
+  <programme start="20251016170500 +0700" stop="20251016170500 +0700" channel="antv1">
+    <title lang="vi">Tình yêu tồi tệ, tập 20/27</title>
+  </programme>
+  <programme start="20251016170500 +0700" stop="20251016170500 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 17h05 Tình yêu tồi tệ, tập 21/27</title>
+  </programme>
+  <programme start="20251016170500 +0700" stop="20251016180000 +0700" channel="antv1">
+    <title lang="vi">Tình yêu tồi tệ, tập 21/27</title>
+  </programme>
+  <programme start="20251016180000 +0700" stop="20251016190000 +0700" channel="antv1">
+    <title lang="vi">An ninh 24h (55)</title>
+  </programme>
+  <programme start="20251016190000 +0700" stop="20251016194300 +0700" channel="antv1">
+    <title lang="vi">Thời sự VTV (Tiếp sóng)</title>
+  </programme>
+  <programme start="20251016194300 +0700" stop="20251016194500 +0700" channel="antv1">
+    <title lang="vi">Vì nhân dân phục vụ</title>
+  </programme>
+  <programme start="20251016194500 +0700" stop="20251016200000 +0700" channel="antv1">
+    <title lang="vi">An ninh với cuộc sống (10)</title>
+  </programme>
+  <programme start="20251016200000 +0700" stop="20251016201000 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251016201000 +0700" stop="20251016201100 +0700" channel="antv1">
+    <title lang="vi">Góc nhìn sự thật (20) Người Kito hữu và sự đồng hành bền bỉ cùng dân tộc</title>
+  </programme>
+  <programme start="20251016201100 +0700" stop="20251016201100 +0700" channel="antv1">
+    <title lang="vi">Kinh tế tiêu dùng</title>
+  </programme>
+  <programme start="20251016201100 +0700" stop="20251016203500 +0700" channel="antv1">
+    <title lang="vi">Kinh tế tiêu dùng</title>
+  </programme>
+  <programme start="20251016203500 +0700" stop="20251016204500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật sự kiện (10) Những chiến sĩ đặc nhiệm của đơn vị Anh hùng</title>
+  </programme>
+  <programme start="20251016204500 +0700" stop="20251016211000 +0700" channel="antv1">
+    <title lang="vi">Phóng sự (20) Bắc Ninh: Mỏ đất, giấy phép và những chuyến xe nặng lợi nhuận</title>
+  </programme>
+  <programme start="20251016211000 +0700" stop="20251016211000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 21h10 Người đuổi bắt sự sống, tập 7/32</title>
+  </programme>
+  <programme start="20251016211000 +0700" stop="20251016213200 +0700" channel="antv1">
+    <title lang="vi">Người đuổi bắt sự sống, tập 7/32</title>
+  </programme>
+  <programme start="20251016213200 +0700" stop="20251016220500 +0700" channel="antv1">
+    <title lang="vi">ANTV Hotline: 0692324026 Email: news@antv.gov.vn</title>
+  </programme>
+  <programme start="20251016220500 +0700" stop="20251016224000 +0700" channel="antv1">
+    <title lang="vi">Nhật ký an ninh (30)</title>
+  </programme>
+  <programme start="20251016224000 +0700" stop="20251016224000 +0700" channel="antv1">
+    <title lang="vi">Phim truyện 22h40 Cặp đôi hoàn mỹ, tập 21/50</title>
+  </programme>
+  <programme start="20251016224000 +0700" stop="20251016233000 +0700" channel="antv1">
+    <title lang="vi">Cặp đôi hoàn mỹ, tập 21/50</title>
+  </programme>
+  <programme start="20251016233000 +0700" stop="20251017000000 +0700" channel="antv1">
+    <title lang="vi">Văn hóa - Thể thao CAND Ngày về trong sắc cờ hoa</title>
   </programme>
 </tv>
