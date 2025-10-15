@@ -289,27 +289,36 @@ def parse_antv_html(html, base_date):
             seen_texts.add(key)
             ordered_nodes.append(node)
 
-    # 4) filters for contact/ads: regexes to detect phone/email/hotline/website/advert
-    phone_re = re.compile(r'\b0\d{8,}\b')            # long phone numbers starting with 0 (>=9 digits)
-    intl_phone_re = re.compile(r'\+\d{6,}')          # +country numbers
+        # 4) filters for contact/ads: regexes to detect phone/email/hotline/website/advert
+    # (replace existing phone/email/hotline patterns with these stricter checks)
+    phone_re = re.compile(r'\b0\d{8,10}\b')            # local phone numbers 9-11 digits (e.g., 0692324026)
+    intl_phone_re = re.compile(r'\+\d{6,}')            # +country numbers
     email_re = re.compile(r'[\w\.-]+@[\w\.-]+')
-    hotline_kw = re.compile(r'\b(hotline|hot-line|số điện thoại|điện thoại| hotline )\b', re.I)
+    hotline_kw = re.compile(r'\bhotline\b', re.I)
     contact_kw = re.compile(r'\b(email|gmail|yahoo|facebook|zalo|web|www\.|http[:\/]{2})\b', re.I)
     ads_kw = re.compile(r'\b(quảng cáo|advertis|đặt quảng cáo|quảng cáo|sponsor)\b', re.I)
+    explicit_contact_phrases = ["antv hotline", "antvhotline", "antv hotline:", "antv hotline -", "email: news@", "email:news@"]
 
     items = []
     seen_programs = set()
 
     for node in ordered_nodes:
         txt = node.get_text("\n", strip=True)
+        low = txt.lower()
+
+        # explicit phrase check first (fast)
+        if any(phrase in low for phrase in explicit_contact_phrases):
+            continue
+
         # skip blocks that clearly look like contact or ads
-        if phone_re.search(txt) or intl_phone_re.search(txt) or email_re.search(txt) or hotline_kw.search(txt) or contact_kw.search(txt) or ads_kw.search(txt):
+        if phone_re.search(txt) or intl_phone_re.search(txt) or email_re.search(txt) or hotline_kw.search(low) or contact_kw.search(low) or ads_kw.search(low):
             continue
 
         # find first time token
         m = re.search(r'(\d{1,2}[:h\.]\d{2})', txt)
         if not m:
             continue
+  
         time_token_raw = m.group(1)
         time_token = time_token_raw.replace("h", ":").replace(".", ":")
 
