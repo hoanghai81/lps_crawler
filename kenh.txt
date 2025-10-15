@@ -1,3 +1,5 @@
 # ID | URL | NAME
-boomerang | https://info.msky.vn/vn/Boomerang.html
+
+cartoonito | https://info.msky.vn/vn/Boomerang.html | CARTOONITO
+
 angiang2 | https://angiangtv.vn/lich-phat-song/?ngay=2025-10-15&kenh=TV | AN GIANG 2 
