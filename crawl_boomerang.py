@@ -1,81 +1,117 @@
+#!/usr/bin/env python3
 import requests
-import pandas as pd
-from datetime import datetime, timedelta, date
-import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
+import re
+from datetime import datetime, timedelta
+import xml.sax.saxutils as sax
+import sys
 
-# ---- CONFIG ----
-CHANNEL_ID = "Boomerang"
-CHANNEL_NAME = "Boomerang"
-TZ = "+0700"
-BASE_URL = "https://info.msky.vn/vn/export.php?iCat=162&iName=Boomerang&date={}"
+BASE_URL = "https://info.msky.vn/vn/Boomerang.html"
+CHANNEL_XMLTV_ID = "boomerang.msky"
+DISPLAY_NAME = "BOOMERANG"
+TZ_OFFSET = "+0700"
 
-# ----------------
-
-def fetch_excel(date_str):
-    """Tải file Excel export theo ngày (dd/mm/yyyy)"""
-    url = BASE_URL.format(date_str)
-    print("Fetching:", url)
-    resp = requests.get(url, timeout=30)
+def fetch(url):
+    resp = requests.get(url, timeout=20, headers={"User-Agent": "Mozilla/5.0"})
     resp.raise_for_status()
-    return resp.content
+    return resp.text
 
-def parse_excel(data):
-    """Đọc Excel thành DataFrame"""
-    df = pd.read_excel(data)
-    df = df.dropna(subset=["Giờ", "Tên chương trình", "Thời lượng"])
-    return df
+def parse_date_str(s):
+    """Chuyển 'dd/mm/yyyy' -> datetime.date"""
+    return datetime.strptime(s, "%d/%m/%Y").date()
 
-def parse_duration(dur_str):
-    """Chuyển '1:00' hoặc '0:25' thành số phút"""
+def extract_date(soup):
+    text = soup.get_text(" ")
+    m = re.search(r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})', text)
+    if m:
+        return parse_date_str(f"{m.group(1)}/{m.group(2)}/{m.group(3)}")
+    return datetime.utcnow().date()
+
+def parse_schedule(html):
+    soup = BeautifulSoup(html, "html.parser")
+    date = extract_date(soup)
+    table = soup.find("table")
+    if not table:
+        return [], date
+
+    items = []
+    for tr in table.find_all("tr"):
+        tds = [td.get_text(strip=True) for td in tr.find_all("td")]
+        if len(tds) < 2:
+            continue
+        time_str = tds[0]
+        title_vn = tds[1]
+        title_orig = tds[2] if len(tds) >= 3 else ""
+        duration = ""
+        if len(tds) >= 4 and re.match(r'^\d+:\d{2}$', tds[3]):
+            duration = tds[3]
+        if re.match(r'^\d{1,2}:\d{2}$', time_str):
+            items.append({
+                "time": time_str,
+                "title_vn": title_vn,
+                "title_orig": title_orig,
+                "duration": duration,
+                "date": date
+            })
+    return items, date
+
+def parse_duration(s):
+    if not s:
+        return 30
+    m = re.match(r'(\d+):(\d{2})', s)
+    if m:
+        return int(m.group(1)) * 60 + int(m.group(2))
     try:
-        h, m = map(int, dur_str.split(":"))
-        return h * 60 + m
-    except Exception:
+        return int(s)
+    except:
         return 30
 
-def build_xmltv(df_list, days):
-    """Ghép nhiều ngày thành XMLTV"""
-    tv = ET.Element("tv", {"generator-info-name": "lps_crawler"})
-    ch = ET.SubElement(tv, "channel", id=CHANNEL_ID)
-    ET.SubElement(ch, "display-name").text = CHANNEL_NAME
+def fmt_dt(dt):
+    return dt.strftime("%Y%m%d%H%M%S") + " " + TZ_OFFSET
 
-    for df, day in zip(df_list, days):
-        for _, row in df.iterrows():
-            time_str = str(row["Giờ"]).strip()
-            title = str(row["Tên chương trình"]).strip()
-            duration_str = str(row["Thời lượng"]).strip()
-            # Parse giờ bắt đầu
-            try:
-                hh, mm = map(int, time_str.split(":"))
-            except:
-                continue
-            start_dt = datetime.combine(day, datetime.min.time()) + timedelta(hours=hh, minutes=mm)
-            # Thêm duration
-            dur = parse_duration(duration_str)
-            stop_dt = start_dt + timedelta(minutes=dur)
-            # Ghi XML
-            prog = ET.SubElement(tv, "programme", {
-                "start": start_dt.strftime("%Y%m%d%H%M%S ") + TZ,
-                "stop": stop_dt.strftime("%Y%m%d%H%M%S ") + TZ,
-                "channel": CHANNEL_ID
-            })
-            ET.SubElement(prog, "title", {"lang": "vi"}).text = title
+def build_xml(all_items):
+    lines = []
+    lines.append('<?xml version="1.0" encoding="UTF-8"?>')
+    lines.append('<tv source-info-name="msky" generator-info-name="lps_crawler">')
+    lines.append(f'  <channel id="{sax.escape(CHANNEL_XMLTV_ID)}"><display-name>{sax.escape(DISPLAY_NAME)}</display-name></channel>')
 
-    return tv
+    for it in all_items:
+        hh, mm = map(int, it["time"].split(":"))
+        start = datetime.combine(it["date"], datetime.min.time()) + timedelta(hours=hh, minutes=mm)
+        dur = parse_duration(it.get("duration", ""))
+        stop = start + timedelta(minutes=dur)
+        lines.append(f'  <programme start="{fmt_dt(start)}" stop="{fmt_dt(stop)}" channel="{sax.escape(CHANNEL_XMLTV_ID)}">')
+        lines.append(f'    <title lang="vi">{sax.escape(it.get("title_vn",""))}</title>')
+        if it.get("title_orig"):
+            lines.append(f'    <title lang="en">{sax.escape(it.get("title_orig",""))}</title>')
+        lines.append('  </programme>')
+
+    lines.append('</tv>')
+    return "\n".join(lines)
 
 def main():
-    today = date.today()
+    today = datetime.now().date()
     tomorrow = today + timedelta(days=1)
+    dates = [today, tomorrow]
+    all_items = []
 
-    df_today = parse_excel(fetch_excel(today.strftime("%d/%m/%Y")))
-    df_tomorrow = parse_excel(fetch_excel(tomorrow.strftime("%d/%m/%Y")))
+    for d in dates:
+        date_str = d.strftime("%d/%m/%Y")
+        url = f"{BASE_URL}?date={date_str}"
+        print(f"Fetching schedule for {date_str}...", file=sys.stderr)
+        html = fetch(url)
+        items, date = parse_schedule(html)
+        if items:
+            all_items.extend(items)
+        else:
+            print(f"No items found for {date_str}", file=sys.stderr)
 
-    tv = build_xmltv([df_today, df_tomorrow], [today, tomorrow])
-    ET.ElementTree(tv).write("boomerang.xml", encoding="utf-8", xml_declaration=True)
+    if not all_items:
+        print("No schedule items parsed", file=sys.stderr)
+        sys.exit(1)
 
-    print("✅ Xuất thành công boomerang.xml")
-    print(f"Hôm nay: {len(df_today)} chương trình")
-    print(f"Ngày mai: {len(df_tomorrow)} chương trình")
+    xml = build_xml(all_items)
+    print(xml)
 
 if __name__ == "__main__":
     main()
