@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 # craw1.py
 """
-Robust crawler with special parser for angiangtv.vn.
-- Đọc kenh.txt (mỗi dòng: "id | url | name" hoặc chỉ URL)
-- Crawl từng URL, lưu debug_<channel>.html nếu có
-- Dùng parser chuyên cho angiangtv.vn khi cần
-- Luôn tạo epg1.xml hợp lệ, channels_processed.txt, programmes_count.txt
-- In preview epg1.xml để tiện debug trong CI logs
+Crawler that:
+- Reads kenh.txt (each line: "id | url | name" or just URL)
+- For each channel URL, normalizes the ngay= parameter at runtime to Hanoi date(s)
+- Fetches pages and parses programmes
+- Produces a single epg1.xml in XMLTV format containing programmes for multiple days
+- Saves debug_<channel>.html, channels_processed.txt, programmes_count.txt
+- Prints a preview of epg1.xml for CI logs
+
+Behavior:
+- Uses timezone Asia/Ho_Chi_Minh for date calculation and XML times (+0700)
+- By default fetches two days: today (offset 0) and tomorrow (offset 1)
+- You can override days using env var EPG_DAY_OFFSETS (comma-separated offsets, e.g., "0,1" or "0")
 """
 
 import os
@@ -30,6 +36,25 @@ USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
               "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0 Safari/537.36")
 
 tz = pytz.timezone(TIMEZONE)
+
+
+def today_in_hanoi():
+    tz_local = pytz.timezone(TIMEZONE)
+    return datetime.now(tz_local).date()
+
+
+def parse_offsets_env():
+    v = os.environ.get("EPG_DAY_OFFSETS", "0,1")
+    parts = [p.strip() for p in v.split(",") if p.strip() != ""]
+    offsets = []
+    for p in parts:
+        try:
+            offsets.append(int(p))
+        except Exception:
+            continue
+    if not offsets:
+        offsets = [0, 1]
+    return sorted(set(offsets))
 
 
 def load_channels_from_kenh_txt(path):
@@ -57,6 +82,19 @@ def load_channels_from_kenh_txt(path):
             else:
                 print(f"[WARN] Skipping invalid line in {path}: {ln}", file=sys.stderr)
     return chans
+
+
+def normalize_date_in_url(url, offset_days=0):
+    """
+    Replace or add ngay=YYYY-MM-DD in url according to offset_days (Hanoi date)
+    """
+    d = today_in_hanoi() + timedelta(days=offset_days)
+    ds = d.strftime("%Y-%m-%d")
+    if re.search(r"ngay=[0-9]{4}-[0-9]{2}-[0-9]{2}", url):
+        return re.sub(r"(ngay=)[0-9]{4}-[0-9]{2}-[0-9]{2}", r"\1" + ds, url)
+    if "?" in url:
+        return url + "&ngay=" + ds if "ngay=" not in url else url
+    return url + "?ngay=" + ds
 
 
 def fetch(url):
@@ -113,24 +151,20 @@ def parse_angiang_html(html, base_date):
         # Try td siblings (common pattern: time in one td, title in another)
         tds = row.find_all("td")
         if tds:
-            # find td that does not contain time token
             for td in tds:
                 ttxt = td.get_text(" ", strip=True)
                 if not re.search(r'\d{1,2}[:h\.]\d{2}', ttxt):
                     if len(ttxt) > 0:
                         title = ttxt
                         break
-        # class-based candidates
         if not title:
             cand = row.select_one(".tieu-de, .title, .chuongtrinh, .program, .name, .ten-chuong-trinh, .tv-title")
             if cand:
                 title = cand.get_text(" ", strip=True)
-        # fallback: text after time token in same row
         if not title:
             tail = re.split(re.escape(m.group(1)), txt, maxsplit=1)
             if len(tail) > 1:
                 title = tail[1].strip()
-        # last resort: next sibling element
         if not title:
             nxt = row.find_next_sibling()
             if nxt:
@@ -174,12 +208,11 @@ def parse_angiang_html(html, base_date):
 
 def crawl_generic(html, url):
     soup = BeautifulSoup(html, "lxml")
-    # parse base date from URL param if present
     m = re.search(r"ngay=([0-9\-]+)", url)
     try:
-        base_date = dateparser.parse(m.group(1)).date() if m else date.today()
+        base_date = dateparser.parse(m.group(1)).date() if m else today_in_hanoi()
     except Exception:
-        base_date = date.today()
+        base_date = today_in_hanoi()
 
     items = []
     selectors = [
@@ -277,10 +310,10 @@ def build_xmltv(channels_programmes, outpath=OUTPUT):
 
 def main():
     try:
+        offsets = parse_offsets_env()  # e.g., [0,1]
         chans = load_channels_from_kenh_txt(KENH_TXT)
         if not chans:
             print("[ERROR] No channels to process - kenh.txt missing or empty", file=sys.stderr)
-            # still create minimal files
             with open(OUTPUT, "wb") as f:
                 f.write(b'<?xml version="1.0" encoding="UTF-8"?><tv generator-info-name="lps_crawler_v1"></tv>')
             with open("channels_processed.txt", "w", encoding="utf-8") as f:
@@ -292,43 +325,56 @@ def main():
         processed = []
         channels_programmes = []
 
+        # For each channel, for each requested offset, fetch and parse programmes for that base_date
         for ch in chans:
             cid = ch.get("id")
-            url = ch.get("url")
+            orig_url = ch.get("url")
             name = ch.get("name", cid)
-            print(f"[INFO] Crawling {cid} -> {url}")
-            try:
-                html = fetch(url)
-                if html:
-                    debug_name = f"debug_{cid}.html"
-                    try:
-                        with open(debug_name, "wb") as fh:
-                            fh.write(html)
-                        print(f"[DEBUG] Saved debug HTML -> {debug_name}")
-                    except Exception as e:
-                        print(f"[WARN] Could not save debug HTML {debug_name}: {e}", file=sys.stderr)
-                else:
-                    print(f"[WARN] No HTML fetched for {url}", file=sys.stderr)
-
-                # choose parser
-                m = re.search(r"ngay=([0-9\-]+)", url)
+            all_items = []
+            print(f"[INFO] Processing channel {cid} ({name}) for offsets: {offsets}")
+            for off in offsets:
+                effective_url = normalize_date_in_url(orig_url, offset_days=off)
+                print(f"[INFO] Crawling {cid} offset={off} -> {effective_url}")
                 try:
-                    base_date = dateparser.parse(m.group(1)).date() if m else date.today()
-                except Exception:
-                    base_date = date.today()
+                    html = fetch(effective_url)
+                    if html:
+                        debug_name = f"debug_{cid}_d{off}.html"
+                        try:
+                            with open(debug_name, "wb") as fh:
+                                fh.write(html)
+                            print(f"[DEBUG] Saved debug HTML -> {debug_name}")
+                        except Exception as e:
+                            print(f"[WARN] Could not save debug HTML {debug_name}: {e}", file=sys.stderr)
+                    else:
+                        print(f"[WARN] No HTML fetched for {effective_url}", file=sys.stderr)
 
-                if "angiangtv.vn" in url:
-                    items = parse_angiang_html(html, base_date)
-                else:
-                    items = crawl_generic(html, url)
-            except Exception as e:
-                print(f"[ERROR] Exception while crawling {url}: {e}", file=sys.stderr)
-                traceback.print_exc()
-                items = []
+                    m = re.search(r"ngay=([0-9\-]+)", effective_url)
+                    try:
+                        base_date = dateparser.parse(m.group(1)).date() if m else today_in_hanoi()
+                    except Exception:
+                        base_date = today_in_hanoi()
 
-            channels_programmes.append({"id": cid, "name": name, "programmes": items})
+                    if "angiangtv.vn" in effective_url:
+                        items = parse_angiang_html(html, base_date)
+                    else:
+                        items = crawl_generic(html, effective_url)
+
+                    # ensure items are for the correct base_date (parser uses base_date already)
+                    all_items.extend(items)
+                except Exception as e:
+                    print(f"[ERROR] Exception while crawling {effective_url}: {e}", file=sys.stderr)
+                    traceback.print_exc()
+                time.sleep(0.2)
+
+            # sort and ensure stops consistent across combined day items
+            all_items = sorted(all_items, key=lambda x: x['start'])
+            for i in range(len(all_items) - 1):
+                all_items[i]['stop'] = all_items[i + 1]['start']
+            if all_items and 'stop' not in all_items[-1]:
+                all_items[-1]['stop'] = all_items[-1]['start'] + timedelta(minutes=DEFAULT_DURATION_MIN)
+
+            channels_programmes.append({"id": cid, "name": name, "programmes": all_items})
             processed.append(cid)
-            time.sleep(0.2)
 
         total_programmes = 0
         try:
@@ -380,4 +426,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-                         
+      
