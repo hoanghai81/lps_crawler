@@ -209,35 +209,30 @@ def parse_angiang_html(html, base_date):
 
 def parse_antv_html(html, base_date):
     """
-    Robust parser for ANTV /truyen-hinh-truc-tuyen.html
-    Improvements over prior version:
-    - Locate the schedule container by finding a heading "LỊCH PHÁT SÓNG" then choosing
-      the nearest ancestor subtree that contains multiple time tokens.
-    - Restrict candidate nodes to li/article/div with short text (<= 6 lines, <= 300 chars)
-      and containing exactly 1 time token to avoid widgets/sidebars.
-    - Deduplicate by (time,title) normalized pair.
-    - Better handling when time and title are on same line.
-    - Returns list of items with 'start' (naive datetime), 'title', 'desc'.
-    Notes:
-    - Relies on helper parse_time_from_text(base_date, text) and DEFAULT_DURATION_MIN.
+    Robust ANTV parser with contact/ad filtering.
+    - Locates schedule container by heading or by subtree with many time tokens.
+    - Selects candidate nodes with exactly 1 time token and not too large.
+    - Filters out nodes that look like contact/ hotline/ email/ ads.
+    - Deduplicates by (time, title).
+    - Returns items with start/title/desc and inferred stop times.
     """
     soup = BeautifulSoup(html, "lxml")
 
-    # 1) Find heading that indicates schedule
+    # helper to count time tokens
+    def count_time_tokens(node):
+        txt = node.get_text(" ", strip=True)
+        return len(re.findall(r'\b\d{1,2}[:h\.]\d{2}\b', txt))
+
+    # 1) find schedule heading
     schedule_heading = None
     for h_tag in soup.select("h1,h2,h3,h4,h5"):
         if "LỊCH PHÁT SÓNG" in h_tag.get_text(" ", strip=True).upper():
             schedule_heading = h_tag
             break
 
-    # 2) Choose best container: ascend to ancestor that contains several time tokens
-    def count_time_tokens(node):
-        txt = node.get_text(" ", strip=True)
-        return len(re.findall(r'\b\d{1,2}[:h\.]\d{2}\b', txt))
-
+    # 2) choose container by ascending ancestors with many time tokens
     container = None
     if schedule_heading:
-        # look up ancestors up to 4 levels and pick the one with most time tokens (>=3)
         best = (None, 0)
         node = schedule_heading
         for _ in range(5):
@@ -248,50 +243,44 @@ def parse_antv_html(html, base_date):
                 best = (node, cnt)
             node = node.parent
         if best[0] and best[1] >= 3:
-            # prefer the child subtree of that ancestor that is closest to the heading
-            # e.g., find the sibling subtree that contains time tokens
             parent = best[0]
-            # look among parent's descendants that are siblings/blocks
+            # pick child of parent that contains time tokens
             candidates = []
             for child in parent.find_all(recursive=False):
-                if count_time_tokens(child) >= 1:
-                    candidates.append((child, count_time_tokens(child)))
+                c = count_time_tokens(child)
+                if c >= 1:
+                    candidates.append((child, c))
             if candidates:
-                # pick the child with most time tokens
                 container = sorted(candidates, key=lambda x: -x[1])[0][0]
             else:
                 container = best[0]
 
-    # fallback selectors if no heading/container found
+    # fallback selectors
     if not container:
         container = soup.select_one(".lich-phat-song, .tv-schedule, .schedule, .box-list, .list-news")
     if not container:
         container = soup.select_one("main, #main, .content, .page-content") or soup
 
-    # 3) Collect candidate nodes: prefer li, article, direct children divs
+    # 3) collect candidates but stricter: prefer elements with 1 time token and small size
     raw_candidates = []
     for sel in ["li", "article", ".item", ".post-item", "div"]:
         for node in container.select(sel):
             txt = node.get_text(" ", strip=True)
             if not txt:
                 continue
-            # count time tokens
             time_count = len(re.findall(r'\b\d{1,2}[:h\.]\d{2}\b', txt))
-            # heuristics to avoid large unrelated blocks:
             if time_count == 0:
                 continue
-            # restrict node size: not too long (likely sidebar/feed) and not many lines
+            # skip very long blocks or many-lines blocks (likely sidebar/aggregates)
             lines = [ln for ln in txt.splitlines() if ln.strip()]
-            if len(lines) > 8:
+            if len(lines) > 8 or len(txt) > 400:
                 continue
-            if len(txt) > 400:
-                continue
-            # prefer nodes with exactly 1 time token to reduce false positives
+            # avoid nodes with too many time tokens (aggregates)
             if time_count > 3:
                 continue
             raw_candidates.append((node, time_count))
 
-    # preserve order, dedupe by normalized text
+    # preserve order, dedupe identical text blocks
     seen_texts = set()
     ordered_nodes = []
     for node, _ in raw_candidates:
@@ -300,11 +289,23 @@ def parse_antv_html(html, base_date):
             seen_texts.add(key)
             ordered_nodes.append(node)
 
-    # 4) Extract time/title/desc from each node
+    # 4) filters for contact/ads: regexes to detect phone/email/hotline/website/advert
+    phone_re = re.compile(r'\b0\d{8,}\b')            # long phone numbers starting with 0 (>=9 digits)
+    intl_phone_re = re.compile(r'\+\d{6,}')          # +country numbers
+    email_re = re.compile(r'[\w\.-]+@[\w\.-]+')
+    hotline_kw = re.compile(r'\b(hotline|hot-line|số điện thoại|điện thoại| hotline )\b', re.I)
+    contact_kw = re.compile(r'\b(email|gmail|yahoo|facebook|zalo|web|www\.|http[:\/]{2})\b', re.I)
+    ads_kw = re.compile(r'\b(quảng cáo|advertis|đặt quảng cáo|quảng cáo|sponsor)\b', re.I)
+
     items = []
-    seen_programs = set()  # (time_str, normalized_title)
+    seen_programs = set()
+
     for node in ordered_nodes:
         txt = node.get_text("\n", strip=True)
+        # skip blocks that clearly look like contact or ads
+        if phone_re.search(txt) or intl_phone_re.search(txt) or email_re.search(txt) or hotline_kw.search(txt) or contact_kw.search(txt) or ads_kw.search(txt):
+            continue
+
         # find first time token
         m = re.search(r'(\d{1,2}[:h\.]\d{2})', txt)
         if not m:
@@ -312,7 +313,7 @@ def parse_antv_html(html, base_date):
         time_token_raw = m.group(1)
         time_token = time_token_raw.replace("h", ":").replace(".", ":")
 
-        # split lines to locate title and desc
+        # split into lines to get title/desc
         lines = [ln.strip() for ln in txt.splitlines() if ln.strip()]
         idx = None
         for i, ln in enumerate(lines):
@@ -322,22 +323,12 @@ def parse_antv_html(html, base_date):
 
         title = ""
         desc = ""
-
         if idx is None:
-            # fallback: remove time token from full txt and take first short line
             cleaned = re.sub(re.escape(time_token_raw), "", txt).strip()
-            # take first 120 chars as title if long
             title = cleaned.split("\n")[0].strip()
         else:
-            # common patterns:
-            # 1) [time]
-            #    [title]
-            #    [desc...]
-            # 2) [time] [title ...]
-            # find candidate title line
             if idx + 1 < len(lines):
                 title = lines[idx + 1]
-                # description may be lines after title; take up to 2 lines as desc
                 if idx + 2 < len(lines):
                     desc = " ".join(lines[idx + 2: idx + 4])
             else:
@@ -345,29 +336,29 @@ def parse_antv_html(html, base_date):
                 line_after = re.sub(re.escape(time_token_raw), "", lines[idx]).strip()
                 title = line_after if line_after else "Unknown"
 
-        # further normalize title: remove stray timestamps or repeated words
+        # normalize title and filter trivial titles
         title_norm = re.sub(r'\b\d{1,2}[:h\.]\d{2}\b', '', title)
         title_norm = " ".join(title_norm.split()).strip()
-        if not title_norm:
-            title_norm = "Unknown"
+        if not title_norm or len(title_norm) < 2:
+            continue
+        # avoid titles that are pure contact-like short strings
+        if phone_re.search(title_norm) or email_re.search(title_norm) or hotline_kw.search(title_norm) or contact_kw.search(title_norm):
+            continue
 
-        # dedupe by (time,title)
         dedupe_key = (time_token, title_norm.lower())
         if dedupe_key in seen_programs:
             continue
         seen_programs.add(dedupe_key)
 
-        # parse start datetime
         start_dt = parse_time_from_text(base_date, time_token)
         if not start_dt:
             continue
 
         items.append({"start": start_dt, "title": title_norm, "desc": " ".join(desc.split()) if desc else ""})
 
-    # 5) Sort and infer stop times
+    # 5) sort + infer stop times (ensure monotonic stops)
     items = sorted(items, key=lambda x: x['start'])
     for i in range(len(items) - 1):
-        # ensure stop after start
         if items[i + 1]['start'] <= items[i]['start']:
             items[i]['stop'] = items[i]['start'] + timedelta(minutes=DEFAULT_DURATION_MIN)
         else:
@@ -376,7 +367,7 @@ def parse_antv_html(html, base_date):
         items[-1]['stop'] = items[-1]['start'] + timedelta(minutes=DEFAULT_DURATION_MIN)
 
     return items
-  
+      
 
 def crawl_generic(html, url):
     soup = BeautifulSoup(html, "lxml")
