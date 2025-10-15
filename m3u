@@ -1,0 +1,25 @@
+#EXTM3U 
+
+#EXTINF:-1 tvg-id="boomerang" group-title="OTHER",CARTOONITO
+http://example.com/stream/vtv1.m3u8
+
+#EXTINF:-1 tvg-id="angiang2test" group-title="OTHER",AN GIANG 2 TEST
+http://example.com/stream/vtv2.m3u8
+
+#EXTINF:-1 tvg-id="antv1" group-title="OTHER",ANTV 1
+http://example.com/stream/vtv3.m3u8
+
+#EXTINF:-1 tvg-id="VTV4" group-title="VTV",VTV4 HD
+http://example.com/stream/vtv4.m3u8
+
+#EXTINF:-1 tvg-id="TNTSports1 HD.uk" group-title="SPORT",TNT SPORT 1 UK
+http://example.com/stream/sctv1.m3u8
+
+#EXTINF:-1 tvg-id="Sky.Sport.Premier.League.nz" group-title="SPORT",SKY SPORT P.L NZ
+http://example.com/stream/sctv2.m3u8
+
+#EXTINF:-1 tvg-id="ON-Sports" group-title="VTVcab",ON Sports
+http://example.com/stream/onsports.m3u8
+
+#EXTINF:-1 tvg-id="onviegiaitri" group-title="VTVcab",ON Vie Giải Trí
+http://example.com/stream/on-vie-gt.m3u8
