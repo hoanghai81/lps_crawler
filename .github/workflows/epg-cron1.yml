@@ -5,6 +5,9 @@ on:
     - cron: '0 18 * * *' # 01:00 Asia/Ho_Chi_Minh (UTC+7)
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   crawl:
     runs-on: ubuntu-latest
@@ -67,6 +70,29 @@ jobs:
           echo " - Programme nodes in XML: ${{ steps.verify.outputs.epg1_programme_count }}"
         shell: bash
 
+      - name: Commit epg1.xml back to repo
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add epg1.xml || true
+          git commit -m "Auto update epg1.xml: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || echo "No changes to commit"
+          git push origin HEAD || echo "Push failed"
+        shell: bash
+
+      - name: Show epg1.xml head for debug
+        if: always()
+        run: |
+          echo "=== epg1.xml size ==="
+          if [ -f epg1.xml ]; then
+            wc -c epg1.xml
+            echo "=== first 200 lines of epg1.xml ==="
+            sed -n '1,200p' epg1.xml || true
+          else
+            echo "epg1.xml not found"
+          fi
+        shell: bash
+
       - name: Upload epg1 artifact
         uses: actions/upload-artifact@v4
         with:
@@ -79,6 +105,7 @@ jobs:
         with:
           name: debug-and-stats
           path: |
+            debug_*.html
             angiang_debug.html
             channels_processed.txt
             programmes_count.txt
