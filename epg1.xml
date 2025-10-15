@@ -1,139 +1,292 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tv generator-info-name="lps_crawler_v1">
-  <channel id="boomerang">
-    <display-name>boomerang</display-name>
+  <channel id="cartoonito">
+    <display-name>CARTOONITO</display-name>
   </channel>
   <channel id="angiang2">
     <display-name>AN GIANG 2</display-name>
   </channel>
-  <programme start="20251015000000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015000000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">ella giữa những vì sao xa interstellar ella 1:00</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015020000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015020000 +0700" channel="cartoonito">
     <title lang="vi">ella giữa những vì sao xa interstellar ella 1:00</title>
   </programme>
-  <programme start="20251015020000 +0700" stop="20251015030000 +0700" channel="boomerang">
+  <programme start="20251015020000 +0700" stop="20251015030000 +0700" channel="cartoonito">
     <title lang="vi">thỏ con dũng cảm brave bunnies 1:00</title>
   </programme>
-  <programme start="20251015030000 +0700" stop="20251015040000 +0700" channel="boomerang">
+  <programme start="20251015030000 +0700" stop="20251015040000 +0700" channel="cartoonito">
     <title lang="vi">thỏ con dũng cảm brave bunnies 1:00</title>
   </programme>
-  <programme start="20251015040000 +0700" stop="20251015050000 +0700" channel="boomerang">
+  <programme start="20251015040000 +0700" stop="20251015050000 +0700" channel="cartoonito">
     <title lang="vi">trang trại khủng long dino ranch 1:00</title>
   </programme>
-  <programme start="20251015050000 +0700" stop="20251015060000 +0700" channel="boomerang">
+  <programme start="20251015050000 +0700" stop="20251015060000 +0700" channel="cartoonito">
     <title lang="vi">trang trại khủng long dino ranch 1:00</title>
   </programme>
-  <programme start="20251015060000 +0700" stop="20251015070000 +0700" channel="boomerang">
+  <programme start="20251015060000 +0700" stop="20251015070000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu baby looney tunes 1:00</title>
   </programme>
-  <programme start="20251015070000 +0700" stop="20251015073000 +0700" channel="boomerang">
+  <programme start="20251015070000 +0700" stop="20251015073000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí mini beat power rockers 0:30</title>
   </programme>
-  <programme start="20251015073000 +0700" stop="20251015075500 +0700" channel="boomerang">
+  <programme start="20251015073000 +0700" stop="20251015075500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
   </programme>
-  <programme start="20251015075500 +0700" stop="20251015080000 +0700" channel="boomerang">
+  <programme start="20251015075500 +0700" stop="20251015080000 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí tom and jerry gokko 0:05</title>
   </programme>
-  <programme start="20251015080000 +0700" stop="20251015083000 +0700" channel="boomerang">
+  <programme start="20251015080000 +0700" stop="20251015083000 +0700" channel="cartoonito">
     <title lang="vi">kiểm lâm rob ranger rob 0:30</title>
   </programme>
-  <programme start="20251015083000 +0700" stop="20251015090000 +0700" channel="boomerang">
+  <programme start="20251015083000 +0700" stop="20251015090000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
   </programme>
-  <programme start="20251015090000 +0700" stop="20251015093000 +0700" channel="boomerang">
+  <programme start="20251015090000 +0700" stop="20251015093000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
   </programme>
-  <programme start="20251015093000 +0700" stop="20251015100000 +0700" channel="boomerang">
+  <programme start="20251015093000 +0700" stop="20251015100000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry the tom and jerry show 0:30</title>
   </programme>
-  <programme start="20251015100000 +0700" stop="20251015102500 +0700" channel="boomerang">
+  <programme start="20251015100000 +0700" stop="20251015102500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
   </programme>
-  <programme start="20251015102500 +0700" stop="20251015103000 +0700" channel="boomerang">
+  <programme start="20251015102500 +0700" stop="20251015103000 +0700" channel="cartoonito">
     <title lang="vi">gặp gỡ biệt đội xe dơi meet the batwheels 0:05</title>
   </programme>
-  <programme start="20251015103000 +0700" stop="20251015110000 +0700" channel="boomerang">
+  <programme start="20251015103000 +0700" stop="20251015110000 +0700" channel="cartoonito">
     <title lang="vi">tom biết nói: tổ đội anh hùng talking tom heroes: suddenly super 0:30</title>
   </programme>
-  <programme start="20251015110000 +0700" stop="20251015113000 +0700" channel="boomerang">
+  <programme start="20251015110000 +0700" stop="20251015113000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí mini beat power rockers 0:30</title>
   </programme>
-  <programme start="20251015113000 +0700" stop="20251015120000 +0700" channel="boomerang">
+  <programme start="20251015113000 +0700" stop="20251015120000 +0700" channel="cartoonito">
     <title lang="vi">dorothy và phù thủy xứ oz dorothy and the wizard of oz 0:30</title>
   </programme>
-  <programme start="20251015120000 +0700" stop="20251015123000 +0700" channel="boomerang">
+  <programme start="20251015120000 +0700" stop="20251015123000 +0700" channel="cartoonito">
     <title lang="vi">chú nhện lucas lucas the spider 0:30</title>
   </programme>
-  <programme start="20251015123000 +0700" stop="20251015130000 +0700" channel="boomerang">
+  <programme start="20251015123000 +0700" stop="20251015130000 +0700" channel="cartoonito">
     <title lang="vi">kiểm lâm rob ranger rob 0:30</title>
   </programme>
-  <programme start="20251015130000 +0700" stop="20251015133000 +0700" channel="boomerang">
+  <programme start="20251015130000 +0700" stop="20251015133000 +0700" channel="cartoonito">
     <title lang="vi">thế giới của barney barney's world 0:30</title>
   </programme>
-  <programme start="20251015133000 +0700" stop="20251015140000 +0700" channel="boomerang">
+  <programme start="20251015133000 +0700" stop="20251015140000 +0700" channel="cartoonito">
     <title lang="vi">đội thợ xây của thỏ bugs bugs bunny builders 0:30</title>
   </programme>
-  <programme start="20251015140000 +0700" stop="20251015142500 +0700" channel="boomerang">
+  <programme start="20251015140000 +0700" stop="20251015142500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
   </programme>
-  <programme start="20251015142500 +0700" stop="20251015143000 +0700" channel="boomerang">
+  <programme start="20251015142500 +0700" stop="20251015143000 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí tom and jerry gokko 0:05</title>
   </programme>
-  <programme start="20251015143000 +0700" stop="20251015150000 +0700" channel="boomerang">
+  <programme start="20251015143000 +0700" stop="20251015150000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry the tom and jerry show 0:30</title>
   </programme>
-  <programme start="20251015150000 +0700" stop="20251015153000 +0700" channel="boomerang">
+  <programme start="20251015150000 +0700" stop="20251015153000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry the tom and jerry show 0:30</title>
   </programme>
-  <programme start="20251015153000 +0700" stop="20251015160000 +0700" channel="boomerang">
+  <programme start="20251015153000 +0700" stop="20251015160000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
   </programme>
-  <programme start="20251015160000 +0700" stop="20251015163000 +0700" channel="boomerang">
+  <programme start="20251015160000 +0700" stop="20251015163000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
   </programme>
-  <programme start="20251015163000 +0700" stop="20251015170000 +0700" channel="boomerang">
+  <programme start="20251015163000 +0700" stop="20251015170000 +0700" channel="cartoonito">
     <title lang="vi">thế giới nhỏ bao la của jessica jessica's big little world 0:30</title>
   </programme>
-  <programme start="20251015170000 +0700" stop="20251015173000 +0700" channel="boomerang">
+  <programme start="20251015170000 +0700" stop="20251015173000 +0700" channel="cartoonito">
     <title lang="vi">thế giới của barney barney's world 0:30</title>
   </programme>
-  <programme start="20251015173000 +0700" stop="20251015180000 +0700" channel="boomerang">
+  <programme start="20251015173000 +0700" stop="20251015180000 +0700" channel="cartoonito">
     <title lang="vi">chú nhện lucas lucas the spider 0:30</title>
   </programme>
-  <programme start="20251015180000 +0700" stop="20251015183000 +0700" channel="boomerang">
+  <programme start="20251015180000 +0700" stop="20251015183000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí mini beat power rockers 0:30</title>
   </programme>
-  <programme start="20251015183000 +0700" stop="20251015185500 +0700" channel="boomerang">
+  <programme start="20251015183000 +0700" stop="20251015185500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
   </programme>
-  <programme start="20251015185500 +0700" stop="20251015190000 +0700" channel="boomerang">
+  <programme start="20251015185500 +0700" stop="20251015190000 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí tom and jerry gokko 0:05</title>
   </programme>
-  <programme start="20251015190000 +0700" stop="20251015193000 +0700" channel="boomerang">
+  <programme start="20251015190000 +0700" stop="20251015193000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu baby looney tunes 0:30</title>
   </programme>
-  <programme start="20251015193000 +0700" stop="20251015200000 +0700" channel="boomerang">
+  <programme start="20251015193000 +0700" stop="20251015200000 +0700" channel="cartoonito">
     <title lang="vi">tom biết nói: tổ đội anh hùng talking tom heroes: suddenly super 0:30</title>
   </programme>
-  <programme start="20251015200000 +0700" stop="20251015203000 +0700" channel="boomerang">
+  <programme start="20251015200000 +0700" stop="20251015203000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
   </programme>
-  <programme start="20251015203000 +0700" stop="20251015210000 +0700" channel="boomerang">
+  <programme start="20251015203000 +0700" stop="20251015210000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
   </programme>
-  <programme start="20251015210000 +0700" stop="20251015213000 +0700" channel="boomerang">
+  <programme start="20251015210000 +0700" stop="20251015213000 +0700" channel="cartoonito">
     <title lang="vi">đội chế tạo mecha mecha builders 0:30</title>
   </programme>
-  <programme start="20251015213000 +0700" stop="20251015220000 +0700" channel="boomerang">
+  <programme start="20251015213000 +0700" stop="20251015220000 +0700" channel="cartoonito">
     <title lang="vi">đội chế tạo mecha mecha builders 0:30</title>
   </programme>
-  <programme start="20251015220000 +0700" stop="20251015230000 +0700" channel="boomerang">
+  <programme start="20251015220000 +0700" stop="20251015230000 +0700" channel="cartoonito">
     <title lang="vi">đội thợ xây của thỏ bugs bugs bunny builders 1:00</title>
   </programme>
-  <programme start="20251015230000 +0700" stop="20251015233000 +0700" channel="boomerang">
+  <programme start="20251015230000 +0700" stop="20251016000000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu baby looney tunes 1:00</title>
+  </programme>
+  <programme start="20251016000000 +0700" stop="20251016010000 +0700" channel="cartoonito">
+    <title lang="vi">ella giữa những vì sao xa interstellar ella 1:00</title>
+  </programme>
+  <programme start="20251016010000 +0700" stop="20251016020000 +0700" channel="cartoonito">
+    <title lang="vi">ella giữa những vì sao xa interstellar ella 1:00</title>
+  </programme>
+  <programme start="20251016020000 +0700" stop="20251016030000 +0700" channel="cartoonito">
+    <title lang="vi">thỏ con dũng cảm brave bunnies 1:00</title>
+  </programme>
+  <programme start="20251016030000 +0700" stop="20251016040000 +0700" channel="cartoonito">
+    <title lang="vi">thỏ con dũng cảm brave bunnies 1:00</title>
+  </programme>
+  <programme start="20251016040000 +0700" stop="20251016050000 +0700" channel="cartoonito">
+    <title lang="vi">trang trại khủng long dino ranch 1:00</title>
+  </programme>
+  <programme start="20251016050000 +0700" stop="20251016060000 +0700" channel="cartoonito">
+    <title lang="vi">trang trại khủng long dino ranch 1:00</title>
+  </programme>
+  <programme start="20251016060000 +0700" stop="20251016070000 +0700" channel="cartoonito">
+    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu baby looney tunes 1:00</title>
+  </programme>
+  <programme start="20251016070000 +0700" stop="20251016073000 +0700" channel="cartoonito">
+    <title lang="vi">ban nhạc rock nhí mini beat power rockers 0:30</title>
+  </programme>
+  <programme start="20251016073000 +0700" stop="20251016075500 +0700" channel="cartoonito">
+    <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
+  </programme>
+  <programme start="20251016075500 +0700" stop="20251016080000 +0700" channel="cartoonito">
+    <title lang="vi">tom và jerry nhí tom and jerry gokko 0:05</title>
+  </programme>
+  <programme start="20251016080000 +0700" stop="20251016083000 +0700" channel="cartoonito">
+    <title lang="vi">kiểm lâm rob ranger rob 0:30</title>
+  </programme>
+  <programme start="20251016083000 +0700" stop="20251016090000 +0700" channel="cartoonito">
+    <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
+  </programme>
+  <programme start="20251016090000 +0700" stop="20251016093000 +0700" channel="cartoonito">
+    <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
+  </programme>
+  <programme start="20251016093000 +0700" stop="20251016100000 +0700" channel="cartoonito">
+    <title lang="vi">chương trình tom và jerry the tom and jerry show 0:30</title>
+  </programme>
+  <programme start="20251016100000 +0700" stop="20251016102500 +0700" channel="cartoonito">
+    <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
+  </programme>
+  <programme start="20251016102500 +0700" stop="20251016103000 +0700" channel="cartoonito">
+    <title lang="vi">gặp gỡ biệt đội xe dơi meet the batwheels 0:05</title>
+  </programme>
+  <programme start="20251016103000 +0700" stop="20251016110000 +0700" channel="cartoonito">
+    <title lang="vi">tom biết nói: tổ đội anh hùng talking tom heroes: suddenly super 0:30</title>
+  </programme>
+  <programme start="20251016110000 +0700" stop="20251016113000 +0700" channel="cartoonito">
+    <title lang="vi">ban nhạc rock nhí mini beat power rockers 0:30</title>
+  </programme>
+  <programme start="20251016113000 +0700" stop="20251016120000 +0700" channel="cartoonito">
+    <title lang="vi">dorothy và phù thủy xứ oz dorothy and the wizard of oz 0:30</title>
+  </programme>
+  <programme start="20251016120000 +0700" stop="20251016123000 +0700" channel="cartoonito">
+    <title lang="vi">chú nhện lucas lucas the spider 0:30</title>
+  </programme>
+  <programme start="20251016123000 +0700" stop="20251016130000 +0700" channel="cartoonito">
+    <title lang="vi">kiểm lâm rob ranger rob 0:30</title>
+  </programme>
+  <programme start="20251016130000 +0700" stop="20251016133000 +0700" channel="cartoonito">
+    <title lang="vi">thế giới của barney barney's world 0:30</title>
+  </programme>
+  <programme start="20251016133000 +0700" stop="20251016140000 +0700" channel="cartoonito">
+    <title lang="vi">đội thợ xây của thỏ bugs bugs bunny builders 0:30</title>
+  </programme>
+  <programme start="20251016140000 +0700" stop="20251016142500 +0700" channel="cartoonito">
+    <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
+  </programme>
+  <programme start="20251016142500 +0700" stop="20251016143000 +0700" channel="cartoonito">
+    <title lang="vi">tom và jerry nhí tom and jerry gokko 0:05</title>
+  </programme>
+  <programme start="20251016143000 +0700" stop="20251016150000 +0700" channel="cartoonito">
+    <title lang="vi">chương trình tom và jerry the tom and jerry show 0:30</title>
+  </programme>
+  <programme start="20251016150000 +0700" stop="20251016153000 +0700" channel="cartoonito">
+    <title lang="vi">chương trình tom và jerry the tom and jerry show 0:30</title>
+  </programme>
+  <programme start="20251016153000 +0700" stop="20251016160000 +0700" channel="cartoonito">
+    <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
+  </programme>
+  <programme start="20251016160000 +0700" stop="20251016163000 +0700" channel="cartoonito">
+    <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
+  </programme>
+  <programme start="20251016163000 +0700" stop="20251016170000 +0700" channel="cartoonito">
+    <title lang="vi">thế giới nhỏ bao la của jessica jessica's big little world 0:30</title>
+  </programme>
+  <programme start="20251016170000 +0700" stop="20251016173000 +0700" channel="cartoonito">
+    <title lang="vi">thế giới của barney barney's world 0:30</title>
+  </programme>
+  <programme start="20251016173000 +0700" stop="20251016180000 +0700" channel="cartoonito">
+    <title lang="vi">chú nhện lucas lucas the spider 0:30</title>
+  </programme>
+  <programme start="20251016180000 +0700" stop="20251016183000 +0700" channel="cartoonito">
+    <title lang="vi">ban nhạc rock nhí mini beat power rockers 0:30</title>
+  </programme>
+  <programme start="20251016183000 +0700" stop="20251016185500 +0700" channel="cartoonito">
+    <title lang="vi">biệt đội xe dơi batwheels 0:25</title>
+  </programme>
+  <programme start="20251016185500 +0700" stop="20251016190000 +0700" channel="cartoonito">
+    <title lang="vi">tom và jerry nhí tom and jerry gokko 0:05</title>
+  </programme>
+  <programme start="20251016190000 +0700" stop="20251016193000 +0700" channel="cartoonito">
+    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu baby looney tunes 0:30</title>
+  </programme>
+  <programme start="20251016193000 +0700" stop="20251016200000 +0700" channel="cartoonito">
+    <title lang="vi">tom biết nói: tổ đội anh hùng talking tom heroes: suddenly super 0:30</title>
+  </programme>
+  <programme start="20251016200000 +0700" stop="20251016203000 +0700" channel="cartoonito">
+    <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
+  </programme>
+  <programme start="20251016203000 +0700" stop="20251016210000 +0700" channel="cartoonito">
+    <title lang="vi">gấu xám và những chú chuột lemmut grizzy and the lemmings 0:30</title>
+  </programme>
+  <programme start="20251016210000 +0700" stop="20251016213000 +0700" channel="cartoonito">
+    <title lang="vi">đội chế tạo mecha mecha builders 0:30</title>
+  </programme>
+  <programme start="20251016213000 +0700" stop="20251016220000 +0700" channel="cartoonito">
+    <title lang="vi">đội chế tạo mecha mecha builders 0:30</title>
+  </programme>
+  <programme start="20251016220000 +0700" stop="20251016230000 +0700" channel="cartoonito">
+    <title lang="vi">đội thợ xây của thỏ bugs bugs bunny builders 1:00</title>
+  </programme>
+  <programme start="20251016230000 +0700" stop="20251016233000 +0700" channel="cartoonito">
+    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu baby looney tunes 1:00</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
+    <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
   </programme>
   <programme start="20251015051500 +0700" stop="20251015051500 +0700" channel="angiang2">
     <title lang="vi">Nhạc hiệu – Chào cờ buổi sáng – Giới thiệu chương trình</title>
@@ -162,8 +315,20 @@
   <programme start="20251015052000 +0700" stop="20251015052000 +0700" channel="angiang2">
     <title lang="vi">Hạt cát diệu kỳ - Số 39 - 47</title>
   </programme>
+  <programme start="20251015052000 +0700" stop="20251015052000 +0700" channel="angiang2">
+    <title lang="vi">Hạt cát diệu kỳ - Số 39 - 47</title>
+  </programme>
+  <programme start="20251015052000 +0700" stop="20251015052000 +0700" channel="angiang2">
+    <title lang="vi">Hạt cát diệu kỳ - Số 39 - 47</title>
+  </programme>
   <programme start="20251015052000 +0700" stop="20251015053000 +0700" channel="angiang2">
     <title lang="vi">Hạt cát diệu kỳ - Số 39 - 47</title>
+  </programme>
+  <programme start="20251015053000 +0700" stop="20251015053000 +0700" channel="angiang2">
+    <title lang="vi">Thời sự An Giang – Chương trình An Giang ngày mới</title>
+  </programme>
+  <programme start="20251015053000 +0700" stop="20251015053000 +0700" channel="angiang2">
+    <title lang="vi">Thời sự An Giang – Chương trình An Giang ngày mới</title>
   </programme>
   <programme start="20251015053000 +0700" stop="20251015053000 +0700" channel="angiang2">
     <title lang="vi">Thời sự An Giang – Chương trình An Giang ngày mới</title>
@@ -174,8 +339,20 @@
   <programme start="20251015055000 +0700" stop="20251015055000 +0700" channel="angiang2">
     <title lang="vi">Ký sự:  Hành trình theo chân Bác (tập 3)</title>
   </programme>
+  <programme start="20251015055000 +0700" stop="20251015055000 +0700" channel="angiang2">
+    <title lang="vi">Ký sự:  Hành trình theo chân Bác (tập 3)</title>
+  </programme>
+  <programme start="20251015055000 +0700" stop="20251015055000 +0700" channel="angiang2">
+    <title lang="vi">Ký sự:  Hành trình theo chân Bác (tập 3)</title>
+  </programme>
   <programme start="20251015055000 +0700" stop="20251015060000 +0700" channel="angiang2">
     <title lang="vi">Ký sự:  Hành trình theo chân Bác (tập 3)</title>
+  </programme>
+  <programme start="20251015060000 +0700" stop="20251015060000 +0700" channel="angiang2">
+    <title lang="vi">Thông báo – Quảng cáo</title>
+  </programme>
+  <programme start="20251015060000 +0700" stop="20251015060000 +0700" channel="angiang2">
+    <title lang="vi">Thông báo – Quảng cáo</title>
   </programme>
   <programme start="20251015060000 +0700" stop="20251015060000 +0700" channel="angiang2">
     <title lang="vi">Thông báo – Quảng cáo</title>
@@ -186,8 +363,20 @@
   <programme start="20251015060500 +0700" stop="20251015060500 +0700" channel="angiang2">
     <title lang="vi">Về chốn linh thiêng: Di tích Nguyễn Trung Trực - Vị Anh Hùng dân tộc</title>
   </programme>
+  <programme start="20251015060500 +0700" stop="20251015060500 +0700" channel="angiang2">
+    <title lang="vi">Về chốn linh thiêng: Di tích Nguyễn Trung Trực - Vị Anh Hùng dân tộc</title>
+  </programme>
+  <programme start="20251015060500 +0700" stop="20251015060500 +0700" channel="angiang2">
+    <title lang="vi">Về chốn linh thiêng: Di tích Nguyễn Trung Trực - Vị Anh Hùng dân tộc</title>
+  </programme>
   <programme start="20251015060500 +0700" stop="20251015062000 +0700" channel="angiang2">
     <title lang="vi">Về chốn linh thiêng: Di tích Nguyễn Trung Trực - Vị Anh Hùng dân tộc</title>
+  </programme>
+  <programme start="20251015062000 +0700" stop="20251015062000 +0700" channel="angiang2">
+    <title lang="vi">Phim hoạt hình Thành phố xe hơi – Tập 83 - 84 hết</title>
+  </programme>
+  <programme start="20251015062000 +0700" stop="20251015062000 +0700" channel="angiang2">
+    <title lang="vi">Phim hoạt hình Thành phố xe hơi – Tập 83 - 84 hết</title>
   </programme>
   <programme start="20251015062000 +0700" stop="20251015062000 +0700" channel="angiang2">
     <title lang="vi">Phim hoạt hình Thành phố xe hơi – Tập 83 - 84 hết</title>
@@ -198,8 +387,20 @@
   <programme start="20251015065000 +0700" stop="20251015065000 +0700" channel="angiang2">
     <title lang="vi">Ca nhạc Tuyển tập Bolero 10</title>
   </programme>
+  <programme start="20251015065000 +0700" stop="20251015065000 +0700" channel="angiang2">
+    <title lang="vi">Ca nhạc Tuyển tập Bolero 10</title>
+  </programme>
+  <programme start="20251015065000 +0700" stop="20251015065000 +0700" channel="angiang2">
+    <title lang="vi">Ca nhạc Tuyển tập Bolero 10</title>
+  </programme>
   <programme start="20251015065000 +0700" stop="20251015072000 +0700" channel="angiang2">
     <title lang="vi">Ca nhạc Tuyển tập Bolero 10</title>
+  </programme>
+  <programme start="20251015072000 +0700" stop="20251015072000 +0700" channel="angiang2">
+    <title lang="vi">Phim sitcom Cafe tử tế - Tập 14</title>
+  </programme>
+  <programme start="20251015072000 +0700" stop="20251015072000 +0700" channel="angiang2">
+    <title lang="vi">Phim sitcom Cafe tử tế - Tập 14</title>
   </programme>
   <programme start="20251015072000 +0700" stop="20251015072000 +0700" channel="angiang2">
     <title lang="vi">Phim sitcom Cafe tử tế - Tập 14</title>
@@ -210,8 +411,20 @@
   <programme start="20251015074500 +0700" stop="20251015074500 +0700" channel="angiang2">
     <title lang="vi">Giới thiệu phim – Giới thiệu chương trình</title>
   </programme>
+  <programme start="20251015074500 +0700" stop="20251015074500 +0700" channel="angiang2">
+    <title lang="vi">Giới thiệu phim – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015074500 +0700" stop="20251015074500 +0700" channel="angiang2">
+    <title lang="vi">Giới thiệu phim – Giới thiệu chương trình</title>
+  </programme>
   <programme start="20251015074500 +0700" stop="20251015075000 +0700" channel="angiang2">
     <title lang="vi">Giới thiệu phim – Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015075000 +0700" stop="20251015075000 +0700" channel="angiang2">
+    <title lang="vi">Thông báo – Quảng cáo</title>
+  </programme>
+  <programme start="20251015075000 +0700" stop="20251015075000 +0700" channel="angiang2">
+    <title lang="vi">Thông báo – Quảng cáo</title>
   </programme>
   <programme start="20251015075000 +0700" stop="20251015075000 +0700" channel="angiang2">
     <title lang="vi">Thông báo – Quảng cáo</title>
@@ -222,8 +435,20 @@
   <programme start="20251015080000 +0700" stop="20251015080000 +0700" channel="angiang2">
     <title lang="vi">PTL: Bác Hồ với các kỳ Đại hội Đảng (tập 1)</title>
   </programme>
+  <programme start="20251015080000 +0700" stop="20251015080000 +0700" channel="angiang2">
+    <title lang="vi">PTL: Bác Hồ với các kỳ Đại hội Đảng (tập 1)</title>
+  </programme>
+  <programme start="20251015080000 +0700" stop="20251015080000 +0700" channel="angiang2">
+    <title lang="vi">PTL: Bác Hồ với các kỳ Đại hội Đảng (tập 1)</title>
+  </programme>
   <programme start="20251015080000 +0700" stop="20251015083000 +0700" channel="angiang2">
     <title lang="vi">PTL: Bác Hồ với các kỳ Đại hội Đảng (tập 1)</title>
+  </programme>
+  <programme start="20251015083000 +0700" stop="20251015083000 +0700" channel="angiang2">
+    <title lang="vi">Quê hương – Đất nước – Con người: Trở lại Hòn Ngang</title>
+  </programme>
+  <programme start="20251015083000 +0700" stop="20251015083000 +0700" channel="angiang2">
+    <title lang="vi">Quê hương – Đất nước – Con người: Trở lại Hòn Ngang</title>
   </programme>
   <programme start="20251015083000 +0700" stop="20251015083000 +0700" channel="angiang2">
     <title lang="vi">Quê hương – Đất nước – Con người: Trở lại Hòn Ngang</title>
@@ -234,8 +459,20 @@
   <programme start="20251015084500 +0700" stop="20251015084500 +0700" channel="angiang2">
     <title lang="vi">Chương trình Sức sống thanh xuân – Tập 6</title>
   </programme>
+  <programme start="20251015084500 +0700" stop="20251015084500 +0700" channel="angiang2">
+    <title lang="vi">Chương trình Sức sống thanh xuân – Tập 6</title>
+  </programme>
+  <programme start="20251015084500 +0700" stop="20251015084500 +0700" channel="angiang2">
+    <title lang="vi">Chương trình Sức sống thanh xuân – Tập 6</title>
+  </programme>
   <programme start="20251015084500 +0700" stop="20251015091500 +0700" channel="angiang2">
     <title lang="vi">Chương trình Sức sống thanh xuân – Tập 6</title>
+  </programme>
+  <programme start="20251015091500 +0700" stop="20251015091500 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Việt Nam Cần một bờ vai – Tập 41</title>
+  </programme>
+  <programme start="20251015091500 +0700" stop="20251015091500 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Việt Nam Cần một bờ vai – Tập 41</title>
   </programme>
   <programme start="20251015091500 +0700" stop="20251015091500 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Việt Nam Cần một bờ vai – Tập 41</title>
@@ -246,8 +483,20 @@
   <programme start="20251015101500 +0700" stop="20251015101500 +0700" channel="angiang2">
     <title lang="vi">QHĐNCN: Lễ Sene Đolta vùng Bảy Núi An Giang</title>
   </programme>
+  <programme start="20251015101500 +0700" stop="20251015101500 +0700" channel="angiang2">
+    <title lang="vi">QHĐNCN: Lễ Sene Đolta vùng Bảy Núi An Giang</title>
+  </programme>
+  <programme start="20251015101500 +0700" stop="20251015101500 +0700" channel="angiang2">
+    <title lang="vi">QHĐNCN: Lễ Sene Đolta vùng Bảy Núi An Giang</title>
+  </programme>
   <programme start="20251015101500 +0700" stop="20251015103000 +0700" channel="angiang2">
     <title lang="vi">QHĐNCN: Lễ Sene Đolta vùng Bảy Núi An Giang</title>
+  </programme>
+  <programme start="20251015103000 +0700" stop="20251015103000 +0700" channel="angiang2">
+    <title lang="vi">Ký ức miền quê “Mùa săn cá ngát”</title>
+  </programme>
+  <programme start="20251015103000 +0700" stop="20251015103000 +0700" channel="angiang2">
+    <title lang="vi">Ký ức miền quê “Mùa săn cá ngát”</title>
   </programme>
   <programme start="20251015103000 +0700" stop="20251015103000 +0700" channel="angiang2">
     <title lang="vi">Ký ức miền quê “Mùa săn cá ngát”</title>
@@ -258,8 +507,20 @@
   <programme start="20251015105500 +0700" stop="20251015105500 +0700" channel="angiang2">
     <title lang="vi">Thông báo - Quảng cáo - Nhắn tin - Giới thiệu phim</title>
   </programme>
+  <programme start="20251015105500 +0700" stop="20251015105500 +0700" channel="angiang2">
+    <title lang="vi">Thông báo - Quảng cáo - Nhắn tin - Giới thiệu phim</title>
+  </programme>
+  <programme start="20251015105500 +0700" stop="20251015105500 +0700" channel="angiang2">
+    <title lang="vi">Thông báo - Quảng cáo - Nhắn tin - Giới thiệu phim</title>
+  </programme>
   <programme start="20251015105500 +0700" stop="20251015110000 +0700" channel="angiang2">
     <title lang="vi">Thông báo - Quảng cáo - Nhắn tin - Giới thiệu phim</title>
+  </programme>
+  <programme start="20251015110000 +0700" stop="20251015110000 +0700" channel="angiang2">
+    <title lang="vi">Thời sự An Giang – Bản tin Quốc tế - Thể thao</title>
+  </programme>
+  <programme start="20251015110000 +0700" stop="20251015110000 +0700" channel="angiang2">
+    <title lang="vi">Thời sự An Giang – Bản tin Quốc tế - Thể thao</title>
   </programme>
   <programme start="20251015110000 +0700" stop="20251015110000 +0700" channel="angiang2">
     <title lang="vi">Thời sự An Giang – Bản tin Quốc tế - Thể thao</title>
@@ -270,8 +531,20 @@
   <programme start="20251015113000 +0700" stop="20251015113000 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Yêu nhau đi em – Tập 33 - 34</title>
   </programme>
+  <programme start="20251015113000 +0700" stop="20251015113000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Yêu nhau đi em – Tập 33 - 34</title>
+  </programme>
+  <programme start="20251015113000 +0700" stop="20251015113000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Yêu nhau đi em – Tập 33 - 34</title>
+  </programme>
   <programme start="20251015113000 +0700" stop="20251015133000 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Yêu nhau đi em – Tập 33 - 34</title>
+  </programme>
+  <programme start="20251015133000 +0700" stop="20251015133000 +0700" channel="angiang2">
+    <title lang="vi">Phim sitcom Khi chàng là vợ - Tập 5</title>
+  </programme>
+  <programme start="20251015133000 +0700" stop="20251015133000 +0700" channel="angiang2">
+    <title lang="vi">Phim sitcom Khi chàng là vợ - Tập 5</title>
   </programme>
   <programme start="20251015133000 +0700" stop="20251015133000 +0700" channel="angiang2">
     <title lang="vi">Phim sitcom Khi chàng là vợ - Tập 5</title>
@@ -282,8 +555,20 @@
   <programme start="20251015140000 +0700" stop="20251015140000 +0700" channel="angiang2">
     <title lang="vi">Ký ức miền quê: Nhớ mùa nước nổi quê nhà</title>
   </programme>
+  <programme start="20251015140000 +0700" stop="20251015140000 +0700" channel="angiang2">
+    <title lang="vi">Ký ức miền quê: Nhớ mùa nước nổi quê nhà</title>
+  </programme>
+  <programme start="20251015140000 +0700" stop="20251015140000 +0700" channel="angiang2">
+    <title lang="vi">Ký ức miền quê: Nhớ mùa nước nổi quê nhà</title>
+  </programme>
   <programme start="20251015140000 +0700" stop="20251015141500 +0700" channel="angiang2">
     <title lang="vi">Ký ức miền quê: Nhớ mùa nước nổi quê nhà</title>
+  </programme>
+  <programme start="20251015141500 +0700" stop="20251015141500 +0700" channel="angiang2">
+    <title lang="vi">Chương trình tiếng Khmer</title>
+  </programme>
+  <programme start="20251015141500 +0700" stop="20251015141500 +0700" channel="angiang2">
+    <title lang="vi">Chương trình tiếng Khmer</title>
   </programme>
   <programme start="20251015141500 +0700" stop="20251015141500 +0700" channel="angiang2">
     <title lang="vi">Chương trình tiếng Khmer</title>
@@ -294,8 +579,20 @@
   <programme start="20251015151500 +0700" stop="20251015151500 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Bạo phong nhãn - Tập 34</title>
   </programme>
+  <programme start="20251015151500 +0700" stop="20251015151500 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Bạo phong nhãn - Tập 34</title>
+  </programme>
+  <programme start="20251015151500 +0700" stop="20251015151500 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Bạo phong nhãn - Tập 34</title>
+  </programme>
   <programme start="20251015151500 +0700" stop="20251015161500 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Bạo phong nhãn - Tập 34</title>
+  </programme>
+  <programme start="20251015161500 +0700" stop="20251015161500 +0700" channel="angiang2">
+    <title lang="vi">Bản tin quốc tế - thể thao</title>
+  </programme>
+  <programme start="20251015161500 +0700" stop="20251015161500 +0700" channel="angiang2">
+    <title lang="vi">Bản tin quốc tế - thể thao</title>
   </programme>
   <programme start="20251015161500 +0700" stop="20251015161500 +0700" channel="angiang2">
     <title lang="vi">Bản tin quốc tế - thể thao</title>
@@ -306,14 +603,32 @@
   <programme start="20251015163000 +0700" stop="20251015163000 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Đường ranh giới  - Tập 15</title>
   </programme>
+  <programme start="20251015163000 +0700" stop="20251015163000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Đường ranh giới  - Tập 15</title>
+  </programme>
+  <programme start="20251015163000 +0700" stop="20251015163000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Đường ranh giới  - Tập 15</title>
+  </programme>
   <programme start="20251015163000 +0700" stop="20251015171500 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Đường ranh giới  - Tập 15</title>
   </programme>
   <programme start="20251015171500 +0700" stop="20251015171500 +0700" channel="angiang2">
     <title lang="vi">Phim hoạt hình Poli và những người bạn – Tập 87 – 88 hết</title>
   </programme>
+  <programme start="20251015171500 +0700" stop="20251015171500 +0700" channel="angiang2">
+    <title lang="vi">Phim hoạt hình Poli và những người bạn – Tập 87 – 88 hết</title>
+  </programme>
+  <programme start="20251015171500 +0700" stop="20251015171500 +0700" channel="angiang2">
+    <title lang="vi">Phim hoạt hình Poli và những người bạn – Tập 87 – 88 hết</title>
+  </programme>
   <programme start="20251015171500 +0700" stop="20251015174500 +0700" channel="angiang2">
     <title lang="vi">Phim hoạt hình Poli và những người bạn – Tập 87 – 88 hết</title>
+  </programme>
+  <programme start="20251015174500 +0700" stop="20251015174500 +0700" channel="angiang2">
+    <title lang="vi">Chuyên mục: Cải cách hành chính</title>
+  </programme>
+  <programme start="20251015174500 +0700" stop="20251015174500 +0700" channel="angiang2">
+    <title lang="vi">Chuyên mục: Cải cách hành chính</title>
   </programme>
   <programme start="20251015174500 +0700" stop="20251015174500 +0700" channel="angiang2">
     <title lang="vi">Chuyên mục: Cải cách hành chính</title>
@@ -327,8 +642,23 @@
   <programme start="20251015180000 +0700" stop="20251015180000 +0700" channel="angiang2">
     <title lang="vi">Bản tin 18:00</title>
   </programme>
+  <programme start="20251015180000 +0700" stop="20251015180000 +0700" channel="angiang2">
+    <title lang="vi">Unknown</title>
+  </programme>
+  <programme start="20251015180000 +0700" stop="20251015180000 +0700" channel="angiang2">
+    <title lang="vi">Bản tin 18:00</title>
+  </programme>
+  <programme start="20251015180000 +0700" stop="20251015180000 +0700" channel="angiang2">
+    <title lang="vi">Bản tin 18:00</title>
+  </programme>
   <programme start="20251015180000 +0700" stop="20251015181500 +0700" channel="angiang2">
     <title lang="vi">Unknown</title>
+  </programme>
+  <programme start="20251015181500 +0700" stop="20251015181500 +0700" channel="angiang2">
+    <title lang="vi">Ký sự: Hương Giang (tập 7)</title>
+  </programme>
+  <programme start="20251015181500 +0700" stop="20251015181500 +0700" channel="angiang2">
+    <title lang="vi">:</title>
   </programme>
   <programme start="20251015181500 +0700" stop="20251015181500 +0700" channel="angiang2">
     <title lang="vi">Ký sự: Hương Giang (tập 7)</title>
@@ -339,8 +669,20 @@
   <programme start="20251015183000 +0700" stop="20251015183000 +0700" channel="angiang2">
     <title lang="vi">Thời sự An Giang</title>
   </programme>
+  <programme start="20251015183000 +0700" stop="20251015183000 +0700" channel="angiang2">
+    <title lang="vi">Thời sự An Giang</title>
+  </programme>
+  <programme start="20251015183000 +0700" stop="20251015183000 +0700" channel="angiang2">
+    <title lang="vi">Thời sự An Giang</title>
+  </programme>
   <programme start="20251015183000 +0700" stop="20251015185500 +0700" channel="angiang2">
     <title lang="vi">Thời sự An Giang</title>
+  </programme>
+  <programme start="20251015185500 +0700" stop="20251015185500 +0700" channel="angiang2">
+    <title lang="vi">Thông tin kinh tế - Thông báo – Quảng cáo</title>
+  </programme>
+  <programme start="20251015185500 +0700" stop="20251015185500 +0700" channel="angiang2">
+    <title lang="vi">Thông tin kinh tế - Thông báo – Quảng cáo</title>
   </programme>
   <programme start="20251015185500 +0700" stop="20251015185500 +0700" channel="angiang2">
     <title lang="vi">Thông tin kinh tế - Thông báo – Quảng cáo</title>
@@ -351,8 +693,20 @@
   <programme start="20251015190500 +0700" stop="20251015190500 +0700" channel="angiang2">
     <title lang="vi">Dự báo thời tiết</title>
   </programme>
+  <programme start="20251015190500 +0700" stop="20251015190500 +0700" channel="angiang2">
+    <title lang="vi">Dự báo thời tiết</title>
+  </programme>
+  <programme start="20251015190500 +0700" stop="20251015190500 +0700" channel="angiang2">
+    <title lang="vi">Dự báo thời tiết</title>
+  </programme>
   <programme start="20251015190500 +0700" stop="20251015191000 +0700" channel="angiang2">
     <title lang="vi">Dự báo thời tiết</title>
+  </programme>
+  <programme start="20251015191000 +0700" stop="20251015191000 +0700" channel="angiang2">
+    <title lang="vi">Phim sitcom Cà phê tử tế  - Tập 194</title>
+  </programme>
+  <programme start="20251015191000 +0700" stop="20251015191000 +0700" channel="angiang2">
+    <title lang="vi">Phim sitcom Cà phê tử tế  - Tập 194</title>
   </programme>
   <programme start="20251015191000 +0700" stop="20251015191000 +0700" channel="angiang2">
     <title lang="vi">Phim sitcom Cà phê tử tế  - Tập 194</title>
@@ -363,8 +717,20 @@
   <programme start="20251015194500 +0700" stop="20251015194500 +0700" channel="angiang2">
     <title lang="vi">Thông báo - Quảng cáo</title>
   </programme>
+  <programme start="20251015194500 +0700" stop="20251015194500 +0700" channel="angiang2">
+    <title lang="vi">Thông báo - Quảng cáo</title>
+  </programme>
+  <programme start="20251015194500 +0700" stop="20251015194500 +0700" channel="angiang2">
+    <title lang="vi">Thông báo - Quảng cáo</title>
+  </programme>
   <programme start="20251015194500 +0700" stop="20251015195000 +0700" channel="angiang2">
     <title lang="vi">Thông báo - Quảng cáo</title>
+  </programme>
+  <programme start="20251015195000 +0700" stop="20251015195000 +0700" channel="angiang2">
+    <title lang="vi">Ca cổ: Huyền thoại một Anh Hùng</title>
+  </programme>
+  <programme start="20251015195000 +0700" stop="20251015195000 +0700" channel="angiang2">
+    <title lang="vi">Ca cổ: Huyền thoại một Anh Hùng</title>
   </programme>
   <programme start="20251015195000 +0700" stop="20251015195000 +0700" channel="angiang2">
     <title lang="vi">Ca cổ: Huyền thoại một Anh Hùng</title>
@@ -375,8 +741,20 @@
   <programme start="20251015202000 +0700" stop="20251015202000 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Việt Nam Lao công bí ẩn – Tập 7</title>
   </programme>
+  <programme start="20251015202000 +0700" stop="20251015202000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Việt Nam Lao công bí ẩn – Tập 7</title>
+  </programme>
+  <programme start="20251015202000 +0700" stop="20251015202000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Việt Nam Lao công bí ẩn – Tập 7</title>
+  </programme>
   <programme start="20251015202000 +0700" stop="20251015210500 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Việt Nam Lao công bí ẩn – Tập 7</title>
+  </programme>
+  <programme start="20251015210500 +0700" stop="20251015210500 +0700" channel="angiang2">
+    <title lang="vi">Sức sống thanh xuân – Tập 6</title>
+  </programme>
+  <programme start="20251015210500 +0700" stop="20251015210500 +0700" channel="angiang2">
+    <title lang="vi">Sức sống thanh xuân – Tập 6</title>
   </programme>
   <programme start="20251015210500 +0700" stop="20251015210500 +0700" channel="angiang2">
     <title lang="vi">Sức sống thanh xuân – Tập 6</title>
@@ -387,8 +765,20 @@
   <programme start="20251015213000 +0700" stop="20251015213000 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Thái Lan Cầu vồng trở lại – Tập 19</title>
   </programme>
+  <programme start="20251015213000 +0700" stop="20251015213000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Thái Lan Cầu vồng trở lại – Tập 19</title>
+  </programme>
+  <programme start="20251015213000 +0700" stop="20251015213000 +0700" channel="angiang2">
+    <title lang="vi">Phim truyện Thái Lan Cầu vồng trở lại – Tập 19</title>
+  </programme>
   <programme start="20251015213000 +0700" stop="20251015221500 +0700" channel="angiang2">
     <title lang="vi">Phim truyện Thái Lan Cầu vồng trở lại – Tập 19</title>
+  </programme>
+  <programme start="20251015221500 +0700" stop="20251015221500 +0700" channel="angiang2">
+    <title lang="vi">Ca cổ Tình ấm chiều quê 01</title>
+  </programme>
+  <programme start="20251015221500 +0700" stop="20251015221500 +0700" channel="angiang2">
+    <title lang="vi">Ca cổ Tình ấm chiều quê 01</title>
   </programme>
   <programme start="20251015221500 +0700" stop="20251015221500 +0700" channel="angiang2">
     <title lang="vi">Ca cổ Tình ấm chiều quê 01</title>
@@ -399,14 +789,32 @@
   <programme start="20251015224500 +0700" stop="20251015224500 +0700" channel="angiang2">
     <title lang="vi">Dự báo thời tiết</title>
   </programme>
+  <programme start="20251015224500 +0700" stop="20251015224500 +0700" channel="angiang2">
+    <title lang="vi">Dự báo thời tiết</title>
+  </programme>
+  <programme start="20251015224500 +0700" stop="20251015224500 +0700" channel="angiang2">
+    <title lang="vi">Dự báo thời tiết</title>
+  </programme>
   <programme start="20251015224500 +0700" stop="20251015225000 +0700" channel="angiang2">
     <title lang="vi">Dự báo thời tiết</title>
   </programme>
   <programme start="20251015225000 +0700" stop="20251015225000 +0700" channel="angiang2">
     <title lang="vi">Bản tin cuối ngày - Thế giới 24 giờ</title>
   </programme>
+  <programme start="20251015225000 +0700" stop="20251015225000 +0700" channel="angiang2">
+    <title lang="vi">Bản tin cuối ngày - Thế giới 24 giờ</title>
+  </programme>
+  <programme start="20251015225000 +0700" stop="20251015225000 +0700" channel="angiang2">
+    <title lang="vi">Bản tin cuối ngày - Thế giới 24 giờ</title>
+  </programme>
   <programme start="20251015225000 +0700" stop="20251015231500 +0700" channel="angiang2">
     <title lang="vi">Bản tin cuối ngày - Thế giới 24 giờ</title>
+  </programme>
+  <programme start="20251015231500 +0700" stop="20251015231500 +0700" channel="angiang2">
+    <title lang="vi">Giới thiệu chương trình</title>
+  </programme>
+  <programme start="20251015231500 +0700" stop="20251015231500 +0700" channel="angiang2">
+    <title lang="vi">Giới thiệu chương trình</title>
   </programme>
   <programme start="20251015231500 +0700" stop="20251015231500 +0700" channel="angiang2">
     <title lang="vi">Giới thiệu chương trình</title>
