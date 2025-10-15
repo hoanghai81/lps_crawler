@@ -19,10 +19,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+            - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 python-dateutil pytz lxml pyyaml
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          
 
       - name: Run crawler
         run: |
