@@ -3,8 +3,11 @@
   <channel id="cartoonito">
     <display-name>CARTOONITO</display-name>
   </channel>
-  <channel id="angiang2">
-    <display-name>AN GIANG 2</display-name>
+  <channel id="angiang2test">
+    <display-name>AN GIANG 2 TEST</display-name>
+  </channel>
+  <channel id="antv1">
+    <display-name>ANTV 1</display-name>
   </channel>
   <programme start="20251015000000 +0700" stop="20251015000500 +0700" channel="cartoonito">
     <title lang="vi">ella giữa những vì sao xa</title>
@@ -263,5 +266,32 @@
   </programme>
   <programme start="20251015230000 +0700" stop="20251015233000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
+  </programme>
+  <programme start="20251015040700 +0700" stop="20251015040700 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251015040700 +0700" stop="20251015080900 +0700" channel="antv1">
+    <title lang="vi">Tin nhanh</title>
+  </programme>
+  <programme start="20251015080900 +0700" stop="20251015100600 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251015100600 +0700" stop="20251015110500 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251015110500 +0700" stop="20251015142800 +0700" channel="antv1">
+    <title lang="vi">Nhân vật - Sự kiện</title>
+  </programme>
+  <programme start="20251015142800 +0700" stop="20251015194300 +0700" channel="antv1">
+    <title lang="vi">113 Online</title>
+  </programme>
+  <programme start="20251015194300 +0700" stop="20251015201100 +0700" channel="antv1">
+    <title lang="vi">Vì nhân dân phục vụ</title>
+  </programme>
+  <programme start="20251015201100 +0700" stop="20251015201100 +0700" channel="antv1">
+    <title lang="vi">Kinh tế tiêu dùng</title>
+  </programme>
+  <programme start="20251015201100 +0700" stop="20251015204100 +0700" channel="antv1">
+    <title lang="vi">Kinh tế tiêu dùng</title>
   </programme>
 </tv>
