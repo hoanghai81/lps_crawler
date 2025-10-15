@@ -1,267 +1,267 @@
 <?xml version="1.0" encoding="utf-8"?>
 <tv generator-info-name="lps_crawler">
-  <channel id="boomerang">
-    <display-name>boomerang</display-name>
+  <channel id="cartoonito">
+    <display-name>CARTOONITO</display-name>
   </channel>
   <channel id="angiang2">
     <display-name>AN GIANG 2</display-name>
   </channel>
-  <programme start="20251015000000 +0700" stop="20251015000500 +0700" channel="boomerang">
+  <programme start="20251015000000 +0700" stop="20251015000500 +0700" channel="cartoonito">
     <title lang="vi">ella giữa những vì sao xa</title>
   </programme>
-  <programme start="20251015000500 +0700" stop="20251015000500 +0700" channel="boomerang">
+  <programme start="20251015000500 +0700" stop="20251015000500 +0700" channel="cartoonito">
     <title lang="vi">kiểm lâm rob</title>
   </programme>
-  <programme start="20251015000500 +0700" stop="20251015000500 +0700" channel="boomerang">
+  <programme start="20251015000500 +0700" stop="20251015000500 +0700" channel="cartoonito">
     <title lang="vi">tom biết nói: tổ đội anh hùng</title>
   </programme>
-  <programme start="20251015000500 +0700" stop="20251015000500 +0700" channel="boomerang">
+  <programme start="20251015000500 +0700" stop="20251015000500 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry</title>
   </programme>
-  <programme start="20251015000500 +0700" stop="20251015002500 +0700" channel="boomerang">
+  <programme start="20251015000500 +0700" stop="20251015002500 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
   </programme>
-  <programme start="20251015002500 +0700" stop="20251015002500 +0700" channel="boomerang">
+  <programme start="20251015002500 +0700" stop="20251015002500 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí</title>
   </programme>
-  <programme start="20251015002500 +0700" stop="20251015002500 +0700" channel="boomerang">
+  <programme start="20251015002500 +0700" stop="20251015002500 +0700" channel="cartoonito">
     <title lang="vi">gặp gỡ biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015002500 +0700" stop="20251015002500 +0700" channel="boomerang">
+  <programme start="20251015002500 +0700" stop="20251015002500 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí</title>
   </programme>
-  <programme start="20251015002500 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015002500 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">dorothy và phù thủy xứ oz</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">chú nhện lucas</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">kiểm lâm rob</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">thế giới của barney</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">đội thợ xây của thỏ bugs</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">thế giới nhỏ bao la của jessica</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">thế giới của barney</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">chú nhện lucas</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">tom biết nói: tổ đội anh hùng</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">đội chế tạo mecha</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015003000 +0700" channel="cartoonito">
     <title lang="vi">đội chế tạo mecha</title>
   </programme>
-  <programme start="20251015003000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015003000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">đội thợ xây của thỏ bugs</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">ella giữa những vì sao xa</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">ella giữa những vì sao xa</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">thỏ con dũng cảm</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">thỏ con dũng cảm</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">trang trại khủng long</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">trang trại khủng long</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015010000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
   </programme>
-  <programme start="20251015010000 +0700" stop="20251015020000 +0700" channel="boomerang">
+  <programme start="20251015010000 +0700" stop="20251015020000 +0700" channel="cartoonito">
     <title lang="vi">console.log(&quot;xin chao&quot;);function getLPS(){var catid = $(&quot;#catid&quot;).val();var Date_load = $(&quot;input#date&quot;).val();var urlProgram = &quot;http://info.msky.vn&quot;+catid+&quot;?date=&quot;+Date_load;window.location.href = urlProgram;}$('select#catid').change(function(){getLPS();});jQuery.browser = {};(function () {jQuery.browser.msie = false;jQuery.browser.version = 0;if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {jQuery.browser.msie = true;jQuery.browser.version = RegExp.$1;}})();$( &quot;#date&quot;).datepicker({    numberOfMonths: 1,  showButtonPanel: true,  dateFormat: 'dd/mm/yy',  onSelect: function(dateText, inst) {  getLPS();return false;}});</title>
   </programme>
-  <programme start="20251015020000 +0700" stop="20251015030000 +0700" channel="boomerang">
+  <programme start="20251015020000 +0700" stop="20251015030000 +0700" channel="cartoonito">
     <title lang="vi">thỏ con dũng cảm</title>
   </programme>
-  <programme start="20251015030000 +0700" stop="20251015040000 +0700" channel="boomerang">
+  <programme start="20251015030000 +0700" stop="20251015040000 +0700" channel="cartoonito">
     <title lang="vi">thỏ con dũng cảm</title>
   </programme>
-  <programme start="20251015040000 +0700" stop="20251015050000 +0700" channel="boomerang">
+  <programme start="20251015040000 +0700" stop="20251015050000 +0700" channel="cartoonito">
     <title lang="vi">trang trại khủng long</title>
   </programme>
-  <programme start="20251015050000 +0700" stop="20251015060000 +0700" channel="boomerang">
+  <programme start="20251015050000 +0700" stop="20251015060000 +0700" channel="cartoonito">
     <title lang="vi">trang trại khủng long</title>
   </programme>
-  <programme start="20251015060000 +0700" stop="20251015070000 +0700" channel="boomerang">
+  <programme start="20251015060000 +0700" stop="20251015070000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
   </programme>
-  <programme start="20251015070000 +0700" stop="20251015073000 +0700" channel="boomerang">
+  <programme start="20251015070000 +0700" stop="20251015073000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí</title>
   </programme>
-  <programme start="20251015073000 +0700" stop="20251015075500 +0700" channel="boomerang">
+  <programme start="20251015073000 +0700" stop="20251015075500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015075500 +0700" stop="20251015080000 +0700" channel="boomerang">
+  <programme start="20251015075500 +0700" stop="20251015080000 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí</title>
   </programme>
-  <programme start="20251015080000 +0700" stop="20251015083000 +0700" channel="boomerang">
+  <programme start="20251015080000 +0700" stop="20251015083000 +0700" channel="cartoonito">
     <title lang="vi">kiểm lâm rob</title>
   </programme>
-  <programme start="20251015083000 +0700" stop="20251015090000 +0700" channel="boomerang">
+  <programme start="20251015083000 +0700" stop="20251015090000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015090000 +0700" stop="20251015093000 +0700" channel="boomerang">
+  <programme start="20251015090000 +0700" stop="20251015093000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015093000 +0700" stop="20251015100000 +0700" channel="boomerang">
+  <programme start="20251015093000 +0700" stop="20251015100000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry</title>
   </programme>
-  <programme start="20251015100000 +0700" stop="20251015102500 +0700" channel="boomerang">
+  <programme start="20251015100000 +0700" stop="20251015102500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015102500 +0700" stop="20251015103000 +0700" channel="boomerang">
+  <programme start="20251015102500 +0700" stop="20251015103000 +0700" channel="cartoonito">
     <title lang="vi">gặp gỡ biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015103000 +0700" stop="20251015110000 +0700" channel="boomerang">
+  <programme start="20251015103000 +0700" stop="20251015110000 +0700" channel="cartoonito">
     <title lang="vi">tom biết nói: tổ đội anh hùng</title>
   </programme>
-  <programme start="20251015110000 +0700" stop="20251015113000 +0700" channel="boomerang">
+  <programme start="20251015110000 +0700" stop="20251015113000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí</title>
   </programme>
-  <programme start="20251015113000 +0700" stop="20251015120000 +0700" channel="boomerang">
+  <programme start="20251015113000 +0700" stop="20251015120000 +0700" channel="cartoonito">
     <title lang="vi">dorothy và phù thủy xứ oz</title>
   </programme>
-  <programme start="20251015120000 +0700" stop="20251015123000 +0700" channel="boomerang">
+  <programme start="20251015120000 +0700" stop="20251015123000 +0700" channel="cartoonito">
     <title lang="vi">chú nhện lucas</title>
   </programme>
-  <programme start="20251015123000 +0700" stop="20251015130000 +0700" channel="boomerang">
+  <programme start="20251015123000 +0700" stop="20251015130000 +0700" channel="cartoonito">
     <title lang="vi">kiểm lâm rob</title>
   </programme>
-  <programme start="20251015130000 +0700" stop="20251015133000 +0700" channel="boomerang">
+  <programme start="20251015130000 +0700" stop="20251015133000 +0700" channel="cartoonito">
     <title lang="vi">thế giới của barney</title>
   </programme>
-  <programme start="20251015133000 +0700" stop="20251015140000 +0700" channel="boomerang">
+  <programme start="20251015133000 +0700" stop="20251015140000 +0700" channel="cartoonito">
     <title lang="vi">đội thợ xây của thỏ bugs</title>
   </programme>
-  <programme start="20251015140000 +0700" stop="20251015142500 +0700" channel="boomerang">
+  <programme start="20251015140000 +0700" stop="20251015142500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015142500 +0700" stop="20251015143000 +0700" channel="boomerang">
+  <programme start="20251015142500 +0700" stop="20251015143000 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí</title>
   </programme>
-  <programme start="20251015143000 +0700" stop="20251015150000 +0700" channel="boomerang">
+  <programme start="20251015143000 +0700" stop="20251015150000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry</title>
   </programme>
-  <programme start="20251015150000 +0700" stop="20251015153000 +0700" channel="boomerang">
+  <programme start="20251015150000 +0700" stop="20251015153000 +0700" channel="cartoonito">
     <title lang="vi">chương trình tom và jerry</title>
   </programme>
-  <programme start="20251015153000 +0700" stop="20251015160000 +0700" channel="boomerang">
+  <programme start="20251015153000 +0700" stop="20251015160000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015160000 +0700" stop="20251015163000 +0700" channel="boomerang">
+  <programme start="20251015160000 +0700" stop="20251015163000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015163000 +0700" stop="20251015170000 +0700" channel="boomerang">
+  <programme start="20251015163000 +0700" stop="20251015170000 +0700" channel="cartoonito">
     <title lang="vi">thế giới nhỏ bao la của jessica</title>
   </programme>
-  <programme start="20251015170000 +0700" stop="20251015173000 +0700" channel="boomerang">
+  <programme start="20251015170000 +0700" stop="20251015173000 +0700" channel="cartoonito">
     <title lang="vi">thế giới của barney</title>
   </programme>
-  <programme start="20251015173000 +0700" stop="20251015180000 +0700" channel="boomerang">
+  <programme start="20251015173000 +0700" stop="20251015180000 +0700" channel="cartoonito">
     <title lang="vi">chú nhện lucas</title>
   </programme>
-  <programme start="20251015180000 +0700" stop="20251015183000 +0700" channel="boomerang">
+  <programme start="20251015180000 +0700" stop="20251015183000 +0700" channel="cartoonito">
     <title lang="vi">ban nhạc rock nhí</title>
   </programme>
-  <programme start="20251015183000 +0700" stop="20251015185500 +0700" channel="boomerang">
+  <programme start="20251015183000 +0700" stop="20251015185500 +0700" channel="cartoonito">
     <title lang="vi">biệt đội xe dơi</title>
   </programme>
-  <programme start="20251015185500 +0700" stop="20251015190000 +0700" channel="boomerang">
+  <programme start="20251015185500 +0700" stop="20251015190000 +0700" channel="cartoonito">
     <title lang="vi">tom và jerry nhí</title>
   </programme>
-  <programme start="20251015190000 +0700" stop="20251015193000 +0700" channel="boomerang">
+  <programme start="20251015190000 +0700" stop="20251015193000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
   </programme>
-  <programme start="20251015193000 +0700" stop="20251015200000 +0700" channel="boomerang">
+  <programme start="20251015193000 +0700" stop="20251015200000 +0700" channel="cartoonito">
     <title lang="vi">tom biết nói: tổ đội anh hùng</title>
   </programme>
-  <programme start="20251015200000 +0700" stop="20251015203000 +0700" channel="boomerang">
+  <programme start="20251015200000 +0700" stop="20251015203000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015203000 +0700" stop="20251015210000 +0700" channel="boomerang">
+  <programme start="20251015203000 +0700" stop="20251015210000 +0700" channel="cartoonito">
     <title lang="vi">gấu xám và những chú chuột lemmut</title>
   </programme>
-  <programme start="20251015210000 +0700" stop="20251015213000 +0700" channel="boomerang">
+  <programme start="20251015210000 +0700" stop="20251015213000 +0700" channel="cartoonito">
     <title lang="vi">đội chế tạo mecha</title>
   </programme>
-  <programme start="20251015213000 +0700" stop="20251015220000 +0700" channel="boomerang">
+  <programme start="20251015213000 +0700" stop="20251015220000 +0700" channel="cartoonito">
     <title lang="vi">đội chế tạo mecha</title>
   </programme>
-  <programme start="20251015220000 +0700" stop="20251015230000 +0700" channel="boomerang">
+  <programme start="20251015220000 +0700" stop="20251015230000 +0700" channel="cartoonito">
     <title lang="vi">đội thợ xây của thỏ bugs</title>
   </programme>
-  <programme start="20251015230000 +0700" stop="20251015233000 +0700" channel="boomerang">
+  <programme start="20251015230000 +0700" stop="20251015233000 +0700" channel="cartoonito">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
   </programme>
 </tv>
