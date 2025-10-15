@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # craw1.py
 """
-craw1.py
-- Đọc list kênh từ kenh.txt (mỗi dòng: "id | url | name" hoặc chỉ URL)
-- Crawl từng URL, trích giờ + tiêu đề bằng heuristics
-- Sinh epg1.xml (xmltv) ở thư mục gốc
-- Ghi channels_processed.txt và programmes_count.txt để workflow báo cáo
+Robust crawler for GitHub Actions:
+- Always produce epg1.xml (valid xmltv with root <tv>)
+- Produce channels_processed.txt and programmes_count.txt
+- Save per-channel debug HTML as debug_<channel>.html when available
+- Verbose logging to stdout/stderr for Actions logs
 """
 
 import os
 import re
 import sys
 import time
+import traceback
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, date, timedelta
@@ -31,7 +32,7 @@ tz = pytz.timezone(TIMEZONE)
 
 def load_channels_from_kenh_txt(path):
     if not os.path.exists(path):
-        print(f"{path} not found", file=sys.stderr)
+        print(f"[ERROR] {path} not found", file=sys.stderr)
         return []
     chans = []
     with open(path, "r", encoding="utf-8") as f:
@@ -52,7 +53,7 @@ def load_channels_from_kenh_txt(path):
                 cid = host.replace(".", "_")
                 chans.append({"id": cid, "url": ln, "name": cid})
             else:
-                print(f"Skipping invalid line in {path}: {ln}", file=sys.stderr)
+                print(f"[WARN] Skipping invalid line in {path}: {ln}", file=sys.stderr)
     return chans
 
 def fetch(url):
@@ -62,40 +63,50 @@ def fetch(url):
         "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8"
     }
     try:
-        r = requests.get(url, headers=headers, timeout=25)
+        r = requests.get(url, headers=headers, timeout=30)
         r.raise_for_status()
-        time.sleep(0.4)
+        time.sleep(0.3)
         return r.content
     except Exception as e:
-        print(f"fetch error {url}: {e}", file=sys.stderr)
+        print(f"[ERROR] fetch error {url}: {e}", file=sys.stderr)
         return b""
 
 def parse_time_from_text(base_date, txt):
-    txt = txt.strip()
+    txt = (txt or "").strip()
     txt = txt.replace("h", ":").replace(".", ":")
     m = re.search(r'(\d{1,2}:\d{2})', txt)
     if not m:
         try:
             t = dateparser.parse(txt).time()
             return datetime.combine(base_date, t)
-        except:
+        except Exception:
             return None
     try:
         t = dateparser.parse(m.group(1)).time()
         return datetime.combine(base_date, t)
-    except:
+    except Exception:
         return None
 
-def crawl_generic(url):
+def crawl_generic(url, channel_id):
     html = fetch(url)
-    if not html:
+    if html:
+        debug_name = f"debug_{channel_id}.html"
+        try:
+            with open(debug_name, "wb") as fh:
+                fh.write(html)
+            print(f"[DEBUG] Saved debug HTML -> {debug_name}")
+        except Exception as e:
+            print(f"[WARN] Could not save debug HTML {debug_name}: {e}", file=sys.stderr)
+    else:
+        print(f"[WARN] No HTML fetched for {url}", file=sys.stderr)
         return []
-    soup = BeautifulSoup(html, "lxml")
 
+    soup = BeautifulSoup(html, "lxml")
+    # parse base date from URL param if present
     m = re.search(r"ngay=([0-9\-]+)", url)
     try:
         base_date = dateparser.parse(m.group(1)).date() if m else date.today()
-    except:
+    except Exception:
         base_date = date.today()
 
     items = []
@@ -149,6 +160,7 @@ def crawl_generic(url):
     if items and 'stop' not in items[-1]:
         items[-1]['stop'] = items[-1]['start'] + timedelta(minutes=DEFAULT_DURATION_MIN)
 
+    print(f"[INFO] Parsed {len(items)} items from {url}")
     return items
 
 def build_xmltv(channels_programmes, outpath=OUTPUT):
@@ -176,53 +188,91 @@ def build_xmltv(channels_programmes, outpath=OUTPUT):
                 d = ET.SubElement(prog, "desc", {"lang":"vi"})
                 d.text = p.get("desc","")
             total += 1
-    import xml.dom.minidom
-    raw = ET.tostring(tv, encoding="utf-8")
-    pretty = xml.dom.minidom.parseString(raw).toprettyxml(indent="  ", encoding="utf-8")
-    with open(outpath, "wb") as f:
-        f.write(pretty)
+    # write pretty xml; ensure at least empty <tv> if total==0
+    try:
+        import xml.dom.minidom
+        raw = ET.tostring(tv, encoding="utf-8")
+        pretty = xml.dom.minidom.parseString(raw).toprettyxml(indent="  ", encoding="utf-8")
+        with open(outpath, "wb") as f:
+            f.write(pretty)
+    except Exception as e:
+        print(f"[ERROR] Failed to write pretty XML: {e}", file=sys.stderr)
+        # fallback minimal xml
+        minimal = '<?xml version="1.0" encoding="UTF-8"?><tv generator-info-name="lps_crawler_v1"></tv>'
+        with open(outpath, "wb") as f:
+            f.write(minimal.encode("utf-8"))
     return total
 
 def main():
-    chans = load_channels_from_kenh_txt(KENH_TXT)
-    if not chans:
-        print("No channels to process", file=sys.stderr)
-        sys.exit(1)
+    try:
+        chans = load_channels_from_kenh_txt(KENH_TXT)
+        if not chans:
+            print("[ERROR] No channels to process - kenh.txt missing or empty", file=sys.stderr)
+            # still create minimal files
+            with open(OUTPUT, "wb") as f:
+                f.write(b'<?xml version="1.0" encoding="UTF-8"?><tv generator-info-name="lps_crawler_v1"></tv>')
+            with open("channels_processed.txt", "w", encoding="utf-8") as f:
+                f.write("")
+            with open("programmes_count.txt", "w", encoding="utf-8") as f:
+                f.write("0")
+            sys.exit(0)
 
-    processed = []
-    channels_programmes = []
+        processed = []
+        channels_programmes = []
 
-    for ch in chans:
-        cid = ch.get("id")
-        url = ch.get("url")
-        name = ch.get("name", cid)
-        print(f"Crawling {cid} -> {url}")
+        for ch in chans:
+            cid = ch.get("id")
+            url = ch.get("url")
+            name = ch.get("name", cid)
+            print(f"[INFO] Crawling {cid} -> {url}")
+            try:
+                items = crawl_generic(url, cid)
+            except Exception as e:
+                print(f"[ERROR] Exception while crawling {url}: {e}", file=sys.stderr)
+                traceback.print_exc()
+                items = []
+            channels_programmes.append({"id": cid, "name": name, "programmes": items})
+            processed.append(cid)
+            time.sleep(0.2)
+
+        total_programmes = 0
         try:
-            items = crawl_generic(url)
-            # save debug HTML for angiang if present to help later debugging
-            if "angiangtv.vn" in url:
-                html = fetch(url)
-                if html:
-                    with open("angiang_debug.html", "wb") as fh:
-                        fh.write(html)
+            total_programmes = build_xmltv(channels_programmes, outpath=OUTPUT)
         except Exception as e:
-            print(f"Error crawling {url}: {e}", file=sys.stderr)
-            items = []
-        channels_programmes.append({"id": cid, "name": name, "programmes": items})
-        processed.append(cid)
-        time.sleep(0.3)
+            print(f"[ERROR] build_xmltv failed: {e}", file=sys.stderr)
+            traceback.print_exc()
+            # ensure minimal file
+            with open(OUTPUT, "wb") as f:
+                f.write(b'<?xml version="1.0" encoding="UTF-8"?><tv generator-info-name="lps_crawler_v1"></tv>')
+            total_programmes = 0
 
-    total_programmes = build_xmltv(channels_programmes, outpath=OUTPUT)
+        # write stats files
+        try:
+            with open("channels_processed.txt", "w", encoding="utf-8") as f:
+                for p in processed:
+                    f.write(p + "\n")
+            with open("programmes_count.txt", "w", encoding="utf-8") as f:
+                f.write(str(total_programmes))
+        except Exception as e:
+            print(f"[WARN] Could not write stats files: {e}", file=sys.stderr)
 
-    with open("channels_processed.txt", "w", encoding="utf-8") as f:
-        for p in processed:
-            f.write(p + "\n")
-    with open("programmes_count.txt", "w", encoding="utf-8") as f:
-        f.write(str(total_programmes))
-
-    print(f"Done. channels={len(processed)} programmes={total_programmes}")
-    sys.exit(0)
+        print(f"[DONE] channels={len(processed)} programmes={total_programmes}")
+        sys.exit(0)
+    except Exception as e:
+        print(f"[FATAL] Unexpected error: {e}", file=sys.stderr)
+        traceback.print_exc()
+        # create minimal outputs so workflow has files to inspect
+        try:
+            with open(OUTPUT, "wb") as f:
+                f.write(b'<?xml version="1.0" encoding="UTF-8"?><tv generator-info-name="lps_crawler_v1"></tv>')
+            with open("channels_processed.txt", "w", encoding="utf-8") as f:
+                f.write("")
+            with open("programmes_count.txt", "w", encoding="utf-8") as f:
+                f.write("0")
+        except:
+            pass
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
-      
+          
