@@ -205,6 +205,107 @@ def parse_angiang_html(html, base_date):
         items[-1]['stop'] = items[-1]['start'] + timedelta(minutes=DEFAULT_DURATION_MIN)
     return items
 
+def parse_antv_html(html, base_date):
+    """
+    Parser specialized for ANTV page /truyen-hinh-truc-tuyen.html
+    Heuristics:
+    - Find the section titled 'LỊCH PHÁT SÓNG' or nodes that look like schedule entries
+    - Extract time (HH:MM), title, and any following description lines
+    - base_date is a date object representing the day for the schedule
+    """
+    soup = BeautifulSoup(html, "lxml")
+    items = []
+
+    # 1) Try to locate schedule container by heading
+    container = None
+    for h in soup.select("h1,h2,h3,h4,h5"):
+        if "LỊCH PHÁT SÓNG" in h.get_text(" ", strip=True).upper():
+            # prefer next sibling block that contains list
+            nxt = h.find_next_sibling()
+            if nxt:
+                container = nxt
+                break
+    if not container:
+        container = soup.select_one(".lich-phat-song, .tv-schedule, .schedule, .box-list, .list-news")
+    if not container:
+        # fallback to scanning main content area
+        container = soup.select_one("main, #main, .content, .page-content") or soup
+
+    # 2) Gather candidate nodes
+    candidates = []
+    # common schedule structures: list items, articles, divs with time text
+    for sel in ["li", "article", ".item", ".post-item", "div"]:
+        for node in container.select(sel):
+            text = node.get_text(" ", strip=True)
+            if re.search(r'\b\d{1,2}[:h\.]\d{2}\b', text):
+                candidates.append(node)
+
+    # deduplicate preserving order
+    seen = set()
+    uniq = []
+    for node in candidates:
+        key = node.get_text(" ", strip=True)
+        if key not in seen:
+            seen.add(key)
+            uniq.append(node)
+
+    # 3) Extract time/title/desc from each node
+    for node in uniq:
+        txt = node.get_text("\n", strip=True)
+        # find first time token
+        m = re.search(r'(\d{1,2}[:h\.]\d{2})', txt)
+        if not m:
+            continue
+        time_token = m.group(1).replace("h", ":").replace(".", ":")
+        # split lines to find title/desc lines
+        lines = [ln.strip() for ln in txt.splitlines() if ln.strip()]
+        # attempt: line that contains time often at start; title is subsequent line(s)
+        title = ""
+        desc = ""
+        # find index of line containing time token
+        idx = None
+        for i, ln in enumerate(lines):
+            if re.search(re.escape(m.group(1)), ln):
+                idx = i
+                break
+        if idx is None:
+            # fallback: use first line with time removed
+            combined = re.sub(re.escape(m.group(1)), "", txt).strip()
+            title = combined
+        else:
+            # common patterns:
+            # [time]
+            # [title]
+            # [desc]
+            if idx + 1 < len(lines):
+                title = lines[idx + 1]
+                if idx + 2 < len(lines):
+                    desc = " ".join(lines[idx + 2:idx + 4])  # take up to 2 following lines as desc
+            else:
+                # sometimes time and title on same line
+                line = re.sub(re.escape(m.group(1)), "", lines[idx]).strip()
+                title = line if line else "Unknown"
+
+        # fallback: if title still empty, use node text without time
+        if not title:
+            title = re.sub(re.escape(m.group(1)), "", txt).strip().split("\n")[0]
+
+        # normalize title to single line
+        title = " ".join(title.split())
+        desc = " ".join(desc.split())
+
+        start_dt = parse_time_from_text(base_date, time_token)
+        if start_dt:
+            items.append({"start": start_dt, "title": title or "Unknown", "desc": desc or ""})
+
+    # 4) Sort and infer stops
+    items = sorted(items, key=lambda x: x['start'])
+    for i in range(len(items) - 1):
+        items[i]['stop'] = items[i + 1]['start']
+    if items and 'stop' not in items[-1]:
+        items[-1]['stop'] = items[-1]['start'] + timedelta(minutes=DEFAULT_DURATION_MIN)
+    return items
+
 
 def crawl_generic(html, url):
     soup = BeautifulSoup(html, "lxml")
