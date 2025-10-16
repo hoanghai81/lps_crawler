@@ -1,146 +1,101 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import xml.etree.ElementTree as ET
-import xml.sax.saxutils as sax
 
-# ====================================
-# CONFIG
-# ====================================
-BASE_URL = "https://info.msky.vn/vn/Boomerang.html?date="
-CHANNEL_ID = "cartoonito"
-CHANNEL_NAME = "CARTOONITO"
-OUTPUT_FILE = "boomerang.xml"
-TZ_OFFSET = "+0700"
+# Giờ Việt Nam (UTC+7)
+VN_TZ = timezone(timedelta(hours=7))
 
-
-# ====================================
-# HÀM CRAWL
-# ====================================
-def fetch_day(date_str):
-    """Crawl 1 ngày từ trang Boomerang (dạng dd/mm/YYYY)"""
-    url = BASE_URL + date_str
+def fetch_epg(date_str):
+    """
+    Lấy EPG từ info.msky.vn cho ngày cụ thể (dd/mm/yyyy)
+    """
+    url = f"https://info.msky.vn/vn/Boomerang.html?date={date_str}"
     print(f"Fetching: {url}")
-    resp = requests.get(url, timeout=15)
+    resp = requests.get(url, timeout=20)
     resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "html.parser")
+    return resp.text
 
-    rows = soup.select("table tr")
-    items = []
-    for tr in rows:
-        tds = tr.find_all("td")
-        if len(tds) >= 2:
-            time_str = tds[0].get_text(strip=True)
-            title_vi = tds[1].get_text(strip=True)
-            if not time_str or not title_vi:
-                continue
-            items.append({
-                "date_str": date_str,
-                "time_str": time_str,
-                "title_vi": title_vi,
-                "title_en": title_vi,   # fallback
-                "duration_min": None
-            })
-    return items
+def parse_html_to_programs(html, base_date):
+    """
+    Parse HTML -> danh sách chương trình [(start_dt, stop_dt, title, desc)]
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.find("table", {"class": "tableEPG"})
+    programs = []
 
+    if not table:
+        print("⚠️ Không tìm thấy bảng EPG")
+        return programs
 
-# ====================================
-# HÀM XUẤT XMLTV (đã FIX rollover)
-# ====================================
-def create_xmltv(program_items, output_file=OUTPUT_FILE):
-    tv = ET.Element("tv", {"source-info-name": "msky.vn", "generator-info-name": "lps_crawler"})
-    ch = ET.SubElement(tv, "channel", {"id": CHANNEL_ID})
-    ET.SubElement(ch, "display-name").text = CHANNEL_NAME
-
-    last_dt = None
-    programmes = []
-
-    for item in program_items:
-        date_str = item.get("date_str")
-        time_str = item.get("time_str")
-        title_vi = item.get("title_vi", "").strip()
-        title_en = item.get("title_en", "").strip() or title_vi
-        duration_min = item.get("duration_min")
-
-        if not date_str or not time_str:
+    rows = table.find_all("tr")
+    for row in rows[1:]:  # bỏ header
+        cols = [c.get_text(strip=True) for c in row.find_all("td")]
+        if len(cols) < 2:
             continue
 
-        time_str = time_str.strip()
-        # thêm số 0 phía trước nếu giờ chỉ có 1 chữ số
-        if len(time_str.split(":")[0]) == 1:
-            time_str = "0" + time_str
+        time_str, title = cols[0], cols[1]
+        desc = cols[2] if len(cols) > 2 else ""
 
+        # Thời gian bắt đầu: HH:MM
         try:
-            start_dt = datetime.strptime(f"{date_str.strip()} {time_str}", "%d/%m/%Y %H:%M")
-        except Exception as e:
-            print(f"⚠️ Bỏ qua dòng lỗi: {date_str} {time_str} ({e})")
+            start_time = datetime.strptime(time_str, "%H:%M").time()
+        except ValueError:
             continue
 
-        # nếu giờ nhỏ hơn giờ trước đó → đã sang ngày mới
-        if last_dt is not None:
-            while start_dt <= last_dt:
-                start_dt += timedelta(days=1)
+        start_dt = datetime.combine(base_date, start_time, VN_TZ)
+        programs.append((start_dt, title, desc))
 
-        programmes.append({
-            "start_dt": start_dt,
-            "title_vi": title_vi,
-            "title_en": title_en,
-            "duration_min": duration_min
-        })
-
-        last_dt = start_dt
-
-    # tính giờ kết thúc (stop)
-    for i, p in enumerate(programmes):
-        start_dt = p["start_dt"]
-        duration = p.get("duration_min")
-
-        if duration and isinstance(duration, int) and duration > 0:
-            stop_dt = start_dt + timedelta(minutes=duration)
+    # Tính giờ kết thúc (stop) bằng giờ bắt đầu kế tiếp
+    result = []
+    for i, (start_dt, title, desc) in enumerate(programs):
+        if i < len(programs) - 1:
+            stop_dt = programs[i + 1][0]
         else:
-            if i + 1 < len(programmes):
-                stop_dt = programmes[i + 1]["start_dt"]
-                if stop_dt <= start_dt:
-                    stop_dt += timedelta(days=1)
-            else:
-                stop_dt = start_dt + timedelta(minutes=30)
+            stop_dt = start_dt + timedelta(minutes=30)  # chương trình cuối mặc định 30 phút
+        result.append((start_dt, stop_dt, title, desc))
 
-        if stop_dt <= start_dt:
-            stop_dt = start_dt + timedelta(minutes=30)
-
-        prog = ET.SubElement(tv, "programme", {
-            "start": start_dt.strftime("%Y%m%d%H%M%S ") + TZ_OFFSET,
-            "stop": stop_dt.strftime("%Y%m%d%H%M%S ") + TZ_OFFSET,
-            "channel": CHANNEL_ID
-        })
-        ET.SubElement(prog, "title", {"lang": "vi"}).text = sax.escape(p["title_vi"])
-        ET.SubElement(prog, "title", {"lang": "en"}).text = sax.escape(p["title_en"])
-
-    ET.ElementTree(tv).write(output_file, encoding="utf-8", xml_declaration=True)
-    print(f"✅ Xuất thành công {output_file} ({len(programmes)} programmes)")
+    return result
 
 
-# ====================================
-# MAIN
-# ====================================
-def main():
-    today = datetime.now().strftime("%d/%m/%Y")
-    tomorrow = (datetime.now() + timedelta(days=1)).strftime("%d/%m/%Y")
+def generate_xmltv(programs, output_file="boomerang.xml"):
+    tv = ET.Element("tv", attrib={"generator-info-name": "msky_crawler"})
 
-    all_items = []
-    for d in [today, tomorrow]:
-        try:
-            items = fetch_day(d)
-            all_items.extend(items)
-        except Exception as e:
-            print(f"⚠️ Lỗi khi crawl {d}: {e}")
+    # Channel info
+    ch = ET.SubElement(tv, "channel", id="cartoonito")
+    ET.SubElement(ch, "display-name").text = "CARTOONITO"
+    ET.SubElement(ch, "url").text = "https://info.msky.vn/vn/Boomerang.html"
 
-    print(f"✅ Tổng cộng: {len(all_items)} chương trình")
+    for start_dt, stop_dt, title, desc in programs:
+        prog = ET.SubElement(
+            tv,
+            "programme",
+            {
+                "start": start_dt.strftime("%Y%m%d%H%M%S +0700"),
+                "stop": stop_dt.strftime("%Y%m%d%H%M%S +0700"),
+                "channel": "cartoonito",
+            },
+        )
+        ET.SubElement(prog, "title", lang="vi").text = title
+        ET.SubElement(prog, "desc", lang="vi").text = desc
 
-    create_xmltv(all_items, OUTPUT_FILE)
+    tree = ET.ElementTree(tv)
+    ET.indent(tree, space="  ", level=0)
+    tree.write(output_file, encoding="utf-8", xml_declaration=True)
+    print(f"✅ Xuất thành công {output_file} ({len(programs)} programmes)")
 
 
 if __name__ == "__main__":
     print("=== RUNNING CRAWLER ===")
-    main()
+    today = datetime.now(VN_TZ).date()
+    date_str = today.strftime("%d/%m/%Y")
+
+    try:
+        html = fetch_epg(date_str)
+        programs = parse_html_to_programs(html, today)
+        print(f"✅ Tổng cộng: {len(programs)} chương trình")
+        generate_xmltv(programs)
+    except Exception as e:
+        print(f"⚠️ Lỗi: {e}")
+
     print("=== DONE ===")
