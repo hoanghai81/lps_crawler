@@ -5,13 +5,14 @@ boomerang.py
 Generate boomerang.xml (XMLTV) for CARTOONITO (channel id: cartoonito)
 Source: https://info.msky.vn/vn/Boomerang.html
 
-Behavior:
-- Fetches the source page and finds the best container with schedule by counting time tokens.
-- Removes scripts/styles before parsing.
-- Extracts time tokens (HH:MM) and nearest titles, handles midnight rollover.
-- Deduplicates by (start_time, normalized_title).
-- Always writes a valid XMLTV with channel node even if no programmes found.
-- Timezone fixed to +0700.
+Improvements in this version:
+- Remove scripts/styles/pre/code/json-ld before parsing.
+- Find best container by counting time tokens.
+- Extract time tokens and nearest titles, with robust cleaning.
+- Remove "Source: ..." and other noise from titles.
+- Deduplicate by (start_iso, normalized_title).
+- Infer stop times from next program; fallback default duration.
+- Always write valid XMLTV with channel node even if no programmes found.
 """
 
 from datetime import datetime, date, time as dtime, timedelta
@@ -20,7 +21,7 @@ import sys
 import xml.etree.ElementTree as ET
 
 import requests
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag, Comment
 from dateutil import tz
 
 SOURCE_URL = "https://info.msky.vn/vn/Boomerang.html"
@@ -28,37 +29,48 @@ CHANNEL_ID = "cartoonito"
 CHANNEL_NAME = "CARTOONITO"
 OUTPUT_FILE = "boomerang.xml"
 DEFAULT_DURATION_MIN = 30
-TZ_OFFSET = "+0700"  # for timestamps in XMLTV
+TZ_OFFSET = "+0700"  # timezone for timestamps
 
 # regex to find time tokens like 6:30, 06:30, 23:59, 6.30 (dot allowed)
 TIME_RE = re.compile(r'\b([01]?\d|2[0-3])[:.][0-5]\d\b')
 
-# text patterns to treat as noise
+# noise patterns to avoid
 NOISE_PATTERNS = [
     re.compile(r'console\.log', re.I),
     re.compile(r'function\s*\(', re.I),
     re.compile(r'\$\(|jQuery', re.I),
     re.compile(r'http[:\/]{2}', re.I),
     re.compile(r'@[\w\.-]+', re.I),  # emails
+    re.compile(r'\bhotline\b', re.I),
+    re.compile(r'\bemail\b', re.I),
 ]
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; boomerang-bot/1.0)"}
 
 
 def fetch_html(url, timeout=20):
-    resp = requests.get(url, timeout=timeout, headers=HEADERS)
-    resp.raise_for_status()
-    return resp.text
+    r = requests.get(url, timeout=timeout, headers=HEADERS)
+    r.raise_for_status()
+    return r.text
 
 
-def clean_soup(soup):
-    # remove scripts, styles, comments
-    for tag in soup.find_all(["script", "style", "noscript", "iframe"]):
-        tag.decompose()
-    # remove comments
-    for element in soup(text=lambda t: isinstance(t, (NavigableString,)) and isinstance(t, type(soup.new_string(''))) and t.strip().startswith("<!--")):
+def remove_noise_tags(soup):
+    # remove script/style/noscript/iframe/pre/code/json-ld and comments
+    for tag in soup.find_all(["script", "style", "noscript", "iframe", "pre", "code"]):
         try:
-            element.extract()
+            tag.decompose()
+        except Exception:
+            pass
+    # remove JSON-LD blocks (application/ld+json)
+    for tag in soup.find_all("script", {"type": "application/ld+json"}):
+        try:
+            tag.decompose()
+        except Exception:
+            pass
+    # remove comments
+    for c in soup.find_all(text=lambda t: isinstance(t, Comment)):
+        try:
+            c.extract()
         except Exception:
             pass
     return soup
@@ -70,70 +82,62 @@ def count_time_tokens(node):
 
 
 def choose_best_container(soup):
-    # candidate selectors that often contain schedules
     selectors = [
         "main", "#main", ".content", ".page-content", ".schedule", ".lich-phat-song",
-        ".lps", ".program-list", ".tv-schedule", ".box-list", "article"
+        ".lps", ".program-list", ".tv-schedule", ".box-list", "article", ".site-content"
     ]
     candidates = []
-    # try explicit selectors first
     for sel in selectors:
-        found = soup.select(sel)
-        for f in found:
-            cnt = count_time_tokens(f)
+        for el in soup.select(sel):
+            cnt = count_time_tokens(el)
             if cnt:
-                candidates.append((f, cnt))
-    # fallback: search all divs with at least one time token, limit to reasonable count
+                candidates.append((el, cnt))
     if not candidates:
-        for div in soup.find_all(["div", "section", "article"], limit=200):
-            cnt = count_time_tokens(div)
+        # fallback: search reasonable nodes
+        for el in soup.find_all(["div", "section", "article"], limit=300):
+            cnt = count_time_tokens(el)
             if cnt:
-                candidates.append((div, cnt))
+                candidates.append((el, cnt))
     if not candidates:
-        # final fallback: entire document
         return soup
-    # choose candidate with maximum time tokens
     best = max(candidates, key=lambda x: x[1])[0]
     return best
 
 
 def is_noise_text(s):
-    if not s:
+    if not s or not s.strip():
         return True
-    low = s.lower()
-    # short nonsense
+    low = s.strip().lower()
     if len(low) < 2:
         return True
     for p in NOISE_PATTERNS:
         if p.search(low):
             return True
-    # lines that look like pure digits or just punctuation
-    if re.fullmatch(r'[\d\-\:\.\s\|]+', low):
+    # pure punctuation/digits
+    if re.fullmatch(r'[\d\-\:\.\s\|,]+', low):
         return True
     return False
 
 
 def extract_time_nodes(container):
     """
-    Return list of tuples (time_str, node) in document order from the container.
-    node is the NavigableString that contains the time token.
+    Return list of (time_str, node) in document order where node is the NavigableString containing the token.
     """
     matches = []
     for text in container.find_all(string=TIME_RE):
-        # skip empty or noise-containing text
         parent = getattr(text, "parent", None)
         if parent and parent.name in ("script", "style", "noscript", "iframe"):
             continue
-        t = TIME_RE.search(text)
-        if t:
-            matches.append((t.group(0).replace(".", ":"), text))
+        m = TIME_RE.search(text)
+        if m:
+            matches.append((m.group(0).replace(".", ":"), text))
     return matches
 
 
-def sibling_text(s):
-    if isinstance(s, Tag):
-        return s.get_text(" ", strip=True)
-    return str(s).strip()
+def sibling_text(x):
+    if isinstance(x, Tag):
+        return x.get_text(" ", strip=True)
+    return str(x).strip()
 
 
 def clean_title(s):
@@ -143,20 +147,19 @@ def clean_title(s):
     # remove leading/trailing separators
     s = re.sub(r'^[\-\:\–\—\|]+\s*', '', s)
     s = re.sub(r'\s*[\-\:\–\—\|]+$', '', s)
-    # remove code-like fragments
+    # remove explicit Source: URL or similar
+    s = re.sub(r'\bSource:\s*https?:\/\/\S+', '', s, flags=re.I)
+    s = re.sub(r'https?:\/\/\S+', '', s, flags=re.I)
+    # remove code-like or noise patterns
     for p in NOISE_PATTERNS:
         s = p.sub('', s)
-    return s.strip()
+    s = s.strip()
+    return s
 
 
 def extract_title_near_node(node):
     """
-    Given a NavigableString node containing a time token, attempt to find the program title:
-    Strategy:
-      1) If same text node contains additional text (after or before time), use it.
-      2) Check direct siblings (next and previous).
-      3) Check parent element child nodes after the time node.
-      4) Search next elements in doc order up to a small limit.
+    For a text node containing a time token, try to extract a nearby title.
     """
     text_str = str(node)
     m = TIME_RE.search(text_str)
@@ -168,20 +171,21 @@ def extract_title_near_node(node):
         if before and not TIME_RE.search(before) and not is_noise_text(before):
             return clean_title(before)
 
-    # siblings: prefer next sibling
+    # next sibling
     ns = node.next_sibling
     if ns:
         st = sibling_text(ns)
         if st and not TIME_RE.search(st) and not is_noise_text(st):
             return clean_title(st)
 
+    # prev sibling
     ps = node.previous_sibling
     if ps:
         st = sibling_text(ps)
         if st and not TIME_RE.search(st) and not is_noise_text(st):
             return clean_title(st)
 
-    # parent children after the node
+    # parent children after node
     parent = getattr(node, "parent", None)
     if parent:
         found = False
@@ -194,10 +198,10 @@ def extract_title_near_node(node):
                 if ct and not TIME_RE.search(ct) and not is_noise_text(ct):
                     return clean_title(ct)
 
-    # search next text nodes in document order (limited steps)
+    # search forward in document order
     nxt = node
     steps = 0
-    while nxt and steps < 15:
+    while nxt and steps < 20:
         nxt = nxt.next_element
         if isinstance(nxt, NavigableString):
             s = str(nxt).strip()
@@ -209,57 +213,42 @@ def extract_title_near_node(node):
 
 
 def build_programs_from_time_nodes(time_nodes, base_date):
-    """
-    time_nodes: list of (time_str, node) in doc order
-    base_date: date for the first day's schedules
-    Returns: list of programs dicts with start, stop, title
-    """
     programs = []
     last_start = None
     current_day = base_date
     seen = set()
-
     for time_str, node in time_nodes:
         title = extract_title_near_node(node)
         if not title:
-            # try to find an emphasized tag in parent (b,strong,h*)
             p = getattr(node, "parent", None)
             if p:
                 heading = p.find(["b", "strong", "h1", "h2", "h3", "h4", "h5"])
                 if heading:
                     title = heading.get_text(" ", strip=True)
-        if not title:
-            # skip if no plausible title
+        title = clean_title(title)
+        if not title or is_noise_text(title):
             continue
-
-        # skip noisy titles
-        if is_noise_text(title):
+        try:
+            hh, mm = (int(x) for x in time_str.split(":"))
+        except Exception:
             continue
-
-        # parse time
-        hh, mm = (int(x) for x in time_str.split(":"))
         start_dt = datetime.combine(current_day, dtime(hh, mm))
         if last_start and start_dt <= last_start:
-            # rollover to next day
             start_dt = start_dt + timedelta(days=1)
             current_day = start_dt.date()
-
-        # dedupe by (date, time, normalized title)
         key = (start_dt.isoformat(), re.sub(r'\s+', ' ', title).lower())
         if key in seen:
             last_start = start_dt
             continue
         seen.add(key)
-
         programs.append({"start": start_dt, "stop": start_dt + timedelta(minutes=DEFAULT_DURATION_MIN), "title": title})
         last_start = start_dt
 
-    # infer stops from next start times
+    # infer stops
     programs = sorted(programs, key=lambda x: x["start"])
     for i in range(len(programs) - 1):
         if programs[i + 1]["start"] > programs[i]["start"]:
             programs[i]["stop"] = programs[i + 1]["start"]
-
     return programs
 
 
@@ -279,53 +268,55 @@ def build_xmltv(programs):
 
     # programmes
     for p in programs:
+        if not p.get("start") or not p.get("stop") or not p.get("title"):
+            continue
         prog = ET.SubElement(tv, "programme", start=xmltv_timestamp(p["start"]), stop=xmltv_timestamp(p["stop"]), channel=CHANNEL_ID)
         title = ET.SubElement(prog, "title", lang="vi")
         title.text = p["title"]
-        # optional source info in credits
         credits = ET.SubElement(prog, "credits")
         presenter = ET.SubElement(credits, "presenter")
         presenter.text = "Source: " + SOURCE_URL
-
-    # produce bytes
     return ET.tostring(tv, encoding="utf-8", method="xml")
 
 
+def write_xml_file(xml_bytes):
+    with open(OUTPUT_FILE, "wb") as f:
+        f.write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
+        f.write(xml_bytes)
+
+
 def main():
-    # base_date = today in Hanoi
     htz = tz.gettz("Asia/Ho_Chi_Minh")
     today_hanoi = datetime.now(tz=htz).date()
 
     try:
         html = fetch_html(SOURCE_URL)
     except Exception as e:
-        print("Failed to fetch source:", e, file=sys.stderr)
-        # write minimal xml with channel node and exit 0 so CI doesn't fail hard
+        # write minimal xml and exit 0 to avoid CI failing hard
         empty_xml = build_xmltv([])
-        with open(OUTPUT_FILE, "wb") as f:
-            f.write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-            f.write(empty_xml)
+        write_xml_file(empty_xml)
+        print("Failed to fetch source:", e, file=sys.stderr)
         sys.exit(0)
 
     soup = BeautifulSoup(html, "lxml")
-    clean_soup(soup)
-
+    remove_noise_tags(soup)
     container = choose_best_container(soup)
 
-    # extract time nodes in container
+    # additional defensive removals on chosen container
+    for bad in container.select(".debug, .json-ld, .hidden, .rawdump"):
+        try:
+            bad.decompose()
+        except Exception:
+            pass
+
     time_nodes = extract_time_nodes(container)
     if not time_nodes:
-        # fallback: try whole page if container had none
         time_nodes = extract_time_nodes(soup)
 
-    # ensure order is document order (they should be)
     programs = build_programs_from_time_nodes(time_nodes, today_hanoi)
 
-    # write xmltv even if empty
     xml_bytes = build_xmltv(programs)
-    with open(OUTPUT_FILE, "wb") as f:
-        f.write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-        f.write(xml_bytes)
+    write_xml_file(xml_bytes)
 
     print(f"Wrote {OUTPUT_FILE} with {len(programs)} programmes (source: {SOURCE_URL})")
 
