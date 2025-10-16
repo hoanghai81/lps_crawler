@@ -1,65 +1,74 @@
-import requests_html
-from datetime import datetime, timedelta, timezone
-from xml.etree.ElementTree import Element, SubElement, ElementTree
+import datetime
+from requests_html import HTMLSession
+import xml.etree.ElementTree as ET
 
-def fetch_qpvn():
-    session = requests_html.HTMLSession()
+def crawl_qpvn():
     url = "https://qpvn.vn/tv.html"
+    channel_id = "qpvn1"
+    channel_name = "QPVN"
+
     print(f"Fetching: {url}")
+
+    session = HTMLSession()
     r = session.get(url)
-    r.html.render(timeout=30, sleep=3)
-    items = r.html.find(".schedule-item, .list-schedule-item")
+
+    try:
+        # Render toàn bộ trang – cho phép JS load lịch
+        r.html.render(timeout=60, sleep=10)
+    except Exception as e:
+        print(f"⚠️ Render error: {e}")
+
+    # thử vài selector phổ biến trên trang này
+    selectors = [
+        ".schedule-item",         # giả định
+        ".item-schedule",         # dự phòng
+        ".tv-schedule-item",      # dự phòng khác
+        "li",                     # fallback
+    ]
 
     programmes = []
-    today = datetime.now(timezone(timedelta(hours=7)))
-    date_str = today.strftime("%Y%m%d")
+    for sel in selectors:
+        items = r.html.find(sel)
+        if len(items) > 2:
+            print(f"✅ Dò được selector: {sel} ({len(items)} items)")
+            for it in items:
+                try:
+                    time_text = it.find("span.time", first=True).text.strip()
+                    title = it.find("span.title", first=True).text.strip()
+                    desc_el = it.find("span.description", first=True)
+                    desc = desc_el.text.strip() if desc_el else ""
 
-    for item in items:
-        try:
-            time_str = item.find(".time", first=True).text.strip()
-            title_el = item.find(".title", first=True)
-            title = title_el.text.strip() if title_el else "Chương trình"
-            desc_el = item.find(".desc, .description", first=True)
-            desc = desc_el.text.strip() if desc_el else ""
+                    today = datetime.date.today().strftime("%Y%m%d")
+                    start_dt = datetime.datetime.strptime(
+                        f"{today} {time_text}", "%Y%m%d %H:%M"
+                    )
+                    stop_dt = start_dt + datetime.timedelta(minutes=30)  # tạm thời 30 phút
 
-            start_dt = datetime.strptime(
-                f"{today.strftime('%Y-%m-%d')} {time_str}", "%Y-%m-%d %H:%M"
-            ).replace(tzinfo=timezone(timedelta(hours=7)))
+                    programmes.append({
+                        "start": start_dt.strftime("%Y%m%d%H%M%S") + " +0700",
+                        "stop": stop_dt.strftime("%Y%m%d%H%M%S") + " +0700",
+                        "title": title,
+                        "desc": desc
+                    })
+                except Exception as e:
+                    print("⚠️ Parse error:", e)
+            break
 
-            # tạm thời cộng 1h cho thời gian kết thúc
-            stop_dt = start_dt + timedelta(hours=1)
+    print(f"✅ Tổng cộng: {len(programmes)} chương trình")
 
-            programmes.append({
-                "start": start_dt.strftime("%Y%m%d%H%M%S %z"),
-                "stop": stop_dt.strftime("%Y%m%d%H%M%S %z"),
-                "title": title,
-                "desc": desc
-            })
-        except Exception as e:
-            print(f"⚠️ Parse error: {e}")
-            continue
-
-    return programmes
-
-
-def export_xmltv(programmes, output_file="qpvn.xml"):
-    tv = Element("tv")
-    channel = SubElement(tv, "channel", id="qpvn1")
-    SubElement(channel, "display-name").text = "QPVN"
+    # Xuất XMLTV
+    tv = ET.Element("tv")
+    channel = ET.SubElement(tv, "channel", id=channel_id)
+    ET.SubElement(channel, "display-name").text = channel_name
 
     for p in programmes:
-        prog = SubElement(
-            tv, "programme", start=p["start"], stop=p["stop"], channel="qpvn1"
-        )
-        SubElement(prog, "title", lang="vi").text = p["title"]
-        if p["desc"]:
-            SubElement(prog, "desc", lang="vi").text = p["desc"]
+        pr = ET.SubElement(tv, "programme", start=p["start"], stop=p["stop"], channel=channel_id)
+        ET.SubElement(pr, "title").text = p["title"]
+        ET.SubElement(pr, "desc").text = p["desc"]
 
-    ElementTree(tv).write(output_file, encoding="utf-8", xml_declaration=True)
-    print(f"✅ Xuất thành công {output_file} ({len(programmes)} programmes)")
-
+    ET.ElementTree(tv).write("qpvn.xml", encoding="utf-8", xml_declaration=True)
+    print("✅ Xuất thành công qpvn.xml")
 
 if __name__ == "__main__":
-    programmes = fetch_qpvn()
-    export_xmltv(programmes)
-  
+    crawl_qpvn()
+        
