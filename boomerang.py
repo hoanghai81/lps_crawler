@@ -3,99 +3,102 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, timezone
 import xml.etree.ElementTree as ET
 
-# Giờ Việt Nam (UTC+7)
+# =====================
+# CONFIG
+# =====================
+CHANNEL_ID = "boomerang"
+CHANNEL_NAME = "Boomerang"
+SOURCE_NAME = "msky.vn"
+BASE_URL = "https://info.msky.vn/vn/Boomerang.html?date={date}"
+
+# =====================
+# GET CURRENT DATE (VN TIME)
+# =====================
 VN_TZ = timezone(timedelta(hours=7))
+today_vn = datetime.now(VN_TZ)
+today_str = today_vn.strftime("%d/%m/%Y")
+today_xml = today_vn.strftime("%Y%m%d")
 
-def fetch_epg(date_str):
-    """
-    Lấy EPG từ info.msky.vn cho ngày cụ thể (dd/mm/yyyy)
-    """
-    url = f"https://info.msky.vn/vn/Boomerang.html?date={date_str}"
-    print(f"Fetching: {url}")
-    resp = requests.get(url, timeout=20)
-    resp.raise_for_status()
-    return resp.text
+# =====================
+# FETCH PAGE
+# =====================
+print("=== RUNNING CRAWLER ===")
+print(f"Fetching: {BASE_URL.format(date=today_str)}")
 
-def parse_html_to_programs(html, base_date):
-    """
-    Parse HTML -> danh sách chương trình [(start_dt, stop_dt, title, desc)]
-    """
-    soup = BeautifulSoup(html, "html.parser")
-    table = soup.find("table", {"class": "tableEPG"})
-    programs = []
+res = requests.get(BASE_URL.format(date=today_str), timeout=30)
+res.encoding = "utf-8"
+soup = BeautifulSoup(res.text, "html.parser")
 
-    if not table:
-        print("⚠️ Không tìm thấy bảng EPG")
-        return programs
-
-    rows = table.find_all("tr")
-    for row in rows[1:]:  # bỏ header
-        cols = [c.get_text(strip=True) for c in row.find_all("td")]
-        if len(cols) < 2:
+table = soup.find("table")
+if not table:
+    print("⚠️ Không tìm thấy bảng EPG")
+    programmes = []
+else:
+    programmes = []
+    rows = table.find_all("tr")[1:]  # Bỏ tiêu đề
+    for row in rows:
+        cols = row.find_all("td")
+        if len(cols) < 3:
             continue
 
-        time_str, title = cols[0], cols[1]
-        desc = cols[2] if len(cols) > 2 else ""
+        time_str = cols[0].get_text(strip=True)
+        title_vi = cols[1].get_text(strip=True)
+        title_en = cols[2].get_text(strip=True) if len(cols) > 2 else ""
 
-        # Thời gian bắt đầu: HH:MM
+        # Xác định start datetime
         try:
-            start_time = datetime.strptime(time_str, "%H:%M").time()
-        except ValueError:
+            start_dt = datetime.strptime(f"{today_str} {time_str}", "%d/%m/%Y %H:%M")
+            if start_dt.hour < 4:
+                # Nếu giờ < 4 thì coi là sáng hôm sau (vì msky hay nối tiếp 2 ngày)
+                start_dt += timedelta(days=1)
+        except:
             continue
 
-        start_dt = datetime.combine(base_date, start_time, VN_TZ)
-        programs.append((start_dt, title, desc))
+        # Stop time = +30 phút mặc định (vì không có trong trang)
+        stop_dt = start_dt + timedelta(minutes=30)
 
-    # Tính giờ kết thúc (stop) bằng giờ bắt đầu kế tiếp
-    result = []
-    for i, (start_dt, title, desc) in enumerate(programs):
-        if i < len(programs) - 1:
-            stop_dt = programs[i + 1][0]
-        else:
-            stop_dt = start_dt + timedelta(minutes=30)  # chương trình cuối mặc định 30 phút
-        result.append((start_dt, stop_dt, title, desc))
+        programmes.append({
+            "start": start_dt,
+            "stop": stop_dt,
+            "title_vi": title_vi,
+            "title_en": title_en,
+        })
 
-    return result
+# =====================
+# FILTER ONLY TODAY (0h–23h59)
+# =====================
+start_day = today_vn.replace(hour=0, minute=0, second=0, microsecond=0)
+end_day = start_day + timedelta(days=1)
+filtered = [
+    p for p in programmes
+    if start_day <= p["start"] < end_day
+]
 
+# =====================
+# BUILD XMLTV
+# =====================
+tv = ET.Element("tv", {
+    "source-info-name": SOURCE_NAME,
+    "generator-info-name": "lps_crawler"
+})
 
-def generate_xmltv(programs, output_file="boomerang.xml"):
-    tv = ET.Element("tv", attrib={"generator-info-name": "msky_crawler"})
+ET.SubElement(tv, "channel", {"id": CHANNEL_ID}).append(
+    ET.Element("display-name", text=CHANNEL_NAME)
+)
 
-    # Channel info
-    ch = ET.SubElement(tv, "channel", id="cartoonito")
-    ET.SubElement(ch, "display-name").text = "CARTOONITO"
-    ET.SubElement(ch, "url").text = "https://info.msky.vn/vn/Boomerang.html"
+for p in filtered:
+    prog = ET.SubElement(tv, "programme", {
+        "start": p["start"].strftime("%Y%m%d%H%M%S +0700"),
+        "stop": p["stop"].strftime("%Y%m%d%H%M%S +0700"),
+        "channel": CHANNEL_ID
+    })
+    ET.SubElement(prog, "title", {"lang": "vi"}).text = p["title_vi"]
+    if p["title_en"]:
+        ET.SubElement(prog, "title", {"lang": "en"}).text = p["title_en"]
 
-    for start_dt, stop_dt, title, desc in programs:
-        prog = ET.SubElement(
-            tv,
-            "programme",
-            {
-                "start": start_dt.strftime("%Y%m%d%H%M%S +0700"),
-                "stop": stop_dt.strftime("%Y%m%d%H%M%S +0700"),
-                "channel": "cartoonito",
-            },
-        )
-        ET.SubElement(prog, "title", lang="vi").text = title
-        ET.SubElement(prog, "desc", lang="vi").text = desc
+tree = ET.ElementTree(tv)
+tree.write(f"{CHANNEL_ID}.xml", encoding="utf-8", xml_declaration=True)
 
-    tree = ET.ElementTree(tv)
-    ET.indent(tree, space="  ", level=0)
-    tree.write(output_file, encoding="utf-8", xml_declaration=True)
-    print(f"✅ Xuất thành công {output_file} ({len(programs)} programmes)")
-
-
-if __name__ == "__main__":
-    print("=== RUNNING CRAWLER ===")
-    today = datetime.now(VN_TZ).date()
-    date_str = today.strftime("%d/%m/%Y")
-
-    try:
-        html = fetch_epg(date_str)
-        programs = parse_html_to_programs(html, today)
-        print(f"✅ Tổng cộng: {len(programs)} chương trình")
-        generate_xmltv(programs)
-    except Exception as e:
-        print(f"⚠️ Lỗi: {e}")
-
-    print("=== DONE ===")
+print(f"✅ Tổng cộng: {len(filtered)} chương trình")
+print(f"✅ Xuất thành công {CHANNEL_ID}.xml")
+print("=== DONE ===")
