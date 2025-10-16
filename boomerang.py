@@ -1,23 +1,18 @@
 #!/usr/bin/env python3
 """
-Generate boomerang.xml (XMLTV) for CARTOONITO (channel id: cartoonito)
-Source: https://info.msky.vn/vn/Boomerang.html
-
-Behavior:
-- Fetches the source page and looks for a markdown-style table or lines with
-  time | title | original_title | duration.
-- Builds XMLTV with timezone +0700 and writes boomerang.xml in current dir.
-- Handles midnight rollover: times that decrease are considered next day.
-- Default duration: 30 minutes if not parseable.
+Robust boomerang.py
+- Scrape schedule from SOURCE_URL by finding time tokens (HH:MM) in HTML then extracting nearby titles.
+- Build XMLTV boomerang.xml for channel id "cartoonito", name "CARTOONITO".
+- Handles midnight rollover.
+- If no programs found, writes an empty but valid XMLTV with channel element.
 """
 
 import re
 import sys
 from datetime import datetime, date, time, timedelta
 import requests
-from bs4 import BeautifulSoup
-from dateutil import tz, parser as dateparser
-import html
+from bs4 import BeautifulSoup, NavigableString, Tag
+from dateutil import tz
 import xml.etree.ElementTree as ET
 
 SOURCE_URL = "https://info.msky.vn/vn/Boomerang.html"
@@ -25,156 +20,159 @@ CHANNEL_ID = "cartoonito"
 CHANNEL_NAME = "CARTOONITO"
 OUTPUT_FILE = "boomerang.xml"
 DEFAULT_DURATION_MIN = 30
-TZ_STR = "+0700"
+TZ_OFFSET = "+0700"
 
-def fetch_page(url):
-    r = requests.get(url, timeout=20)
+TIME_RE = re.compile(r'\b([01]?\d|2[0-3])[:.][0-5]\d\b')
+
+def fetch_page(url, timeout=20):
+    r = requests.get(url, timeout=timeout, headers={"User-Agent": "Mozilla/5.0"})
     r.raise_for_status()
     return r.text
 
-def extract_table_text(html_text):
+def find_time_nodes(soup):
     """
-    Try to extract a markdown-style table or plain text schedule from page.
-    Returns list of rows as lists of cells.
+    Return list of (time_str, node) where node is the Tag or NavigableString containing that time text.
     """
-    soup = BeautifulSoup(html_text, "lxml")
-    # Prefer any <pre> or <table> or main content
-    # 1) raw text blocks
-    candidates = []
-    for tag in soup.find_all(["pre", "code"]):
-        txt = tag.get_text("\n", strip=True)
-        if "|" in txt:
-            candidates.append(txt)
-    # 2) markdown-like in page content
-    main = soup.get_text("\n", strip=True)
-    if "|" in main:
-        candidates.append(main)
+    results = []
+    # search text nodes
+    for text in soup.find_all(string=TIME_RE):
+        # ignore inside scripts/styles
+        if isinstance(text, NavigableString):
+            parent = text.parent
+            # skip if inside script/style or hidden
+            if parent.name in ("script", "style", "noscript"):
+                continue
+            t = TIME_RE.search(text)
+            if t:
+                results.append((t.group(0).replace(".", ":"), text))
+    return results
 
-    if not candidates:
-        return []
-
-    # pick the largest candidate containing 'Thời gian' or many '|' separators
-    best = max(candidates, key=lambda t: (t.count("\n"), t.count("|")))
-    lines = [ln.strip() for ln in best.splitlines() if ln.strip()]
-
-    # keep only lines that look like table rows (contain pipes) or look like "HH:MM"
-    table_lines = [ln for ln in lines if "|" in ln or re.search(r'^\d{1,2}[:.]\d{2}\b', ln)]
-    rows = []
-    for ln in table_lines:
-        # split by pipe but avoid splitting URLs
-        parts = [p.strip() for p in re.split(r'\s*\|\s*', ln) if p.strip()]
-        if len(parts) >= 2:
-            rows.append(parts)
-    return rows
-
-def parse_rows_to_programs(rows, base_date):
+def extract_title_from_node(node):
     """
-    Input: rows = list of cell lists. Expected columns include a HH:MM cell and a title and duration.
-    Return list of dicts: {start: datetime, stop: datetime, title: str, desc: str}
+    Attempt to find program title nearest to a time token node.
+    Strategies:
+    1) If same text node contains more than time (e.g., "06:30 Thời sự An Giang"), return rest.
+    2) Check sibling nodes (next_sibling, previous_sibling).
+    3) Check parent tag and its child text nodes excluding time token.
+    4) As fallback, return the nearest text within parent's next element.
     """
-    progs = []
+    # 1) same node
+    txt = str(node)
+    m = TIME_RE.search(txt)
+    if m:
+        after = txt[m.end():].strip()
+        if after:
+            return clean_title(after)
+        before = txt[:m.start()].strip()
+        if before:
+            return clean_title(before)
+
+    # 2) siblings
+    sib = node.next_sibling
+    if sib:
+        stext = sibling_text(sib)
+        if stext and not TIME_RE.search(stext):
+            return clean_title(stext)
+    sib = node.previous_sibling
+    if sib:
+        stext = sibling_text(sib)
+        if stext and not TIME_RE.search(stext):
+            return clean_title(stext)
+
+    # 3) parent children (look after the current node)
+    parent = node.parent
+    if parent:
+        found = False
+        for child in parent.contents:
+            if found:
+                ct = child.get_text(" ", strip=True) if isinstance(child, Tag) else str(child).strip()
+                if ct and not TIME_RE.search(ct):
+                    return clean_title(ct)
+            else:
+                if child is node or (isinstance(child, NavigableString) and child == node):
+                    found = True
+
+    # 4) nearest next element in document order
+    nxt = node
+    steps = 0
+    while nxt and steps < 10:
+        nxt = nxt.next_element
+        if isinstance(nxt, NavigableString):
+            s = str(nxt).strip()
+            if s and not TIME_RE.search(s):
+                return clean_title(s)
+        steps += 1
+
+    return ""
+
+def sibling_text(s):
+    if isinstance(s, Tag):
+        return s.get_text(" ", strip=True)
+    return str(s).strip()
+
+def clean_title(s):
+    s = re.sub(r'\s+', ' ', s).strip()
+    # strip leading punctuation or separators
+    s = re.sub(r'^[\-\:\–\—\|]+\s*', '', s)
+    # remove trailing separators
+    s = re.sub(r'\s*[\-\:\–\—\|]+$', '', s)
+    return s
+
+def build_program_list(time_nodes, base_date):
+    """
+    Convert list of (time_str, node) into ordered programs with start/stop/title.
+    """
+    items = []
     last_start = None
     current_day = base_date
-    for cells in rows:
-        # find time token in any cell
-        time_token = None
-        for c in cells[:2]:
-            m = re.search(r'(\d{1,2}[:.]\d{2})', c)
-            if m:
-                time_token = m.group(1).replace(".", ":")
-                break
-        if not time_token:
+    for time_str, node in time_nodes:
+        title = extract_title_from_node(node)
+        if not title:
+            # try to get nearest heading or strong tag in parent
+            p = node.parent
+            if p:
+                heading = p.find(['b','strong','h1','h2','h3','h4','h5'])
+                if heading:
+                    title = heading.get_text(" ", strip=True)
+        if not title:
+            # skip if no reasonable title
             continue
 
-        # title heuristics: prefer second column, else first non-time cell
-        title = ""
-        desc = ""
-        if len(cells) >= 2:
-            # sometimes table is: time | title | original | duration
-            title = cells[1]
-            if len(cells) >= 4:
-                desc = cells[2]
-                dur_cell = cells[3]
-            elif len(cells) == 3:
-                # guess whether third cell is duration or original title
-                if re.search(r'\d+[:.]?\d*', cells[2]):
-                    dur_cell = cells[2]
-                else:
-                    desc = cells[2]
-                    dur_cell = ""
-            else:
-                dur_cell = ""
-        else:
-            # fallback: split line by spaces after time
-            rest = re.sub(re.escape(time_token), "", " ".join(cells)).strip()
-            parts = rest.split("  ")
-            title = parts[0] if parts else rest
-            dur_cell = ""
-
-        title = re.sub(r'\s+', ' ', title).strip()
-        desc = re.sub(r'\s+', ' ', desc).strip()
-
-        # parse start datetime
-        hh, mm = (int(x) for x in time_token.split(":"))
+        hh, mm = (int(x) for x in time_str.split(":"))
         start_dt = datetime.combine(current_day, time(hh, mm))
-        # detect rollover: if last_start exists and this start <= last_start, advance day
         if last_start and start_dt <= last_start:
             start_dt = start_dt + timedelta(days=1)
             current_day = start_dt.date()
 
-        # parse duration from dur_cell or fallback to DEFAULT_DURATION_MIN
-        duration_min = None
-        if 'dur_cell' in locals() and dur_cell:
-            # common formats: "1:00", "0:30", "30", "1:00 "
-            dm = re.search(r'(\d{1,2})[:.](\d{2})', dur_cell)
-            if dm:
-                duration_min = int(dm.group(1)) * 60 + int(dm.group(2))
-            else:
-                dn = re.search(r'(\d+)\s*ph', dur_cell, re.I) or re.search(r'(\d+)', dur_cell)
-                if dn:
-                    duration_min = int(dn.group(1))
-        if not duration_min:
-            duration_min = DEFAULT_DURATION_MIN
+        # default duration
+        stop_dt = start_dt + timedelta(minutes=DEFAULT_DURATION_MIN)
 
-        stop_dt = start_dt + timedelta(minutes=duration_min)
-
-        progs.append({
-            "start": start_dt,
-            "stop": stop_dt,
-            "title": title,
-            "desc": desc
-        })
+        items.append({"start": start_dt, "stop": stop_dt, "title": title})
         last_start = start_dt
 
-    return progs
+    # infer stops by next start when possible
+    items_sorted = sorted(items, key=lambda x: x['start'])
+    for i in range(len(items_sorted)-1):
+        items_sorted[i]['stop'] = items_sorted[i+1]['start']
+    return items_sorted
 
-def build_xmltv(programs, generated_date=None):
+def build_xmltv(programs):
     tv = ET.Element("tv")
     tv.set("generator-info-name", "boomerang.py")
     tv.set("source-info-url", SOURCE_URL)
 
-    # channel
+    # channel node
     ch = ET.SubElement(tv, "channel", id=CHANNEL_ID)
     dn = ET.SubElement(ch, "display-name")
     dn.text = CHANNEL_NAME
 
     # programmes
     for p in programs:
-        # format: YYYYMMDDHHMMSS +0700
-        start_str = p["start"].strftime("%Y%m%d%H%M%S") + " " + TZ_STR
-        stop_str = p["stop"].strftime("%Y%m%d%H%M%S") + " " + TZ_STR
+        start_str = p["start"].strftime("%Y%m%d%H%M%S") + " " + TZ_OFFSET
+        stop_str = p["stop"].strftime("%Y%m%d%H%M%S") + " " + TZ_OFFSET
         prog = ET.SubElement(tv, "programme", start=start_str, stop=stop_str, channel=CHANNEL_ID)
         title = ET.SubElement(prog, "title", lang="vi")
         title.text = p["title"]
-        if p.get("desc"):
-            desc = ET.SubElement(prog, "desc", lang="vi")
-            desc.text = p["desc"]
-        # source tag
-        src = ET.SubElement(prog, "credits")
-        provider = ET.SubElement(src, "presenter")
-        provider.text = "Source: " + SOURCE_URL
-
-    # pretty print
     return ET.tostring(tv, encoding="utf-8", method="xml")
 
 def main():
@@ -183,28 +181,62 @@ def main():
     today_hanoi = datetime.now(tz=hanoi).date()
 
     try:
-        html_text = fetch_page(SOURCE_URL)
+        html = fetch_page(SOURCE_URL)
     except Exception as e:
         print("Failed to fetch source:", e, file=sys.stderr)
         sys.exit(2)
 
-    rows = extract_table_text(html_text)
-    if not rows:
-        print("No schedule table found on source page", file=sys.stderr)
-        sys.exit(3)
+    soup = BeautifulSoup(html, "lxml")
 
-    programs = parse_rows_to_programs(rows, today_hanoi)
+    # 1) first try to find explicit tables or pre blocks with pipes (legacy)
+    rows_with_pipes = []
+    for tag in soup.find_all(["pre", "code", "table"]):
+        txt = tag.get_text("\n", strip=True)
+        if "|" in txt or tag.name == "table":
+            rows_with_pipes.append(txt)
+    programs = []
+    if rows_with_pipes:
+        # attempt to parse time rows from best candidate
+        best = max(rows_with_pipes, key=lambda t: (t.count("\n"), t.count("|")))
+        # split lines, find lines containing times
+        lines = [ln.strip() for ln in best.splitlines() if ln.strip()]
+        time_lines = [ln for ln in lines if TIME_RE.search(ln)]
+        time_nodes = []
+        for ln in time_lines:
+            m = TIME_RE.search(ln)
+            if m:
+                time_nodes.append((m.group(0).replace(".", ":"), ln))
+        # Convert pseudo-nodes to Titles (ln string)
+        last_start = None
+        current_day = today_hanoi
+        for time_str, ln in time_nodes:
+            # title is rest of line after time
+            title = re.sub(re.escape(time_str), "", ln, count=1).strip()
+            if not title:
+                continue
+            hh, mm = (int(x) for x in time_str.split(":"))
+            start_dt = datetime.combine(current_day, time(hh, mm))
+            if last_start and start_dt <= last_start:
+                start_dt = start_dt + timedelta(days=1)
+                current_day = start_dt.date()
+            stop_dt = start_dt + timedelta(minutes=DEFAULT_DURATION_MIN)
+            programs.append({"start": start_dt, "stop": stop_dt, "title": clean_title(title)})
+            last_start = start_dt
+
+    # 2) fallback: generic search for time tokens in page and extract nearby titles
     if not programs:
-        print("No programs parsed", file=sys.stderr)
-        sys.exit(4)
+        time_nodes = find_time_nodes(soup)
+        # keep order of appearance
+        programs = build_program_list(time_nodes, today_hanoi)
 
+    # Write XMLTV (even if empty program list, include channel node)
     xml_bytes = build_xmltv(programs)
     with open(OUTPUT_FILE, "wb") as f:
         f.write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
         f.write(xml_bytes)
 
-    print(f"Wrote {OUTPUT_FILE} with {len(programs)} programmes")
+    print(f"Wrote {OUTPUT_FILE} with {len(programs)} programmes (source: {SOURCE_URL})")
 
 if __name__ == "__main__":
     main()
-  
+      
