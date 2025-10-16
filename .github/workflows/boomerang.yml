@@ -1,0 +1,63 @@
+name: Generate boomerang.xml
+
+on:
+  schedule:
+    # Run daily at 01:00 Hanoi time (Asia/Ho_Chi_Minh). Cron uses UTC in GitHub Actions,
+    # so 01:00 +0700 = 18:00 UTC previous day. To run at 01:00 Hanoi, set cron to 18:00 UTC.
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Ho_Chi_Minh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 python-dateutil
+
+      - name: Run boomerang generator
+        run: |
+          python3 boomerang.py
+
+      - name: Commit and push boomerang.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git add boomerang.xml || true
+          if ! git diff --staged --quiet; then
+            TIMESTAMP="$(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git commit -m "Update boomerang.xml: $TIMESTAMP" || echo "commit failed"
+            # rebase onto remote to avoid non-fast-forward
+            git fetch origin main --depth=1
+            git checkout -B main
+            if git rev-parse --verify origin/main >/dev/null 2>&1; then
+              git rebase origin/main || (git rebase --abort && echo "Rebase failed" && exit 1)
+            fi
+            git push origin main
+          else
+            echo "No changes to boomerang.xml"
+          fi
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boomerang-xml
+          path: boomerang.xml
+          
