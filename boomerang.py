@@ -1,4 +1,4 @@
-# boomerang.py
+# boomerang.py (fixed: normalize early-hours assigned to previous day)
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, timezone
@@ -112,6 +112,30 @@ def compute_stops(items):
     return items
 
 
+def normalize_early_hours_to_base_date(items, base_date):
+    """
+    Một số site liệt kê 00:00-03:xx ở phần đầu của bảng và chúng có thể bị gán lùi về ngày trước.
+    Nếu mục có start_dt.date() < base_date và giờ < 4 (00..03), ta +1 ngày để đưa về base_date.
+    Điều này giữ các chương trình 00:00..03:59 thuộc ngày hiện tại.
+    """
+    adjusted = 0
+    for it in items:
+        sd = it["start_dt"]
+        if sd.date() < base_date and sd.hour < 4:
+            # shift forward until date == base_date (tránh shift quá)
+            while sd.date() < base_date:
+                sd = sd + timedelta(days=1)
+            # adjust stop_dt tương ứng (nếu stop_dt <= old start => cộng cùng số ngày)
+            delta_days = (sd.date() - it["start_dt"].date()).days
+            it["start_dt"] = sd
+            if "stop_dt" in it and it["stop_dt"] is not None:
+                it["stop_dt"] = it["stop_dt"] + timedelta(days=delta_days)
+            adjusted += 1
+    if adjusted:
+        print(f"🔧 Đã điều chỉnh {adjusted} mục early-hours sang ngày {base_date.isoformat()}")
+    return items
+
+
 def filter_only_today(items, base_date):
     """
     Lọc chỉ giữ chương trình có start thuộc ngày base_date (giờ VN).
@@ -149,7 +173,6 @@ def build_xml(items, output_file=OUTPUT_FILE):
     try:
         ET.indent(tree, space="  ", level=0)
     except Exception:
-        # indent new in py3.9+, ignore if not available
         pass
     tree.write(output_file, encoding="utf-8", xml_declaration=True)
     print(f"✅ Xuất thành công {output_file} ({len(items)} programmes)")
@@ -170,16 +193,19 @@ def main():
 
     items = compute_stops(items)
 
+    # --- CHỖ SỬA: normalize early hours (00:00-03:59) nếu bị gán về ngày trước
+    items = normalize_early_hours_to_base_date(items, base_date)
+
     # Lọc chỉ giữ chương trình start thuộc ngày hiện tại (VN)
     filtered = filter_only_today(items, base_date)
 
     # Debug prints (in danh sách start để anh kiểm tra)
     print("=== Program starts (all parsed) ===")
-    for it in items[:20]:
+    for it in items[:200]:
         print(it["start_dt"].strftime("%Y-%m-%d %H:%M:%S %z"), "-", it["title_vi"])
 
     print("=== Program starts (filtered = today) ===")
-    for it in filtered[:20]:
+    for it in filtered[:200]:
         print(it["start_dt"].strftime("%Y-%m-%d %H:%M:%S %z"), "-", it["title_vi"])
 
     build_xml(filtered, OUTPUT_FILE)
