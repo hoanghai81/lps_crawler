@@ -45,18 +45,17 @@ else:
         title_vi = cols[1].get_text(strip=True)
         title_en = cols[2].get_text(strip=True) if len(cols) > 2 else ""
 
-        # Xác định start datetime
         try:
             start_dt = datetime.strptime(f"{today_str} {time_str}", "%d/%m/%Y %H:%M")
+            # Gán timezone VN
+            start_dt = start_dt.replace(tzinfo=VN_TZ)
             if start_dt.hour < 4:
-                # Nếu giờ < 4 thì coi là sáng hôm sau (vì msky hay nối tiếp 2 ngày)
+                # Nếu giờ < 4 thì coi là sáng hôm sau
                 start_dt += timedelta(days=1)
         except:
             continue
 
-        # Stop time = +30 phút mặc định (vì không có trong trang)
         stop_dt = start_dt + timedelta(minutes=30)
-
         programmes.append({
             "start": start_dt,
             "stop": stop_dt,
@@ -82,9 +81,8 @@ tv = ET.Element("tv", {
     "generator-info-name": "lps_crawler"
 })
 
-ET.SubElement(tv, "channel", {"id": CHANNEL_ID}).append(
-    ET.Element("display-name", text=CHANNEL_NAME)
-)
+chan = ET.SubElement(tv, "channel", {"id": CHANNEL_ID})
+ET.SubElement(chan, "display-name").text = CHANNEL_NAME
 
 for p in filtered:
     prog = ET.SubElement(tv, "programme", {
