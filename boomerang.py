@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-boomerang.py (debuggable)
-- Tìm và parse bảng markdown (pipe) từ SOURCE_URL
-- Ghi boomerang.xml và boomerang_debug.txt để kiểm tra nếu parser không thấy gì
-- Cải tiến tìm marker: nhiều biến thể có/không dấu, unescape HTML trước khi tìm
-"""
+boomerang.py
+Generate boomerang.xml (XMLTV) for CARTOONITO
+Source: https://info.msky.vn/vn/Boomerang.html
 
-from datetime import datetime, time as dtime, timedelta
+Strategy:
+1) Try parse HTML <table> that contains header 'Thời gian' (most reliable for this site).
+2) If not found, try markdown pipe table block extraction.
+3) Fallback to time-token scanning.
+"""
+from datetime import datetime, date, time as dtime, timedelta
 import re
 import sys
-import html as html_mod
 import xml.etree.ElementTree as ET
+import html as html_mod
 
 import requests
+from bs4 import BeautifulSoup, Comment
 from dateutil import tz
 
 SOURCE_URL = "https://info.msky.vn/vn/Boomerang.html"
@@ -70,21 +74,140 @@ def write_xml(programs):
         f.write(xml_bytes)
 
 
-def find_table_block_candidates(html_raw):
-    """
-    Return list of candidate blocks (each a list of lines containing '|' ).
-    Tries several strategies:
-      - find marker with '| Thời gian' or variants
-      - find 'Thời gian' (with/without diacritics) and take surrounding lines
-      - fallback: search contiguous runs of pipe-lines
-    """
-    candidates = []
+def clean_soup_remove_noise(soup):
+    for tag in soup.find_all(["script", "style", "noscript", "iframe", "pre", "code"]):
+        try:
+            tag.decompose()
+        except Exception:
+            pass
+    for c in soup.find_all(string=lambda t: isinstance(t, Comment)):
+        try:
+            c.extract()
+        except Exception:
+            pass
+    return soup
 
-    # unescape html entities to make pipes visible if encoded
+
+def parse_html_table(soup, base_date):
+    """
+    Find table element whose header contains 'Thời gian' (vn) or 'Time' then parse rows.
+    Returns list of programs.
+    """
+    tables = soup.find_all("table")
+    programs = []
+    seen = set()
+    last_start = None
+    current_day = base_date
+
+    for tbl in tables:
+        # check header cells text for 'Thời gian' or 'Thoi gian' or 'Time'
+        header_text = " ".join([th.get_text(" ", strip=True).lower() for th in tbl.find_all(["th", "td"])][:6])
+        if any(k in header_text for k in ("thời gian", "thoi gian", "time", "thoi")):
+            # found candidate table; parse rows
+            for tr in tbl.find_all("tr"):
+                tds = tr.find_all("td")
+                if not tds:
+                    continue
+                # extract text from cells
+                cells = [td.get_text(" ", strip=True) for td in tds]
+                # try to find time token in first few cells
+                time_token = None
+                time_idx = None
+                for i, c in enumerate(cells[:4]):
+                    m = TIME_RE.search(c)
+                    if m:
+                        time_token = m.group(0).replace(".", ":")
+                        time_idx = i
+                        break
+                if not time_token:
+                    continue
+                # title heuristics: cell after time_idx
+                title = ""
+                desc = ""
+                dur_cell = ""
+                if time_idx is not None and len(cells) > time_idx + 1:
+                    title = cells[time_idx + 1]
+                    if len(cells) >= time_idx + 4:
+                        candidate = cells[-1]
+                        if DUR_HHMM_RE.search(candidate) or DUR_MIN_RE.search(candidate):
+                            dur_cell = candidate
+                            if len(cells) > time_idx + 2:
+                                desc = " ".join(cells[time_idx + 2:-1])
+                        else:
+                            desc = " ".join(cells[time_idx + 2:])
+                    elif len(cells) == time_idx + 2:
+                        pass
+                    else:
+                        desc = " ".join(cells[time_idx + 2:])
+                else:
+                    # fallback: second cell
+                    if len(cells) >= 2:
+                        title = cells[1]
+                        if len(cells) > 2:
+                            desc = " ".join(cells[2:])
+                    else:
+                        title = " ".join(cells)
+
+                title = re.sub(r'https?://\S+', '', title).strip()
+                desc = re.sub(r'https?://\S+', '', desc).strip()
+                if not title or title.lower().startswith("thời gian") or title.lower().startswith("tên chương trình"):
+                    continue
+
+                try:
+                    hh, mm = (int(x) for x in time_token.split(":"))
+                except Exception:
+                    continue
+                start_dt = datetime.combine(current_day, dtime(hh, mm))
+                if last_start and start_dt <= last_start:
+                    start_dt = start_dt + timedelta(days=1)
+                    current_day = start_dt.date()
+
+                # parse duration
+                duration_min = None
+                if dur_cell:
+                    m = DUR_HHMM_RE.search(dur_cell)
+                    if m:
+                        duration_min = int(m.group(1)) * 60 + int(m.group(2))
+                    else:
+                        m2 = DUR_MIN_RE.search(dur_cell)
+                        if m2:
+                            duration_min = int(m2.group(1))
+                if duration_min is None:
+                    # search in title/desc/row
+                    for txt in (title, desc, " ".join(cells)):
+                        m = DUR_HHMM_RE.search(txt)
+                        if m:
+                            duration_min = int(m.group(1)) * 60 + int(m.group(2))
+                            break
+                        m2 = DUR_MIN_RE.search(txt)
+                        if m2:
+                            duration_min = int(m2.group(1))
+                            break
+                if duration_min is None:
+                    duration_min = DEFAULT_DURATION_MIN
+                stop_dt = start_dt + timedelta(minutes=duration_min)
+
+                key = (start_dt.isoformat(), re.sub(r'\s+', ' ', title).lower())
+                if key in seen:
+                    last_start = start_dt
+                    continue
+                seen.add(key)
+                programs.append({"start": start_dt, "stop": stop_dt, "title": title, "desc": desc})
+                last_start = start_dt
+            # after parsing one suitable table, stop (site uses single table)
+            break
+    # infer stops from next start
+    programs = sorted(programs, key=lambda x: x["start"])
+    for i in range(len(programs) - 1):
+        if programs[i + 1]["start"] > programs[i]["start"]:
+            programs[i]["stop"] = programs[i + 1]["start"]
+    return programs
+
+
+def extract_pipe_table_from_html(html_raw):
+    # similar to previous implementation: find pipe blocks
     html_unesc = html_mod.unescape(html_raw)
-
-    # 1) markers with pipe
-    markers = ['| Thời gian', '|Thời gian', '| Time', '| Thoi gian', '|Thoi gian', '| Th\u1EDDi gian']
+    markers = ['| Thời gian', '|Thời gian', '| Time', '| Thoi gian', '|Thoi gian']
     for m in markers:
         idx = html_unesc.find(m)
         if idx != -1:
@@ -93,71 +216,45 @@ def find_table_block_candidates(html_raw):
             block = html_unesc[start:end]
             rows = [ln.strip() for ln in block.splitlines() if '|' in ln]
             if len(rows) >= 3 and any(TIME_RE.search(r) for r in rows):
-                candidates.append(rows)
-                # prefer earliest successful marker
-                break
-
-    # 2) marker without pipe: just 'Thời gian' or 'Thoi gian' (no surrounding pipe)
-    if not candidates:
-        for m in ['Thời gian', 'Thoi gian', 'Thoi', 'Thoi gian'.strip()]:
-            idx = html_unesc.find(m)
-            if idx != -1:
-                start = max(0, html_unesc.rfind('\n', 0, idx) - 3000)
-                end = min(len(html_unesc), idx + 50000)
-                block = html_unesc[start:end]
-                rows = [ln.strip() for ln in block.splitlines() if '|' in ln]
-                if len(rows) >= 3 and any(TIME_RE.search(r) for r in rows):
-                    candidates.append(rows)
-                    break
-
-    # 3) fallback: find long contiguous pipe blocks anywhere
-    if not candidates:
-        lines = html_unesc.splitlines()
-        best = []
-        best_len = 0
-        i = 0
-        while i < len(lines):
-            if '|' in lines[i]:
-                j = i
-                block = []
-                while j < len(lines) and '|' in lines[j]:
-                    block.append(lines[j].strip())
-                    j += 1
-                if len(block) >= 3 and any(TIME_RE.search(r) for r in block):
-                    if len(block) > best_len:
-                        best_len = len(block)
-                        best = block
-                i = j
-            else:
-                i += 1
-        if best:
-            candidates.append(best)
-
-    return candidates, html_unesc
+                return rows
+    # fallback contiguous pipe runs
+    all_lines = html_unesc.splitlines()
+    best = []
+    best_len = 0
+    i = 0
+    while i < len(all_lines):
+        if '|' in all_lines[i]:
+            j = i
+            block = []
+            while j < len(all_lines) and '|' in all_lines[j]:
+                block.append(all_lines[j].strip())
+                j += 1
+            if len(block) >= 3 and any(TIME_RE.search(r) for r in block):
+                if len(block) > best_len:
+                    best_len = len(block)
+                    best = block
+            i = j
+        else:
+            i += 1
+    return best
 
 
-def parse_table_rows(rows, base_date):
-    """
-    rows: list of pipe-line strings
-    returns programs list
-    """
+def parse_pipe_rows(rows, base_date):
+    # reuse parse logic from earlier for pipe rows
     cleaned = []
     for ln in rows:
         if re.match(r'^\s*\|\s*-{1,}\s*(\|\s*-{1,}\s*)+', ln):
             continue
         cleaned.append(ln.strip())
-
     programs = []
     seen = set()
     last_start = None
     current_day = base_date
-
     for ln in cleaned:
         parts = [p.strip() for p in PIPE_SPLIT_RE.split(ln)]
         parts = [p for p in parts if p != '']
         if not parts:
             continue
-        # find time token
         time_token = None
         time_idx = None
         for i, c in enumerate(parts[:4]):
@@ -172,16 +269,15 @@ def parse_table_rows(rows, base_date):
                 time_token = m.group(0).replace('.', ':')
         if not time_token:
             continue
-
         title = ""
         desc = ""
         dur_cell = ""
         if time_idx is not None and len(parts) > time_idx + 1:
             title = parts[time_idx + 1]
             if len(parts) >= time_idx + 4:
-                dur_candidate = parts[-1]
-                if DUR_HHMM_RE.search(dur_candidate) or DUR_MIN_RE.search(dur_candidate):
-                    dur_cell = dur_candidate
+                candidate = parts[-1]
+                if DUR_HHMM_RE.search(candidate) or DUR_MIN_RE.search(candidate):
+                    dur_cell = candidate
                     if len(parts) > time_idx + 2:
                         desc = " ".join(parts[time_idx + 2:-1])
                 else:
@@ -197,12 +293,10 @@ def parse_table_rows(rows, base_date):
                     desc = " ".join(parts[2:])
             else:
                 title = " ".join(parts)
-
         title = re.sub(r'https?://\S+', '', title).strip()
         desc = re.sub(r'https?://\S+', '', desc).strip()
-        if title.lower().startswith('thời gian') or title.lower().startswith('tên chương trình'):
+        if title.lower().startswith("thời gian") or title.lower().startswith("tên chương trình"):
             continue
-
         try:
             hh, mm = (int(x) for x in time_token.split(':'))
         except Exception:
@@ -211,7 +305,6 @@ def parse_table_rows(rows, base_date):
         if last_start and start_dt <= last_start:
             start_dt = start_dt + timedelta(days=1)
             current_day = start_dt.date()
-
         duration_min = None
         if dur_cell:
             m = DUR_HHMM_RE.search(dur_cell)
@@ -222,7 +315,6 @@ def parse_table_rows(rows, base_date):
                 if m2:
                     duration_min = int(m2.group(1))
         if duration_min is None:
-            # try find in title/desc/ln
             for txt in (title, desc, ln):
                 m = DUR_HHMM_RE.search(txt)
                 if m:
@@ -234,18 +326,14 @@ def parse_table_rows(rows, base_date):
                     break
         if duration_min is None:
             duration_min = DEFAULT_DURATION_MIN
-
         stop_dt = start_dt + timedelta(minutes=duration_min)
-
         key = (start_dt.isoformat(), re.sub(r'\s+', ' ', title).lower())
         if key in seen:
             last_start = start_dt
             continue
         seen.add(key)
-
         programs.append({"start": start_dt, "stop": stop_dt, "title": title, "desc": desc})
         last_start = start_dt
-
     programs = sorted(programs, key=lambda x: x["start"])
     for i in range(len(programs) - 1):
         if programs[i + 1]["start"] > programs[i]["start"]:
@@ -253,12 +341,7 @@ def parse_table_rows(rows, base_date):
     return programs
 
 
-def fallback_scan_for_time_tokens(html_unesc, base_date):
-    # simple fallback scanning lines with '|' and a time token
-    alt_lines = [ln for ln in html_unesc.splitlines() if '|' in ln and TIME_RE.search(ln)]
-    if alt_lines:
-        return parse_table_rows(alt_lines, base_date)
-    # final fallback: scan the whole unescaped text for lines with time token
+def fallback_time_scan_unescaped(html_unesc, base_date):
     lines = [ln.strip() for ln in html_unesc.splitlines() if TIME_RE.search(ln)]
     programs = []
     seen = set()
@@ -266,9 +349,9 @@ def fallback_scan_for_time_tokens(html_unesc, base_date):
     current_day = base_date
     for ln in lines:
         m = TIME_RE.search(ln)
-        if not m: continue
+        if not m:
+            continue
         time_token = m.group(0).replace('.', ':')
-        # title: rest of line after time
         rest = ln[m.end():].strip()
         title = re.sub(r'https?://\S+', '', rest).strip()
         if not title:
@@ -289,6 +372,10 @@ def fallback_scan_for_time_tokens(html_unesc, base_date):
         seen.add(key)
         programs.append({"start": start_dt, "stop": stop_dt, "title": title, "desc": ""})
         last_start = start_dt
+    programs = sorted(programs, key=lambda x: x["start"])
+    for i in range(len(programs) - 1):
+        if programs[i + 1]["start"] > programs[i]["start"]:
+            programs[i]["stop"] = programs[i + 1]["start"]
     return programs
 
 
@@ -299,45 +386,37 @@ def main():
     try:
         html_raw = fetch_html(SOURCE_URL)
     except Exception as e:
-        # write minimal xml and debug
         write_xml([])
         with open(DEBUG_FILE, "w", encoding="utf-8") as df:
             df.write("FETCH FAILED: " + str(e) + "\n")
         print("Fetch failed:", e, file=sys.stderr)
         sys.exit(0)
 
-    # try to find table blocks
-    candidates, html_unesc = find_table_block_candidates(html_raw)
+    html_unesc = html_mod.unescape(html_raw)
+    soup = BeautifulSoup(html_raw, "lxml")
+    clean_soup_remove_noise(soup)
 
-    debug_lines = []
-    debug_lines.append(f"Candidates found: {len(candidates)}")
-    programs = []
+    # 1) try HTML table parse
+    programs = parse_html_table(soup, base_date)
 
-    if candidates:
-        # take the first candidate
-        rows = candidates[0]
-        debug_lines.append(f"Candidate rows count: {len(rows)}")
-        debug_lines.append("First 10 rows preview:")
-        for r in rows[:10]:
-            debug_lines.append(r)
-        programs = parse_table_rows(rows, base_date)
-        debug_lines.append(f"Programs parsed from candidate: {len(programs)}")
-    else:
-        debug_lines.append("No table candidate found, will fallback.")
-        programs = fallback_scan_for_time_tokens(html_unesc, base_date)
-        debug_lines.append(f"Programs parsed from fallback: {len(programs)}")
+    # 2) if none found, try pipe table extraction from raw HTML
+    if not programs:
+        rows = extract_pipe_table_from_html(html_raw)
+        if rows:
+            programs = parse_pipe_rows(rows, base_date)
 
-    # write debug file with some context
+    # 3) fallback scanning unescaped text
+    if not programs:
+        programs = fallback_time_scan_unescaped(html_unesc, base_date)
+
+    # write debug
     with open(DEBUG_FILE, "w", encoding="utf-8") as df:
-        df.write("SOURCE_URL: " + SOURCE_URL + "\n\n")
-        df.write("\n".join(debug_lines) + "\n\n")
-        df.write("== Parsed programs (first 50) ==\n")
-        for p in programs[:50]:
+        df.write("Programs parsed: " + str(len(programs)) + "\n\n")
+        for p in programs[:200]:
             df.write(f"{p['start'].isoformat()} -> {p['stop'].isoformat()} | {p['title']}\n")
-        df.write("\n\n== Extracted HTML snippet (first 20000 chars of unescaped) ==\n")
+        df.write("\n\n=== HTML snippet (first 20000 chars unescaped) ===\n")
         df.write(html_unesc[:20000])
 
-    # write xml
     write_xml(programs)
     print(f"Wrote {OUTPUT_FILE} with {len(programs)} programmes (source: {SOURCE_URL})")
     print("Debug written to", DEBUG_FILE)
@@ -345,3 +424,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+        
