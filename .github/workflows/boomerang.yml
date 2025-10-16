@@ -1,26 +1,53 @@
-name: Crawl Cartoonito EPG
+name: Crawl Boomerang EPG
+
 on:
   schedule:
-    - cron: '0 18 * * *'  # 1h sáng giờ VN (UTC+7)
+    - cron: '0 18 * * *'  # 1h sáng Hà Nội (UTC+7 = 18h hôm trước UTC)
   workflow_dispatch:
 
 jobs:
   crawl:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Cho phép commit lên repo
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install requests beautifulsoup4
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 lxml
+
       - name: Run crawler
-        run: python boomerang.py
-      - name: Commit results
+        id: run_crawler
+        run: |
+          echo "=== RUNNING CRAWLER ==="
+          python boomerang.py | tee output.log
+          echo "=== DONE ==="
+
+      - name: Commit and push results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add boomerang.xml
-          git commit -m "Update boomerang.xml: $(date +'%Y-%m-%d %H:%M:%S')"
-          git push
-          
+          git commit -m "Update boomerang.xml: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git main
+
+      - name: Summary report
+        if: always()
+        run: |
+          echo "## 🛰️ Boomerang EPG Auto Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Run time:** $(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_STEP_SUMMARY
+          echo "**Repo:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Output log:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat output.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
