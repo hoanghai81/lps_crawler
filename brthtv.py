@@ -1,60 +1,74 @@
-import requests
-from lxml import html, etree
-from datetime import datetime, timedelta, timezone
+from playwright.sync_api import sync_playwright
+from lxml import etree, html as lh
+import datetime, time
 
 print("=== RUNNING CRAWLER (BRT HTV) ===")
 
 URL = "https://brt.vn/truyen-hinh"
-JINA_PROXY = "https://r.jina.ai/" + URL  # dùng Jina AI proxy thay Browserless
 
-try:
-    print(f"Đang tải dữ liệu qua Jina AI proxy: {URL}")
-    res = requests.get(JINA_PROXY, timeout=30)
-    res.raise_for_status()
-    page = res.text
-except Exception as e:
-    print(f"❌ Lỗi khi tải trang: {e}")
-    page = ""
-
-if not page.strip():
-    print("❌ Không nhận được nội dung HTML.")
-else:
-    tree = html.fromstring(page)
-    rows = tree.xpath('//div[contains(@class,"schedule")]//tr | //tr[contains(@class,"row") or .//td]')
-    programmes = []
-
-    for row in rows:
-        time_text = "".join(row.xpath('.//time/text() | .//td[1]//text()')).strip()
-        title = "".join(row.xpath('.//a/text() | .//td[2]//text()')).strip()
-        if not time_text or not title:
-            continue
+def fetch_brt_schedule():
+    """Tải HTML bằng Chromium (render JS, retry 3 lần nếu lỗi)"""
+    html_content = ""
+    for attempt in range(3):
+        print(f"Đang tải dữ liệu (lần {attempt+1}/3) từ {URL} ...")
         try:
-            start_dt = datetime.strptime(time_text, "%H:%M").replace(
-                year=datetime.now().year,
-                month=datetime.now().month,
-                day=datetime.now().day,
-                tzinfo=timezone(timedelta(hours=7))
-            )
-        except:
-            continue
-        programmes.append((start_dt, title))
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.set_default_navigation_timeout(90000)  # 90 giây
+                page.goto(URL, wait_until="networkidle")
+                time.sleep(5)  # chờ thêm JS render
+                html_content = page.content()
+                browser.close()
+                if html_content:
+                    print("✅ Tải thành công!")
+                    break
+        except Exception as e:
+            print(f"⚠️ Lỗi khi tải (lần {attempt+1}): {e}")
+            time.sleep(5)
+    return html_content
 
-    print(f"✅ Tổng cộng: {len(programmes)} chương trình")
+def parse_schedule(html):
+    """Phân tích HTML để lấy lịch phát sóng"""
+    doc = lh.fromstring(html)
+    schedule = []
+    rows = doc.xpath('//table//tr')
+    for row in rows:
+        cols = [c.strip() for c in row.xpath('.//td//text()') if c.strip()]
+        if len(cols) >= 2:
+            schedule.append((cols[0], cols[1]))
+    return schedule
 
-    tv = etree.Element("tv", source_info_name="brt.vn", generator_info_name="lps_crawler")
+def export_xml(schedule):
+    """Xuất ra file XMLTV chuẩn"""
+    tv = etree.Element("tv", attrib={
+        "source-info-name": "brt.vn",
+        "generator-info-name": "lps_crawler"
+    })
+
     channel = etree.SubElement(tv, "channel", id="brthtv")
     etree.SubElement(channel, "display-name").text = "BRT HTV"
 
-    for i, (start, title) in enumerate(programmes):
-        start_str = start.strftime("%Y%m%d%H%M%S +0700")
-        stop_str = (programmes[i+1][0].strftime("%Y%m%d%H%M%S +0700") if i+1 < len(programmes)
-                    else (start + timedelta(minutes=30)).strftime("%Y%m%d%H%M%S +0700"))
-        prog = etree.SubElement(tv, "programme", start=start_str, stop=stop_str, channel="brthtv")
-        etree.SubElement(prog, "title", lang="vi").text = title
+    today_str = datetime.datetime.now().strftime("%Y%m%d")
+    for time_txt, title in schedule:
+        start_time = f"{today_str}{time_txt.replace(':','')}00 +0700"
+        programme = etree.SubElement(tv, "programme", attrib={
+            "start": start_time,
+            "channel": "brthtv"
+        })
+        etree.SubElement(programme, "title", lang="vi").text = title
 
-    with open("brthtv.xml", "wb") as f:
-        f.write(etree.tostring(tv, pretty_print=True, encoding="utf-8", xml_declaration=True))
+    tree = etree.ElementTree(tv)
+    tree.write("brthtv.xml", encoding="utf-8", xml_declaration=True, pretty_print=True)
+    print(f"✅ Xuất thành công brthtv.xml ({len(schedule)} chương trình)")
 
-    print("✅ Xuất thành công brthtv.xml")
-
-print("=== DONE ===")
+if __name__ == "__main__":
+    html = fetch_brt_schedule()
+    if not html:
+        print("❌ Không lấy được nội dung trang sau 3 lần thử.")
+    else:
+        schedule = parse_schedule(html)
+        if schedule:
+            export_xml(schedule)
+        else:
+            print("❌ Không tìm thấy chương trình trong bảng HTML.")
