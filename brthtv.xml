@@ -1,2 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
-<tv source-info-name="brt.vn" generator-info-name="lps_crawler"><channel id="brthtv"><display-name>BRT HTV</display-name></channel></tv>
+<tv source-info-name="brt.vn" generator-info-name="lps_crawler">
+<channel id="brthtv">
+<display-name>BRT HTV</display-name>
+</channel>
+</tv>
