@@ -1,37 +1,38 @@
-name: Crawl BRT HTV EPG
+name: BRT HTV EPG Crawler
 
 on:
   schedule:
-    - cron: "0 18 * * *"  # 1h sáng giờ Hà Nội (UTC+7)
+    - cron: "0 18 * * *"   # chạy lúc 1h sáng (UTC+7)
   workflow_dispatch:
 
 jobs:
-  crawl:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml pytz requests-html
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 lxml lxml_html_clean pytz
 
-      - name: Run brthtv crawler
+      - name: Run crawler for BRT HTV
         run: |
-    pip install requests-html lxml_html_clean
-    python brthtv.py
+          echo "=== RUNNING CRAWLER (BRT HTV) ==="
+          python brthtv.py
+          echo "=== DONE ==="
 
-      - name: Commit & push
+      - name: Commit and push results
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add brthtv.xml
-          git commit -m "Update brthtv.xml: $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git main
+          git commit -m "Update brthtv.xml [auto]" || echo "No changes to commit"
+          git push
