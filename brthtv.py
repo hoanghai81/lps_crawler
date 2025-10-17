@@ -5,11 +5,11 @@ from datetime import datetime, timedelta, timezone
 print("=== RUNNING CRAWLER (BRT HTV) ===")
 
 URL = "https://brt.vn/truyen-hinh"
-BROWSERLESS_URL = "https://chrome.browserless.io/content?url=" + URL
+JINA_PROXY = "https://r.jina.ai/" + URL  # dùng Jina AI proxy thay Browserless
 
 try:
-    print(f"Đang tải trang qua Browserless.io: {URL}")
-    res = requests.get(BROWSERLESS_URL, timeout=30)
+    print(f"Đang tải dữ liệu qua Jina AI proxy: {URL}")
+    res = requests.get(JINA_PROXY, timeout=30)
     res.raise_for_status()
     page = res.text
 except Exception as e:
@@ -20,8 +20,7 @@ if not page.strip():
     print("❌ Không nhận được nội dung HTML.")
 else:
     tree = html.fromstring(page)
-    # Tìm các khối chương trình (dựa theo class hoặc thẻ có giờ phát)
-    rows = tree.xpath('//div[contains(@class, "schedule-item")] | //tr[contains(@class, "row") or .//td]')
+    rows = tree.xpath('//div[contains(@class,"schedule")]//tr | //tr[contains(@class,"row") or .//td]')
     programmes = []
 
     for row in rows:
@@ -42,7 +41,6 @@ else:
 
     print(f"✅ Tổng cộng: {len(programmes)} chương trình")
 
-    # Xuất XMLTV
     tv = etree.Element("tv", source_info_name="brt.vn", generator_info_name="lps_crawler")
     channel = etree.SubElement(tv, "channel", id="brthtv")
     etree.SubElement(channel, "display-name").text = "BRT HTV"
