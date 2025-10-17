@@ -17,7 +17,7 @@ def fetch_brt_schedule():
                 page = browser.new_page()
                 page.set_default_navigation_timeout(90000)  # 90 giây
                 page.goto(URL, wait_until="networkidle")
-                time.sleep(5)  # chờ thêm JS render
+                time.sleep(5)  # chờ JS render
                 html_content = page.content()
                 browser.close()
                 if html_content:
@@ -32,11 +32,17 @@ def parse_schedule(html):
     """Phân tích HTML để lấy lịch phát sóng"""
     doc = lh.fromstring(html)
     schedule = []
-    rows = doc.xpath('//table//tr')
-    for row in rows:
-        cols = [c.strip() for c in row.xpath('.//td//text()') if c.strip()]
-        if len(cols) >= 2:
-            schedule.append((cols[0], cols[1]))
+
+    # các phần tử chứa chương trình
+    items = doc.xpath('//div[contains(@class,"schedule-item")]')
+    for item in items:
+        time_txt = item.xpath('.//div[contains(@class,"time")]/text()')
+        title_txt = item.xpath('.//div[contains(@class,"title")]/text()')
+        if time_txt and title_txt:
+            time_str = time_txt[0].strip()
+            title_str = title_txt[0].strip()
+            if time_str and title_str:
+                schedule.append((time_str, title_str))
     return schedule
 
 def export_xml(schedule):
@@ -51,7 +57,9 @@ def export_xml(schedule):
 
     today_str = datetime.datetime.now().strftime("%Y%m%d")
     for time_txt, title in schedule:
-        start_time = f"{today_str}{time_txt.replace(':','')}00 +0700"
+        # format: 20251017 + giờphút00 +0700
+        clean_time = time_txt.replace(":", "").zfill(4)
+        start_time = f"{today_str}{clean_time}00 +0700"
         programme = etree.SubElement(tv, "programme", attrib={
             "start": start_time,
             "channel": "brthtv"
