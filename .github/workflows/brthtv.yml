@@ -1,12 +1,14 @@
-name: Crawl BRT HTV EPG
+name: "Crawl BRT HTV"
+
 on:
-  schedule:
-    - cron: "0 18 * * *" # chạy lúc 1h sáng giờ Hà Nội
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"  # chạy mỗi ngày lúc 00:00 UTC (07:00 sáng VN)
 
 jobs:
   crawl:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -18,16 +20,16 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests lxml
+          pip install playwright lxml
+          playwright install chromium
 
-      - name: Run BRT HTV crawler
+      - name: Run crawler
         run: |
+          echo "=== RUNNING CRAWLER (BRT HTV) ==="
           python brthtv.py
 
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add brthtv.xml
-          git commit -m "Update brthtv.xml" || echo "No changes"
-          git push
+      - name: Upload generated XML
+        uses: actions/upload-artifact@v4
+        with:
+          name: brthtv.xml
+          path: brthtv.xml
