@@ -2,7 +2,7 @@ name: Crawl Boomerang EPG
 
 on:
   schedule:
-    - cron: '0 18 * * *'  # 1h sáng Hà Nội (UTC+7 = 18h hôm trước UTC)
+    - cron: '0 17 * * *'  # 1h sáng Hà Nội (UTC+7 = 18h hôm trước UTC)
   workflow_dispatch:
 
 jobs:
