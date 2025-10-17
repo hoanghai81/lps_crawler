@@ -1,95 +1,87 @@
-import requests
+import time
+from datetime import datetime, timedelta, timezone
 from bs4 import BeautifulSoup
-from datetime import datetime
-import pytz
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import xml.etree.ElementTree as ET
 
-# --- Cấu hình cơ bản ---
+# Cấu hình
+URL = "https://brt.vn/truyen-hinh"
 CHANNEL_ID = "brthtv"
 CHANNEL_NAME = "BRT HTV"
-SOURCE_URL = "https://brt.vn/truyen-hinh"
-OUTPUT_FILE = "brthtv.xml"
+OUTPUT = "brthtv.xml"
+VN_TZ = timezone(timedelta(hours=7))
 
-def fetch_programs():
-    try:
-        response = requests.get(SOURCE_URL, timeout=20)
-        response.encoding = "utf-8"
-    except Exception as e:
-        print(f"❌ Lỗi tải trang: {e}")
-        return []
+print("=== RUNNING CRAWLER (BRT HTV) ===")
+print(f"Đang tải dữ liệu từ {URL} ...")
 
-    soup = BeautifulSoup(response.text, "lxml")
+# Thiết lập trình duyệt headless
+options = Options()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
 
-    # Tìm bảng chương trình trong thẻ <tbody>
-    tbody = soup.find("tbody")
-    if not tbody:
-        print("❌ Không tìm thấy bảng chương trình!")
-        return []
+driver = webdriver.Chrome(options=options)
+driver.get(URL)
+time.sleep(5)  # chờ trang load JS
 
-    rows = tbody.find_all("tr")
-    if not rows:
-        print("❌ Không tìm thấy hàng chương trình!")
-        return []
+html = driver.page_source
+driver.quit()
 
-    # Lấy ngày hiện tại (theo giờ Hà Nội)
-    tz = pytz.timezone("Asia/Ho_Chi_Minh")
-    today = datetime.now(tz).strftime("%Y%m%d")
+soup = BeautifulSoup(html, "html.parser")
 
-    programs = []
-    for row in rows:
-        cols = row.find_all("td")
-        if len(cols) < 2:
-            continue
+# Tìm bảng chương trình
+table = soup.find("table")
+if not table:
+    print("❌ Không tìm thấy bảng chương trình!")
+    with open(OUTPUT, "w", encoding="utf-8") as f:
+        f.write(f'<tv source-info-name="brt.vn" generator-info-name="lps_crawler">\n')
+        f.write(f'  <channel id="{CHANNEL_ID}">\n')
+        f.write(f'    <display-name>{CHANNEL_NAME}</display-name>\n')
+        f.write(f'  </channel>\n</tv>')
+    print(f"✅ Đã tạo file {OUTPUT}")
+    print("=== DONE ===")
+    exit()
 
+rows = table.find_all("tr")
+programmes = []
+today = datetime.now(VN_TZ).date()
+
+for row in rows:
+    cols = row.find_all("td")
+    if len(cols) >= 2:
         time_text = cols[0].get_text(strip=True)
         title = cols[1].get_text(strip=True)
-
-        # Định dạng thời gian
         try:
-            start_time = datetime.strptime(time_text, "%H:%M")
-        except:
+            start = datetime.strptime(time_text, "%H:%M").replace(
+                year=today.year, month=today.month, day=today.day, tzinfo=VN_TZ
+            )
+            programmes.append((start, title))
+        except Exception:
             continue
 
-        start_dt = tz.localize(datetime.now().replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0))
-        start_str = start_dt.strftime("%Y%m%d%H%M%S %z")
+if not programmes:
+    print("❌ Không có chương trình nào để xuất.")
+else:
+    print(f"✅ Tổng cộng: {len(programmes)} chương trình")
 
-        programs.append({
-            "start": start_str,
-            "title": title
-        })
+# Xuất XMLTV
+tv = ET.Element("tv", {"source-info-name": "brt.vn", "generator-info-name": "lps_crawler"})
+channel = ET.SubElement(tv, "channel", {"id": CHANNEL_ID})
+ET.SubElement(channel, "display-name").text = CHANNEL_NAME
 
-    return programs
+for i, (start, title) in enumerate(programmes):
+    prog = ET.SubElement(
+        tv, "programme",
+        {
+            "start": start.strftime("%Y%m%d%H%M%S %z"),
+            "channel": CHANNEL_ID,
+        },
+    )
+    ET.SubElement(prog, "title", {"lang": "vi"}).text = title
 
-def build_xml(programs):
-    xml = []
-    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
-    xml.append('<tv source-info-name="brt.vn" generator-info-name="lps_crawler">')
-    xml.append(f'  <channel id="{CHANNEL_ID}">')
-    xml.append(f'    <display-name>{CHANNEL_NAME}</display-name>')
-    xml.append("  </channel>")
+tree = ET.ElementTree(tv)
+tree.write(OUTPUT, encoding="utf-8", xml_declaration=True)
 
-    for p in programs:
-        xml.append(f'  <programme start="{p["start"]}" channel="{CHANNEL_ID}">')
-        xml.append(f'    <title lang="vi">{p["title"]}</title>')
-        xml.append("  </programme>")
-
-    xml.append("</tv>")
-    return "\n".join(xml)
-
-def main():
-    print(f"Đang lấy dữ liệu từ {SOURCE_URL} ...")
-    programs = fetch_programs()
-
-    if not programs:
-        print("❌ Không có chương trình nào để xuất.")
-        xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<tv source-info-name="brt.vn" generator-info-name="lps_crawler">\n  <channel id="{CHANNEL_ID}">\n    <display-name>{CHANNEL_NAME}</display-name>\n  </channel>\n</tv>'
-    else:
-        print(f"✅ Đã lấy {len(programs)} chương trình.")
-        xml = build_xml(programs)
-
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        f.write(xml)
-
-    print(f"✅ Đã tạo file {OUTPUT_FILE}")
-
-if __name__ == "__main__":
-    main()
+print(f"✅ Đã tạo file {OUTPUT}")
+print("=== DONE ===")
