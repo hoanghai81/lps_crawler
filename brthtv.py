@@ -1,80 +1,95 @@
-from requests_html import HTMLSession
+import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 
-def fetch_brt_schedule():
-    session = HTMLSession()
-    url = "https://brt.vn/truyen-hinh"
-    response = session.get(url)
-    response.html.render(timeout=30, sleep=3)  # chờ JS load
-    soup = BeautifulSoup(response.html.html, 'html.parser')
+# --- Cấu hình cơ bản ---
+CHANNEL_ID = "brthtv"
+CHANNEL_NAME = "BRT HTV"
+SOURCE_URL = "https://brt.vn/truyen-hinh"
+OUTPUT_FILE = "brthtv.xml"
 
-    tbody = soup.find('tbody')
-    if not tbody:
-        print("❌ Không tìm thấy bảng chương trình (sau khi render)!")
+def fetch_programs():
+    try:
+        response = requests.get(SOURCE_URL, timeout=20)
+        response.encoding = "utf-8"
+    except Exception as e:
+        print(f"❌ Lỗi tải trang: {e}")
         return []
 
-    schedule = []
-    rows = tbody.find_all('tr')
+    soup = BeautifulSoup(response.text, "lxml")
+
+    # Tìm bảng chương trình trong thẻ <tbody>
+    tbody = soup.find("tbody")
+    if not tbody:
+        print("❌ Không tìm thấy bảng chương trình!")
+        return []
+
+    rows = tbody.find_all("tr")
+    if not rows:
+        print("❌ Không tìm thấy hàng chương trình!")
+        return []
+
+    # Lấy ngày hiện tại (theo giờ Hà Nội)
+    tz = pytz.timezone("Asia/Ho_Chi_Minh")
+    today = datetime.now(tz).strftime("%Y%m%d")
+
+    programs = []
     for row in rows:
-        cols = row.find_all('td')
-        if len(cols) >= 2:
-            time_str = cols[0].get_text(strip=True)
-            title = cols[1].get_text(strip=True)
-            if time_str and title:
-                schedule.append((time_str, title))
-
-    return schedule
-
-def generate_epg(schedule):
-    if not schedule:
-        return '<tv source-info-name="brt.vn" generator-info-name="lps_crawler">\n<channel id="brthtv">\n<display-name>BRT HTV</display-name>\n</channel>\n</tv>'
-
-    vn_tz = pytz.timezone("Asia/Ho_Chi_Minh")
-    today = datetime.now(vn_tz)
-    date_str = today.strftime("%Y%m%d")
-
-    epg = [
-        '<tv source-info-name="brt.vn" generator-info-name="lps_crawler">',
-        '  <channel id="brthtv">',
-        '    <display-name>BRT HTV</display-name>',
-        '  </channel>'
-    ]
-
-    for i, (time_str, title) in enumerate(schedule):
-        try:
-            start_time = datetime.strptime(f"{date_str} {time_str}", "%Y%m%d %H:%M")
-        except ValueError:
+        cols = row.find_all("td")
+        if len(cols) < 2:
             continue
 
-        start = vn_tz.localize(start_time)
-        if i + 1 < len(schedule):
-            next_time_str = schedule[i + 1][0]
-            try:
-                end_time = datetime.strptime(f"{date_str} {next_time_str}", "%Y%m%d %H:%M")
-                end = vn_tz.localize(end_time)
-            except ValueError:
-                end = start + timedelta(minutes=30)
-        else:
-            end = start + timedelta(minutes=30)
+        time_text = cols[0].get_text(strip=True)
+        title = cols[1].get_text(strip=True)
 
-        start_fmt = start.strftime("%Y%m%d%H%M%S %z")
-        end_fmt = end.strftime("%Y%m%d%H%M%S %z")
+        # Định dạng thời gian
+        try:
+            start_time = datetime.strptime(time_text, "%H:%M")
+        except:
+            continue
 
-        epg.append(f'  <programme start="{start_fmt}" stop="{end_fmt}" channel="brthtv">')
-        epg.append(f'    <title lang="vi">{title}</title>')
-        epg.append('  </programme>')
+        start_dt = tz.localize(datetime.now().replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0))
+        start_str = start_dt.strftime("%Y%m%d%H%M%S %z")
 
-    epg.append('</tv>')
-    return '\n'.join(epg)
+        programs.append({
+            "start": start_str,
+            "title": title
+        })
 
-def save_epg(epg_data, filename="brthtv.xml"):
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(epg_data)
-    print(f"✅ Đã tạo xong file {filename}")
+    return programs
+
+def build_xml(programs):
+    xml = []
+    xml.append('<?xml version="1.0" encoding="UTF-8"?>')
+    xml.append('<tv source-info-name="brt.vn" generator-info-name="lps_crawler">')
+    xml.append(f'  <channel id="{CHANNEL_ID}">')
+    xml.append(f'    <display-name>{CHANNEL_NAME}</display-name>')
+    xml.append("  </channel>")
+
+    for p in programs:
+        xml.append(f'  <programme start="{p["start"]}" channel="{CHANNEL_ID}">')
+        xml.append(f'    <title lang="vi">{p["title"]}</title>')
+        xml.append("  </programme>")
+
+    xml.append("</tv>")
+    return "\n".join(xml)
+
+def main():
+    print(f"Đang lấy dữ liệu từ {SOURCE_URL} ...")
+    programs = fetch_programs()
+
+    if not programs:
+        print("❌ Không có chương trình nào để xuất.")
+        xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<tv source-info-name="brt.vn" generator-info-name="lps_crawler">\n  <channel id="{CHANNEL_ID}">\n    <display-name>{CHANNEL_NAME}</display-name>\n  </channel>\n</tv>'
+    else:
+        print(f"✅ Đã lấy {len(programs)} chương trình.")
+        xml = build_xml(programs)
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        f.write(xml)
+
+    print(f"✅ Đã tạo file {OUTPUT_FILE}")
 
 if __name__ == "__main__":
-    schedule = fetch_brt_schedule()
-    epg = generate_epg(schedule)
-    save_epg(epg)
+    main()
