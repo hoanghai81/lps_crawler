@@ -24,7 +24,9 @@ jobs:
           pip install requests beautifulsoup4 lxml pytz requests-html
 
       - name: Run brthtv crawler
-        run: python brthtv.py
+        run: |
+    pip install requests-html lxml_html_clean
+    python brthtv.py
 
       - name: Commit & push
         run: |
