@@ -1,7 +1,7 @@
 name: Crawl BRT HTV EPG
 on:
   schedule:
-    - cron: "0 18 * * *" # chạy lúc 1h sáng giờ Hà Nội (18h UTC)
+    - cron: "0 18 * * *" # chạy lúc 1h sáng giờ Hà Nội
   workflow_dispatch:
 
 jobs:
