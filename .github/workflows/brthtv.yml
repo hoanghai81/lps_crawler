@@ -1,8 +1,7 @@
-name: "BRT HTV Crawler"
-
+name: Crawl BRT HTV EPG
 on:
   schedule:
-    - cron: "0 18 * * *"  # 1h sáng Hà Nội (UTC+7)
+    - cron: "0 18 * * *" # chạy lúc 1h sáng giờ Hà Nội (18h UTC)
   workflow_dispatch:
 
 jobs:
@@ -13,30 +12,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          pip install cloudscraper beautifulsoup4 lxml pytz
+          pip install requests lxml
 
-      - name: Run crawler
+      - name: Run BRT HTV crawler
         run: |
-          echo "=== RUNNING CRAWLER (BRT HTV) ==="
           python brthtv.py
-          echo "=== DONE ==="
 
-      - name: Upload output XML
-        uses: actions/upload-artifact@v4
-        with:
-          name: brthtv
-          path: brthtv.xml
-
-      - name: Commit and push output
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add brthtv.xml
-          git commit -m "Update BRT HTV EPG" || echo "No changes to commit"
+          git commit -m "Update brthtv.xml" || echo "No changes"
           git push
