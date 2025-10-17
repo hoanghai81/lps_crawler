@@ -1,74 +1,79 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta, timezone
-import xml.etree.ElementTree as ET
-import xml.sax.saxutils as sax
+from datetime import datetime, timedelta
+import pytz
 
-CHANNEL_ID = "brthtv"
-CHANNEL_NAME = "BRT HTV"
-OUTPUT_FILE = "brthtv.xml"
-VN_TZ = timezone(timedelta(hours=7))
-
-def fetch_html():
+def fetch_brt_schedule():
     url = "https://brt.vn/truyen-hinh"
-    print(f"Fetching: {url}")
-    resp = requests.get(url, timeout=20)
-    resp.raise_for_status()
-    resp.encoding = "utf-8"
-    return resp.text
+    response = requests.get(url, timeout=10)
+    response.encoding = 'utf-8'
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-def parse_html(html):
-    """Parse lịch chương trình từ HTML, trả về list các chương trình (start_dt, stop_dt, title)"""
-    soup = BeautifulSoup(html, "html.parser")
-    items = []
-    # tìm bảng hoặc danh sách chứa lịch
-    table = soup.find("table")
-    if table:
-        rows = table.find_all("tr")
-        for row in rows[1:]:
-            cols = row.find_all("td")
-            if len(cols) >= 2:
-                time_str = cols[0].get_text(strip=True)
-                title = cols[1].get_text(strip=True)
-                try:
-                    base = datetime.now(VN_TZ).date()
-                    dt = datetime.strptime(time_str, "%H:%M")
-                    start_dt = datetime.combine(base, dt.time(), VN_TZ)
-                except Exception as e:
-                    print("⚠️ Time parse error:", time_str, e)
-                    continue
-                items.append({"start_dt": start_dt, "title": title})
-    else:
-        print("⚠️ Không tìm thấy bảng lịch")
+    tbody = soup.find('tbody')
+    if not tbody:
+        print("❌ Không tìm thấy bảng chương trình!")
+        return []
 
-    # Tính stop
-    for i in range(len(items)):
-        if i + 1 < len(items):
-            items[i]["stop_dt"] = items[i+1]["start_dt"]
+    schedule = []
+    rows = tbody.find_all('tr')
+    for row in rows:
+        cols = row.find_all('td')
+        if len(cols) >= 2:
+            time_str = cols[0].get_text(strip=True)
+            title = cols[1].get_text(strip=True)
+            if time_str and title:
+                schedule.append((time_str, title))
+
+    return schedule
+
+def generate_epg(schedule):
+    if not schedule:
+        return '<tv source-info-name="brt.vn" generator-info-name="lps_crawler">\n<channel id="brthtv">\n<display-name>BRT HTV</display-name>\n</channel>\n</tv>'
+
+    vn_tz = pytz.timezone("Asia/Ho_Chi_Minh")
+    today = datetime.now(vn_tz)
+    date_str = today.strftime("%Y%m%d")
+
+    epg = [
+        '<tv source-info-name="brt.vn" generator-info-name="lps_crawler">',
+        '  <channel id="brthtv">',
+        '    <display-name>BRT HTV</display-name>',
+        '  </channel>'
+    ]
+
+    for i, (time_str, title) in enumerate(schedule):
+        try:
+            start_time = datetime.strptime(f"{date_str} {time_str}", "%Y%m%d %H:%M")
+        except ValueError:
+            continue
+
+        start = vn_tz.localize(start_time)
+        if i + 1 < len(schedule):
+            next_time_str = schedule[i + 1][0]
+            try:
+                end_time = datetime.strptime(f"{date_str} {next_time_str}", "%Y%m%d %H:%M")
+                end = vn_tz.localize(end_time)
+            except ValueError:
+                end = start + timedelta(minutes=30)
         else:
-            items[i]["stop_dt"] = items[i]["start_dt"] + timedelta(minutes=30)
-    return items
+            end = start + timedelta(minutes=30)
 
-def build_xml(progs):
-    tv = ET.Element("tv", {
-        "source-info-name": "brt.vn",
-        "generator-info-name": "lps_crawler"
-    })
-    ch = ET.SubElement(tv, "channel", {"id": CHANNEL_ID})
-    ET.SubElement(ch, "display-name").text = CHANNEL_NAME
+        start_fmt = start.strftime("%Y%m%d%H%M%S %z")
+        end_fmt = end.strftime("%Y%m%d%H%M%S %z")
 
-    for p in progs:
-        ET.SubElement(tv, "programme", {
-            "start": p["start_dt"].strftime("%Y%m%d%H%M%S +0700"),
-            "stop": p["stop_dt"].strftime("%Y%m%d%H%M%S +0700"),
-            "channel": CHANNEL_ID
-        }).text = sax.escape(p["title"])
+        epg.append(f'  <programme start="{start_fmt}" stop="{end_fmt}" channel="brthtv">')
+        epg.append(f'    <title lang="vi">{title}</title>')
+        epg.append('  </programme>')
 
-    tree = ET.ElementTree(tv)
-    tree.write(OUTPUT_FILE, encoding="utf-8", xml_declaration=True)
-    print(f"✅ Xuất thành công {OUTPUT_FILE} ({len(progs)} chương trình)")
+    epg.append('</tv>')
+    return '\n'.join(epg)
+
+def save_epg(epg_data, filename="brthtv.xml"):
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(epg_data)
+    print(f"✅ Đã tạo xong file {filename}")
 
 if __name__ == "__main__":
-    html = fetch_html()
-    progs = parse_html(html)
-    build_xml(progs)
+    schedule = fetch_brt_schedule()
+    epg = generate_epg(schedule)
+    save_epg(epg)
