@@ -1,17 +1,18 @@
-import requests
+from requests_html import HTMLSession
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import pytz
 
 def fetch_brt_schedule():
+    session = HTMLSession()
     url = "https://brt.vn/truyen-hinh"
-    response = requests.get(url, timeout=10)
-    response.encoding = 'utf-8'
-    soup = BeautifulSoup(response.text, 'html.parser')
+    response = session.get(url)
+    response.html.render(timeout=30, sleep=3)  # chờ JS load
+    soup = BeautifulSoup(response.html.html, 'html.parser')
 
     tbody = soup.find('tbody')
     if not tbody:
-        print("❌ Không tìm thấy bảng chương trình!")
+        print("❌ Không tìm thấy bảng chương trình (sau khi render)!")
         return []
 
     schedule = []
