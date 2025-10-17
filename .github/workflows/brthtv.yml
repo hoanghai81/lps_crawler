@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 lxml pytz
+          pip install requests beautifulsoup4 lxml pytz requests-html
 
       - name: Run brthtv crawler
         run: python brthtv.py
