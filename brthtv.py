@@ -1,87 +1,202 @@
-import time
-from datetime import datetime, timedelta, timezone
+# brthtv.py
+from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta
+import pytz
+import re
+import xml.sax.saxutils as sax
 
-# Cấu hình
 URL = "https://brt.vn/truyen-hinh"
 CHANNEL_ID = "brthtv"
 CHANNEL_NAME = "BRT HTV"
 OUTPUT = "brthtv.xml"
-VN_TZ = timezone(timedelta(hours=7))
+VN = pytz.timezone("Asia/Ho_Chi_Minh")
 
-print("=== RUNNING CRAWLER (BRT HTV) ===")
-print(f"Đang tải dữ liệu từ {URL} ...")
+time_re = re.compile(r'^\s*(\d{1,2}:\d{2})\s*$')
 
-# Thiết lập trình duyệt headless
-options = Options()
-options.add_argument("--headless")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
+def render_page_html(url, wait_ms=3000):
+    """Render page with Playwright and return HTML content."""
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+        context = browser.new_context()
+        page = context.new_page()
+        page.goto(url, wait_until="networkidle", timeout=30000)
+        # small extra wait for dynamic inserts
+        page.wait_for_timeout(wait_ms)
+        content = page.content()
+        browser.close()
+        return content
 
-driver = webdriver.Chrome(options=options)
-driver.get(URL)
-time.sleep(5)  # chờ trang load JS
+def extract_schedule_from_html(html):
+    """
+    Robust extractor:
+    - Find elements whose text matches a time pattern (HH:MM)
+    - For each, try to find the program title in same row / sibling / nearby element
+    Returns list of tuples: (time_str 'HH:MM', title)
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    schedule = []
 
-html = driver.page_source
-driver.quit()
-
-soup = BeautifulSoup(html, "html.parser")
-
-# Tìm bảng chương trình
-table = soup.find("table")
-if not table:
-    print("❌ Không tìm thấy bảng chương trình!")
-    with open(OUTPUT, "w", encoding="utf-8") as f:
-        f.write(f'<tv source-info-name="brt.vn" generator-info-name="lps_crawler">\n')
-        f.write(f'  <channel id="{CHANNEL_ID}">\n')
-        f.write(f'    <display-name>{CHANNEL_NAME}</display-name>\n')
-        f.write(f'  </channel>\n</tv>')
-    print(f"✅ Đã tạo file {OUTPUT}")
-    print("=== DONE ===")
-    exit()
-
-rows = table.find_all("tr")
-programmes = []
-today = datetime.now(VN_TZ).date()
-
-for row in rows:
-    cols = row.find_all("td")
-    if len(cols) >= 2:
-        time_text = cols[0].get_text(strip=True)
-        title = cols[1].get_text(strip=True)
-        try:
-            start = datetime.strptime(time_text, "%H:%M").replace(
-                year=today.year, month=today.month, day=today.day, tzinfo=VN_TZ
-            )
-            programmes.append((start, title))
-        except Exception:
+    # strategy 1: look for <td> with time in table rows
+    for td in soup.find_all(['td','span','div','p','li']):
+        txt = td.get_text(strip=True)
+        if not txt:
             continue
+        m = time_re.match(txt)
+        if m:
+            time_txt = m.group(1)
+            title = None
 
-if not programmes:
-    print("❌ Không có chương trình nào để xuất.")
-else:
-    print(f"✅ Tổng cộng: {len(programmes)} chương trình")
+            # Try to find title in same table row (<tr>)
+            tr = td.find_parent('tr')
+            if tr:
+                # find other <td> in this tr that are not the time
+                for other in tr.find_all('td'):
+                    ot = other.get_text(strip=True)
+                    if ot and not time_re.match(ot):
+                        title = ot
+                        break
 
-# Xuất XMLTV
-tv = ET.Element("tv", {"source-info-name": "brt.vn", "generator-info-name": "lps_crawler"})
-channel = ET.SubElement(tv, "channel", {"id": CHANNEL_ID})
-ET.SubElement(channel, "display-name").text = CHANNEL_NAME
+            # If not found, try siblings in DOM (next elements)
+            if not title:
+                # search next siblings/elements for a non-time text
+                # use next_elements generator
+                for nxt in td.next_elements:
+                    if getattr(nxt, "string", None):
+                        s = nxt.get_text(strip=True) if hasattr(nxt, "get_text") else str(nxt).strip()
+                    else:
+                        try:
+                            s = str(nxt).strip()
+                        except:
+                            s = ""
+                    if not s:
+                        continue
+                    if time_re.match(s):
+                        # hit another time — stop searching for this one
+                        break
+                    # ignore tiny separators
+                    if len(s) >= 2:
+                        title = s
+                        break
 
-for i, (start, title) in enumerate(programmes):
-    prog = ET.SubElement(
-        tv, "programme",
-        {
-            "start": start.strftime("%Y%m%d%H%M%S %z"),
-            "channel": CHANNEL_ID,
-        },
-    )
-    ET.SubElement(prog, "title", {"lang": "vi"}).text = title
+            # If still not found, try parent container text minus time text
+            if not title:
+                parent = td.find_parent()
+                if parent:
+                    full = parent.get_text(" ", strip=True)
+                    # remove the time part
+                    full_minus_time = re.sub(re.escape(time_txt), "", full).strip()
+                    if full_minus_time:
+                        title = full_minus_time
 
-tree = ET.ElementTree(tv)
-tree.write(OUTPUT, encoding="utf-8", xml_declaration=True)
+            if title:
+                schedule.append((time_txt, title))
 
-print(f"✅ Đã tạo file {OUTPUT}")
-print("=== DONE ===")
+    # Deduplicate preserving order (some times may be found multiple times)
+    seen = set()
+    dedup = []
+    for t, ttl in schedule:
+        key = (t, ttl)
+        if key in seen:
+            continue
+        seen.add(key)
+        dedup.append((t, ttl))
+
+    return dedup
+
+def build_xmltv(schedule):
+    """
+    schedule: list of (time_str, title) sorted by appearance
+    Only for today's date (VN time).
+    """
+    tz = VN
+    today = datetime.now(tz).date()
+    programmes = []
+
+    # build datetime objects
+    for time_str, title in schedule:
+        # normalize time strings like "7:00" -> "07:00"
+        hhmm = time_str.strip()
+        if ':' in hhmm:
+            parts = hhmm.split(':')
+            hh = parts[0].zfill(2)
+            mm = parts[1].zfill(2)
+            hhmm = f"{hh}:{mm}"
+        try:
+            dt = datetime.strptime(hhmm, "%H:%M")
+        except ValueError:
+            continue
+        start_dt = datetime(year=today.year, month=today.month, day=today.day,
+                            hour=dt.hour, minute=dt.minute)
+        start_dt = tz.localize(start_dt)
+        programmes.append({"start": start_dt, "title": title})
+
+    # if no programmes return empty xml
+    if not programmes:
+        root = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        root += f'<tv source-info-name="brt.vn" generator-info-name="lps_crawler">\n'
+        root += f'  <channel id="{CHANNEL_ID}"><display-name>{CHANNEL_NAME}</display-name></channel>\n</tv>\n'
+        return root
+
+    # compute stop times: next start or +30m default
+    for i in range(len(programmes)):
+        start = programmes[i]["start"]
+        if i + 1 < len(programmes):
+            stop = programmes[i + 1]["start"]
+            # if next start <= start (rare) add a day to next start
+            if stop <= start:
+                stop = stop + timedelta(days=1)
+        else:
+            stop = start + timedelta(minutes=30)
+        programmes[i]["stop"] = stop
+
+    # ensure chronological order
+    programmes.sort(key=lambda x: x["start"])
+
+    # build xml
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>']
+    lines.append(f'<tv source-info-name="brt.vn" generator-info-name="lps_crawler">')
+    lines.append(f'  <channel id="{CHANNEL_ID}">')
+    lines.append(f'    <display-name>{CHANNEL_NAME}</display-name>')
+    lines.append(f'  </channel>')
+
+    for p in programmes:
+        start_s = p["start"].strftime("%Y%m%d%H%M%S %z")
+        stop_s = p["stop"].strftime("%Y%m%d%H%M%S %z")
+        title_escaped = sax.escape(p["title"])
+        lines.append(f'  <programme start="{start_s}" stop="{stop_s}" channel="{CHANNEL_ID}">')
+        lines.append(f'    <title lang="vi">{title_escaped}</title>')
+        lines.append(f'  </programme>')
+
+    lines.append('</tv>')
+    return "\n".join(lines)
+
+def main():
+    print("=== RUNNING PLAYWRIGHT CRAWLER (BRT HTV) ===")
+    try:
+        html = render_page_html(URL, wait_ms=3000)
+    except Exception as e:
+        print("❌ Render error:", e)
+        html = ""
+
+    if not html:
+        print("❌ Không nhận được HTML đã render.")
+        xml = build_xmltv([]) if False else '<?xml version="1.0" encoding="UTF-8"?><tv source-info-name="brt.vn" generator-info-name="lps_crawler"><channel id="brthtv"><display-name>BRT HTV</display-name></channel></tv>'
+        with open(OUTPUT, "w", encoding="utf-8") as f:
+            f.write(xml)
+        print(f"✅ Đã tạo file {OUTPUT}")
+        return
+
+    schedule = extract_schedule_from_html(html)
+    print(f"✅ Phát hiện {len(schedule)} mục (time,title) raw.")
+    for i, (t, ttl) in enumerate(schedule[:50]):
+        print(f"{i+1:02d}. {t}  - {ttl}")
+
+    xml = build_xmltv(schedule)
+    with open(OUTPUT, "w", encoding="utf-8") as f:
+        f.write(xml)
+    print(f"✅ Xuất file {OUTPUT} (chứa {xml.count('<programme') } programmes)")
+    print("=== DONE ===")
+
+if __name__ == "__main__":
+    main()
