@@ -7,7 +7,6 @@ print("=== RUNNING CRAWLER (BRT HTV) ===")
 URL = "https://brt.vn/truyen-hinh"
 
 def fetch_brt_schedule():
-    """Tải HTML bằng Chromium (render JS, retry 3 lần nếu lỗi)"""
     html_content = ""
     for attempt in range(3):
         print(f"Đang tải dữ liệu (lần {attempt+1}/3) từ {URL} ...")
@@ -15,7 +14,7 @@ def fetch_brt_schedule():
             with sync_playwright() as p:
                 browser = p.chromium.launch(headless=True)
                 page = browser.new_page()
-                page.set_default_navigation_timeout(90000)  # 90 giây
+                page.set_default_navigation_timeout(90000)
                 page.goto(URL, wait_until="networkidle")
                 time.sleep(5)  # chờ JS render
                 html_content = page.content()
@@ -29,15 +28,18 @@ def fetch_brt_schedule():
     return html_content
 
 def parse_schedule(html):
-    """Phân tích HTML để lấy lịch phát sóng"""
     doc = lh.fromstring(html)
     schedule = []
 
-    # các phần tử chứa chương trình
-    items = doc.xpath('//div[contains(@class,"schedule-item")]')
+    # Cấu trúc phổ biến trên trang BRT hiện tại
+    items = doc.xpath('//div[contains(@class,"epg-item") or contains(@class,"epg_row")]')
+    if not items:
+        print("⚠️ Không tìm thấy div.epg-item hoặc .epg_row, thử cấu trúc fallback ...")
+        items = doc.xpath('//div[contains(@class,"schedule-item")]')
+
     for item in items:
-        time_txt = item.xpath('.//div[contains(@class,"time")]/text()')
-        title_txt = item.xpath('.//div[contains(@class,"title")]/text()')
+        time_txt = item.xpath('.//div[contains(@class,"time") or contains(@class,"epg-time")]/text()')
+        title_txt = item.xpath('.//div[contains(@class,"title") or contains(@class,"epg-title")]/text()')
         if time_txt and title_txt:
             time_str = time_txt[0].strip()
             title_str = title_txt[0].strip()
@@ -46,7 +48,6 @@ def parse_schedule(html):
     return schedule
 
 def export_xml(schedule):
-    """Xuất ra file XMLTV chuẩn"""
     tv = etree.Element("tv", attrib={
         "source-info-name": "brt.vn",
         "generator-info-name": "lps_crawler"
@@ -57,7 +58,6 @@ def export_xml(schedule):
 
     today_str = datetime.datetime.now().strftime("%Y%m%d")
     for time_txt, title in schedule:
-        # format: 20251017 + giờphút00 +0700
         clean_time = time_txt.replace(":", "").zfill(4)
         start_time = f"{today_str}{clean_time}00 +0700"
         programme = etree.SubElement(tv, "programme", attrib={
