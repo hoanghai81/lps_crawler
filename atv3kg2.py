@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 # CONFIG
 # =====================
 URL = "https://angiangtv.vn/lich-phat-song/?ngay=2025-10-18&kenh=TV2"
-CHANNEL_ID = "atv3"
+CHANNEL_ID = "atv3kg2"
 CHANNEL_NAME = "An Giang 3"
 OUTPUT_FILE = "atv3kg2.xml"
 # =====================
