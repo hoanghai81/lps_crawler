@@ -1,0 +1,32 @@
+name: Crawl AN GIANG 3 EPG
+on:
+  schedule:
+    - cron: "0 18 * * *"   # 1h sáng giờ Hà Nội
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run crawler
+        run: python atv3kg2.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add atv3kg2.xml
+          git commit -m "Update AN GIANG 3 EPG" || echo "No changes to commit"
+          git push
