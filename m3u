@@ -3,7 +3,7 @@
 #EXTINF:-1 tvg-id="boomerang" group-title="OTHER",CARTOONITO
 http://example.com/stream/vtv1.m3u8
 
-#EXTINF:-1 tvg-id="angiang2test" group-title="OTHER",AN GIANG 2 TEST
+#EXTINF:-1 tvg-id="atv3" group-title="OTHER",AN GIANG 3
 http://example.com/stream/vtv2.m3u8
 
 #EXTINF:-1 tvg-id="antv1" group-title="OTHER",ANTV 1
