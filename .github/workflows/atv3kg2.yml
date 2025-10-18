@@ -1,29 +1,25 @@
 name: Crawl AN GIANG 3 EPG
 on:
   schedule:
-    - cron: "0 18 * * *"   # 1h sáng giờ Hà Nội
+    - cron: '0 18 * * *'  # 1h sáng giờ Hà Nội
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
+          python-version: '3.11'
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 pytz
-
+          pip install playwright beautifulsoup4 lxml
+          playwright install chromium
       - name: Run crawler
         run: python atv3kg2.py
-
-      - name: Commit results
+      - name: Commit & Push result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
