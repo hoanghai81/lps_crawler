@@ -1,95 +1,94 @@
-import requests
+import asyncio
+from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
-import pytz
-from xml.etree.ElementTree import Element, SubElement, tostring
-from xml.dom import minidom
+from datetime import datetime, timedelta, timezone
+import xml.etree.ElementTree as ET
 
-print("=== RUNNING CRAWLER (AN GIANG 3) ===")
+async def fetch_html(url):
+    print(f"Đang tải dữ liệu (render JS) từ {url} ...")
+    for attempt in range(3):
+        try:
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(headless=True)
+                page = await browser.new_page()
+                await page.goto(url, timeout=90000, wait_until="networkidle")
+                html = await page.content()
+                await browser.close()
+                print(f"✅ Tải thành công (lần {attempt+1})")
+                return html
+        except Exception as e:
+            print(f"⚠️ Lỗi lần {attempt+1}: {e}")
+            await asyncio.sleep(3)
+    print("❌ Không thể tải trang sau 3 lần thử.")
+    return None
 
-# ---- CẤU HÌNH ----
-tz = pytz.timezone("Asia/Ho_Chi_Minh")
-today = datetime.now(tz)
-date_str = today.strftime("%Y-%m-%d")
-url = f"https://angiangtv.vn/lich-phat-song/?ngay={date_str}&kenh=TV2"
 
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                  "AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/117.0.0.0 Safari/537.36",
-    "Referer": "https://angiangtv.vn/",
-    "Accept-Language": "vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7",
-}
+def parse_programs(html):
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.find("table")
+    if not table:
+        print("❌ Không tìm thấy bảng chương trình!")
+        return []
 
-print(f"Đang lấy dữ liệu từ {url} ...")
+    rows = table.find_all("tr")
+    programmes = []
+    for row in rows:
+        cols = row.find_all("td")
+        if len(cols) >= 2:
+            time_str = cols[0].get_text(strip=True)
+            title = cols[1].get_text(strip=True)
+            if not time_str or not title:
+                continue
+            try:
+                start_dt = datetime.strptime(time_str, "%H:%M")
+                today = datetime.now(timezone(timedelta(hours=7)))
+                start = today.replace(hour=start_dt.hour, minute=start_dt.minute, second=0, microsecond=0)
+                programmes.append({
+                    "start": start,
+                    "title": title
+                })
+            except:
+                continue
+    return programmes
 
-# ---- TẢI NỘI DUNG ----
-try:
-    resp = requests.get(url, headers=headers, timeout=20)
-    resp.raise_for_status()
-except Exception as e:
-    print(f"❌ Lỗi khi tải trang: {e}")
-    print("=== DONE ===")
-    exit()
 
-soup = BeautifulSoup(resp.text, "html.parser")
+def export_xml(programmes, output_file):
+    tv = ET.Element("tv", {
+        "source-info-name": "angiangtv.vn",
+        "generator-info-name": "lps_crawler"
+    })
 
-# ---- PHÂN TÍCH HTML ----
-programs = []
-rows = soup.select("table tbody tr")
-if not rows:
-    rows = soup.select("tbody tr")  # fallback nếu cấu trúc khác
+    channel = ET.SubElement(tv, "channel", {"id": "atv3kg2"})
+    ET.SubElement(channel, "display-name").text = "AN GIANG 3"
 
-for row in rows:
-    cols = row.find_all("td")
-    if len(cols) >= 2:
-        time_str = cols[0].get_text(strip=True)
-        title = cols[1].get_text(strip=True)
-        if time_str and title:
-            programs.append({"time": time_str, "title": title})
-
-print(f"✅ Tổng cộng: {len(programs)} chương trình")
-
-# ---- XUẤT XMLTV ----
-tv = Element("tv", {
-    "source-info-name": "angiangtv.vn",
-    "generator-info-name": "lps_crawler"
-})
-
-channel = SubElement(tv, "channel", {"id": "atv3kg2"})
-SubElement(channel, "display-name").text = "AN GIANG 3"
-
-for i, p in enumerate(programs):
-    try:
-        # giờ bắt đầu
-        start_time = datetime.strptime(p["time"], "%H:%M").replace(
-            year=today.year, month=today.month, day=today.day
-        )
-        # giờ kết thúc = kế tiếp hoặc +30p
-        if i + 1 < len(programs):
-            next_time = datetime.strptime(programs[i + 1]["time"], "%H:%M").replace(
-                year=today.year, month=today.month, day=today.day
-            )
-        else:
-            next_time = start_time + timedelta(minutes=30)
-
-        start_str = start_time.strftime("%Y%m%d%H%M%S +0700")
-        stop_str = next_time.strftime("%Y%m%d%H%M%S +0700")
-
-        prog = SubElement(tv, "programme", {
-            "start": start_str,
-            "stop": stop_str,
+    for p in programmes:
+        prog = ET.SubElement(tv, "programme", {
+            "start": p["start"].strftime("%Y%m%d%H%M%S +0700"),
             "channel": "atv3kg2"
         })
-        SubElement(prog, "title").text = p["title"]
+        ET.SubElement(prog, "title", {"lang": "vi"}).text = p["title"]
 
-    except Exception as e:
-        print(f"⚠️ Lỗi khi parse {p}: {e}")
+    tree = ET.ElementTree(tv)
+    tree.write(output_file, encoding="utf-8", xml_declaration=True)
+    print(f"✅ Xuất thành công {output_file} ({len(programmes)} programmes)")
 
-xml_str = minidom.parseString(tostring(tv, "utf-8")).toprettyxml(indent="  ")
 
-with open("atv3kg2.xml", "w", encoding="utf-8") as f:
-    f.write(xml_str)
+async def main():
+    print("=== RUNNING CRAWLER (AN GIANG 3) ===")
+    today = datetime.now(timezone(timedelta(hours=7))).strftime("%Y-%m-%d")
+    url = f"https://angiangtv.vn/lich-phat-song/?ngay={today}&kenh=TV2"
 
-print("✅ Xuất thành công atv3kg2.xml")
-print("=== DONE ===")
+    html = await fetch_html(url)
+    if not html:
+        print("❌ Không nhận được nội dung HTML.")
+        print("=== DONE ===")
+        return
+
+    programmes = parse_programs(html)
+    print(f"✅ Tổng cộng: {len(programmes)} chương trình")
+    export_xml(programmes, "atv3kg2.xml")
+    print("=== DONE ===")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
