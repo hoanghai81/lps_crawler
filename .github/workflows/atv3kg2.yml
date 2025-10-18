@@ -1,28 +1,34 @@
 name: Crawl AN GIANG 3 EPG
+
 on:
   schedule:
-    - cron: '0 18 * * *'  # 1h sáng giờ Hà Nội
-  workflow_dispatch:
+    # Chạy tự động lúc 1h sáng mỗi ngày theo giờ Hà Nội (GMT+7)
+    - cron: '0 18 * * *'  # 18h UTC = 1h sáng VN
+  workflow_dispatch:  # Cho phép anh chạy thủ công
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: |
-          pip install playwright beautifulsoup4 lxml
-          playwright install chromium
+          pip install requests beautifulsoup4 lxml
+
       - name: Run crawler
         run: python atv3kg2.py
-      - name: Commit & Push result
+
+      - name: Commit and push results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add atv3kg2.xml
+          git add atv3kg2.xml || true
           git commit -m "Update AN GIANG 3 EPG" || echo "No changes to commit"
           git push
