@@ -25,30 +25,53 @@ async def fetch_html(url):
 
 def parse_programs(html):
     soup = BeautifulSoup(html, "html.parser")
-    table = soup.find("table")
-    if not table:
-        print("❌ Không tìm thấy bảng chương trình!")
-        return []
 
-    rows = table.find_all("tr")
+    # Thử 1: tìm theo cấu trúc div.item (angiangtv.vn dùng kiểu này)
+    items = soup.select("div.item, div.list-item, div.schedule-item")
+
     programmes = []
-    for row in rows:
-        cols = row.find_all("td")
-        if len(cols) >= 2:
-            time_str = cols[0].get_text(strip=True)
-            title = cols[1].get_text(strip=True)
-            if not time_str or not title:
-                continue
-            try:
-                start_dt = datetime.strptime(time_str, "%H:%M")
-                today = datetime.now(timezone(timedelta(hours=7)))
-                start = today.replace(hour=start_dt.hour, minute=start_dt.minute, second=0, microsecond=0)
-                programmes.append({
-                    "start": start,
-                    "title": title
-                })
-            except:
-                continue
+    for div in items:
+        time_tag = div.find("div", class_="time") or div.find("span", class_="time")
+        title_tag = div.find("div", class_="name") or div.find("span", class_="name")
+
+        if not time_tag or not title_tag:
+            continue
+
+        time_str = time_tag.get_text(strip=True)
+        title = title_tag.get_text(strip=True)
+        if not time_str or not title:
+            continue
+
+        try:
+            start_dt = datetime.strptime(time_str, "%H:%M")
+            today = datetime.now(timezone(timedelta(hours=7)))
+            start = today.replace(hour=start_dt.hour, minute=start_dt.minute, second=0, microsecond=0)
+            programmes.append({
+                "start": start,
+                "title": title
+            })
+        except Exception:
+            continue
+
+    # Nếu vẫn chưa có gì, thử backup
+    if not programmes:
+        rows = soup.find_all("tr")
+        for row in rows:
+            cols = row.find_all("td")
+            if len(cols) >= 2:
+                time_str = cols[0].get_text(strip=True)
+                title = cols[1].get_text(strip=True)
+                try:
+                    start_dt = datetime.strptime(time_str, "%H:%M")
+                    today = datetime.now(timezone(timedelta(hours=7)))
+                    start = today.replace(hour=start_dt.hour, minute=start_dt.minute, second=0, microsecond=0)
+                    programmes.append({"start": start, "title": title})
+                except:
+                    continue
+
+    if not programmes:
+        print("❌ Không tìm thấy div.item hoặc bảng chương trình!")
+
     return programmes
 
 
