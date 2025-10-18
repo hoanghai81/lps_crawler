@@ -1,57 +1,139 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Crawler for An Giang TV (KG1 / ATv3KG2) — produce atv3kg2.xml (XMLTV)
+- fetches https://angiangtv.vn/lich-phat-song/?ngay=YYYY-MM-DD&kenh=TV2
+- parses rows .tbl-row -> .time and .program
+- builds <programme start=... stop=... channel="atv3kg2">...
+"""
+import sys
+from datetime import datetime, date, time, timedelta
+from zoneinfo import ZoneInfo
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
 import xml.etree.ElementTree as ET
 
-# =====================
-# CONFIG
-# =====================
-URL = "https://angiangtv.vn/lich-phat-song/?ngay=2025-10-18&kenh=TV2"
+# Config
 CHANNEL_ID = "atv3kg2"
 CHANNEL_NAME = "An Giang 3"
-OUTPUT_FILE = "atv3kg2.xml"
-# =====================
+BASE_URL = "https://angiangtv.vn/lich-phat-song/"
+OUT_FILE = "atv3kg2.xml"
+TZ = ZoneInfo("Asia/Ho_Chi_Minh")  # +07:00
 
-print("=== RUNNING CRAWLER (AN GIANG 3) ===")
-print(f"Đang lấy dữ liệu từ {URL} ...")
-
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; lps_crawler/1.0; +https://github.com/hoanghai81/lps_crawler)"
 }
-try:
-    response = requests.get(URL, headers=headers, timeout=20)
-    response.raise_for_status()
-except Exception as e:
-    print("❌ Lỗi khi tải trang:", e)
-    exit()
 
-soup = BeautifulSoup(response.text, "html.parser")
+def fetch_html_for(date_obj: date):
+    params = {"ngay": date_obj.strftime("%Y-%m-%d"), "kenh": "TV2"}
+    resp = requests.get(BASE_URL, params=params, headers=HEADERS, timeout=30)
+    resp.raise_for_status()
+    return resp.text
 
-# Tìm bảng lịch
-rows = soup.select("div.table div.tbl-row")
+def parse_rows(html_text):
+    soup = BeautifulSoup(html_text, "html.parser")
+    # Primary selector used on site: div.table > div.tbl-row
+    rows = soup.select("div.tbl-row")
+    items = []
+    for r in rows:
+        t_el = r.select_one(".time")
+        p_el = r.select_one(".program")
+        if not t_el or not p_el:
+            continue
+        time_text = t_el.get_text(strip=True)
+        prog_text = p_el.get_text(" ", strip=True)
+        items.append((time_text, prog_text))
+    return items
 
-programs = []
-for row in rows:
-    time_tag = row.select_one(".time")
-    prog_tag = row.select_one(".program")
-    if time_tag and prog_tag:
-        start = time_tag.get_text(strip=True)
-        title = prog_tag.get_text(strip=True)
-        programs.append((start, title))
+def make_dt_for(today: date, hhmm_str: str):
+    # Accept formats like "05:15" or "5:15"
+    s = hhmm_str.strip()
+    parts = s.split(":")
+    if len(parts) != 2:
+        raise ValueError("Unknown time format: %r" % s)
+    hh = int(parts[0])
+    mm = int(parts[1])
+    return datetime.combine(today, time(hour=hh, minute=mm)).replace(tzinfo=TZ)
 
-print(f"✅ Tổng cộng: {len(programs)} chương trình")
+def build_xml(programmes, for_date: date):
+    tv = ET.Element("tv", {
+        "generator-info-name": "lps_crawler",
+        "source-info-name": "angiangtv.vn"
+    })
+    # channel
+    ch = ET.SubElement(tv, "channel", {"id": CHANNEL_ID})
+    dn = ET.SubElement(ch, "display-name")
+    dn.text = CHANNEL_NAME
 
-# ====== GHI RA XML ======
-tv = ET.Element("tv")
-channel = ET.SubElement(tv, "channel", id=CHANNEL_ID)
-ET.SubElement(channel, "display-name").text = CHANNEL_NAME
+    # Add programmes with start/stop
+    # programmes: list of (dt_start, title)
+    for i, (dt_start, title) in enumerate(programmes):
+        # stop = next start or midnight next day
+        if i + 1 < len(programmes):
+            dt_stop = programmes[i + 1][0]
+        else:
+            # last -> midnight next day
+            next_day = (for_date + timedelta(days=1))
+            dt_stop = datetime.combine(next_day, time(0, 0)).replace(tzinfo=TZ)
 
-for t, title in programs:
-    start_dt = datetime.strptime(f"2025-10-18 {t}", "%Y-%m-%d %H:%M")
-    start_str = start_dt.strftime("%Y%m%d%H%M%S +0700")
-    prog = ET.SubElement(tv, "programme", start=start_str, channel=CHANNEL_ID)
-    ET.SubElement(prog, "title", lang="vi").text = title
+        start_str = dt_start.strftime("%Y%m%d%H%M%S") + " +0700"
+        stop_str = dt_stop.strftime("%Y%m%d%H%M%S") + " +0700"
+        p = ET.SubElement(tv, "programme", {"start": start_str, "stop": stop_str, "channel": CHANNEL_ID})
+        t = ET.SubElement(p, "title", {"lang": "vi"})
+        t.text = title
 
-ET.ElementTree(tv).write(OUTPUT_FILE, encoding="utf-8", xml_declaration=True)
-print(f"✅ Xuất thành công {OUTPUT_FILE}")
-print("=== DONE ===")
+    # produce pretty string with header
+    xml_str = ET.tostring(tv, encoding="utf-8")
+    # Add xml declaration manually
+    return b"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xml_str
+
+def main():
+    today = date.today()
+    try:
+        print(f"=== RUNNING CRAWLER (AN GIANG 3) ===")
+        print(f"Đang lấy dữ liệu từ {BASE_URL}?ngay={today.strftime('%Y-%m-%d')}&kenh=TV2 ...")
+        html = fetch_html_for(today)
+    except Exception as e:
+        print("❌ Lỗi khi tải trang:", e)
+        sys.exit(1)
+
+    rows = parse_rows(html)
+    if not rows:
+        print("❌ Không tìm thấy bảng chương trình!")
+        # create minimal xml with channel only
+        root = ET.Element("tv", {
+            "generator-info-name": "lps_crawler",
+            "source-info-name": "angiangtv.vn"
+        })
+        ch = ET.SubElement(root, "channel", {"id": CHANNEL_ID})
+        ET.SubElement(ch, "display-name").text = CHANNEL_NAME
+        out = b"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + ET.tostring(root, encoding="utf-8")
+        with open(OUT_FILE, "wb") as f:
+            f.write(out)
+        print(f"✅ Đã tạo file {OUT_FILE}")
+        return
+
+    # convert times -> datetimes
+    prog_list = []
+    for time_text, title in rows:
+        try:
+            dt = make_dt_for(today, time_text)
+        except Exception as e:
+            # skip malformed times
+            print("⚠️ Bỏ chương trình do format time không đúng:", time_text, title)
+            continue
+        prog_list.append((dt, title))
+
+    # sort by start time just in case
+    prog_list.sort(key=lambda x: x[0])
+
+    # build xml
+    xml_bytes = build_xml(prog_list, today)
+    with open(OUT_FILE, "wb") as f:
+        f.write(xml_bytes)
+
+    print(f"✅ Tổng cộng: {len(prog_list)} chương trình")
+    print(f"✅ Xuất thành công {OUT_FILE}")
+
+if __name__ == "__main__":
+    main()
