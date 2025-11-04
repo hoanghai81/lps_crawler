@@ -3,7 +3,7 @@
 
 import sys
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 import xml.etree.ElementTree as ET
 
@@ -16,16 +16,21 @@ TZ_US = ZoneInfo("America/New_York")
 TZ_VN = ZoneInfo("Asia/Ho_Chi_Minh")
 
 API_URL = f"https://www.tvpassport.com/api/stations/{STATION_ID}/listings?date="
-
 HEADERS = {
     "User-Agent": "Mozilla/5.0",
     "Referer": "https://www.tvpassport.com/",
 }
 
 
-def fetch_json(date_str):
-    url = API_URL + date_str
+def fetch_json(date):
+    url = API_URL + date
+    print("📡 API:", url)
     resp = requests.get(url, headers=HEADERS, timeout=30)
+
+    if resp.status_code == 404:
+        print("⚠️ Data not ready for", date)
+        return None
+
     resp.raise_for_status()
     return resp.json()
 
@@ -52,25 +57,37 @@ def build_xml(programmes):
 
 
 def main():
-    today_vn = datetime.now(TZ_VN).date()
-    date_str = today_vn.strftime("%Y-%m-%d")
+    today_us = datetime.now(TZ_US).date()
+    date_str = today_us.strftime("%Y-%m-%d")
 
-    print("📡 Fetching:", date_str)
     json_data = fetch_json(date_str)
+
+    # Retry fallback: lùi thêm 1 ngày nếu chưa có
+    if not json_data:
+        fallback_date = today_us - timedelta(days=1)
+        date_str = fallback_date.strftime("%Y-%m-%d")
+        print("🔁 Try fallback:", date_str)
+        json_data = fetch_json(date_str)
+
+    if not json_data:
+        print("❌ No data available -> export 0 programmes")
+        with open(OUT_FILE, "wb") as f:
+            f.write(build_xml([]))
+        return
 
     programmes = []
     for item in json_data:
         title = item.get("title", "Unknown")
         desc = item.get("description")
 
-        start_us = datetime.fromisoformat(item["startTime"]).replace(tzinfo=TZ_US)
-        end_us = datetime.fromisoformat(item["endTime"]).replace(tzinfo=TZ_US)
+        start = datetime.fromisoformat(item["startTime"]).replace(tzinfo=TZ_US)
+        end = datetime.fromisoformat(item["endTime"]).replace(tzinfo=TZ_US)
 
         programmes.append({
             "title": title,
             "desc": desc,
-            "start": start_us.astimezone(TZ_VN),
-            "stop": end_us.astimezone(TZ_VN)
+            "start": start.astimezone(TZ_VN),
+            "stop": end.astimezone(TZ_VN)
         })
 
     xml_bytes = build_xml(programmes)
