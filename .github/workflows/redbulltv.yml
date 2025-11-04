@@ -1,0 +1,33 @@
+name: EPG - Redbull TV
+
+on:
+  schedule:
+    - cron: "0 18 * * *" # 01:00 sáng VN (UTC+7)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install requests pytz
+
+      - name: Run crawler
+        run: |
+          python redbulltv.py
+
+      - name: Commit & Push
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add docs/redbulltv.xml
+          git commit -m "Update Redbull TV EPG" || echo "No changes"
+          git push
