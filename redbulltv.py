@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# Crawler EPG cho Redbull TV — Xuất redbulltv.xml (XMLTV)
-
 import os
 import requests
 import xml.etree.ElementTree as ET
@@ -11,28 +9,12 @@ import traceback
 CHANNEL_ID = "redbulltv"
 CHANNEL_NAME = "Redbull TV"
 OUTPUT_FILE = "docs/redbulltv.xml"
-TIMEZONE = pytz.timezone("Asia/Ho_Chi_Minh")
 
-API_URL = "https://www.redbull.com/bigcontent/services/rb2/global/en-INT/channel/EPG"
+TIMEZONE = pytz.timezone("Asia/Ho_Chi_Minh")
+API_URL = "https://www.redbull.com/int-en/epg.json"
 
 def log(msg=""):
     print(msg, flush=True)
-
-def fetch_epg():
-    try:
-        today = datetime.now(TIMEZONE).strftime("%Y-%m-%d")
-        params = {
-            "startDate": today,
-            "endDate": today
-        }
-        r = requests.get(API_URL, params=params, timeout=30, headers={
-            "User-Agent": "Mozilla/5.0"
-        })
-        r.raise_for_status()
-        return r.json()
-    except Exception as e:
-        log(f"[!] API ERROR: {e}")
-        return None
 
 def ensure_dir(path):
     d = os.path.dirname(path)
@@ -42,50 +24,72 @@ def ensure_dir(path):
 def main():
     log("=== RUNNING CRAWLER (REDBULL TV) ===")
 
-    data = fetch_epg()
-    if not data or "channel" not in data:
-        log("❌ Không có dữ liệu!")
+    try:
+        r = requests.get(API_URL, timeout=30)
+        r.raise_for_status()
+        data = r.json()
+    except Exception as e:
+        log(f"[!] API ERROR: {e}")
         return
 
-    programmes = data.get("programs", [])
-    log(f"✅ {len(programmes)} programmes fetched")
+    if "schedule" not in data:
+        log("❌ No 'schedule' in response!")
+        return
+
+    schedule = data["schedule"]
+
+    today = datetime.now(TIMEZONE).date()
+    programmes = []
+
+    for item in schedule:
+        try:
+            start = datetime.fromisoformat(item["start_time"].replace("Z", "+00:00")).astimezone(TIMEZONE)
+            stop  = datetime.fromisoformat(item["end_time"].replace("Z", "+00:00")).astimezone(TIMEZONE)
+        except:
+            continue
+
+        # Filter đúng ngày hôm nay theo giờ VN
+        if start.date() != today:
+            continue
+
+        programmes.append({
+            "start": start,
+            "stop": stop,
+            "title": item.get("title", "").strip(),
+            "desc": item.get("short_description", "").strip()
+        })
+
+    log(f"✅ Found {len(programmes)} programmes for today")
 
     ensure_dir(OUTPUT_FILE)
 
     root = ET.Element("tv", {"generator-info-name": "redbulltv-crawler"})
 
-    # Channel metadata
     ch = ET.SubElement(root, "channel", id=CHANNEL_ID)
     dn = ET.SubElement(ch, "display-name")
     dn.text = CHANNEL_NAME
 
-    # Parse and write programmes
     for p in programmes:
-        try:
-            start = datetime.fromtimestamp(p["start"]/1000, tz=TIMEZONE)
-            stop = datetime.fromtimestamp(p["end"]/1000, tz=TIMEZONE)
-
-            start_fmt = start.strftime("%Y%m%d%H%M%S %z")
-            stop_fmt = stop.strftime("%Y%m%d%H%M%S %z")
-
-            node = ET.SubElement(root, "programme", {
-                "start": start_fmt,
-                "stop": stop_fmt,
-                "channel": CHANNEL_ID
-            })
-
-            t = ET.SubElement(node, "title")
-            t.text = p.get("title", "")
-
-            desc = ET.SubElement(node, "desc")
-            desc.text = p.get("synopsis", "")
-        except:
-            traceback.print_exc()
-            continue
+        start_fmt = p["start"].strftime("%Y%m%d%H%M%S %z")
+        stop_fmt = p["stop"].strftime("%Y%m%d%H%M%S %z")
+        node = ET.SubElement(root, "programme", {
+            "start": start_fmt,
+            "stop": stop_fmt,
+            "channel": CHANNEL_ID
+        })
+        t = ET.SubElement(node, "title")
+        t.text = p["title"] or ""
+        if p["desc"]:
+            d = ET.SubElement(node, "desc")
+            d.text = p["desc"]
 
     ET.ElementTree(root).write(OUTPUT_FILE, encoding="utf-8", xml_declaration=True)
+
     log(f"✅ Xuất thành công {OUTPUT_FILE}")
     log("=== DONE ===")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        traceback.print_exc()
