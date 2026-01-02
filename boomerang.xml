@@ -4,171 +4,167 @@
     <display-name>CARTOONITO</display-name>
     <url>https://info.msky.vn/vn/Boomerang.html</url>
   </channel>
-  <programme start="20260102000000 +0700" stop="20260102010000 +0700" channel="boomerang">
+  <programme start="20260103000000 +0700" stop="20260103010000 +0700" channel="boomerang">
     <title lang="vi">ella giữa những vì sao xa</title>
     <title lang="en">interstellar ella</title>
   </programme>
-  <programme start="20260102010000 +0700" stop="20260102020000 +0700" channel="boomerang">
+  <programme start="20260103010000 +0700" stop="20260103020000 +0700" channel="boomerang">
     <title lang="vi">ella giữa những vì sao xa</title>
     <title lang="en">interstellar ella</title>
   </programme>
-  <programme start="20260102020000 +0700" stop="20260102030000 +0700" channel="boomerang">
+  <programme start="20260103020000 +0700" stop="20260103030000 +0700" channel="boomerang">
     <title lang="vi">thỏ con dũng cảm</title>
     <title lang="en">brave bunnies</title>
   </programme>
-  <programme start="20260102030000 +0700" stop="20260102040000 +0700" channel="boomerang">
+  <programme start="20260103030000 +0700" stop="20260103040000 +0700" channel="boomerang">
     <title lang="vi">thỏ con dũng cảm</title>
     <title lang="en">brave bunnies</title>
   </programme>
-  <programme start="20260102040000 +0700" stop="20260102050000 +0700" channel="boomerang">
+  <programme start="20260103040000 +0700" stop="20260103050000 +0700" channel="boomerang">
     <title lang="vi">trang trại khủng long</title>
     <title lang="en">dino ranch</title>
   </programme>
-  <programme start="20260102050000 +0700" stop="20260102060000 +0700" channel="boomerang">
+  <programme start="20260103050000 +0700" stop="20260103060000 +0700" channel="boomerang">
     <title lang="vi">trang trại khủng long</title>
     <title lang="en">dino ranch</title>
   </programme>
-  <programme start="20260102060000 +0700" stop="20260102070000 +0700" channel="boomerang">
+  <programme start="20260103060000 +0700" stop="20260103070000 +0700" channel="boomerang">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
     <title lang="en">baby looney tunes</title>
   </programme>
-  <programme start="20260102070000 +0700" stop="20260102073000 +0700" channel="boomerang">
+  <programme start="20260103070000 +0700" stop="20260103073000 +0700" channel="boomerang">
     <title lang="vi">ban nhạc rock nhí</title>
     <title lang="en">mini beat power rockers</title>
   </programme>
-  <programme start="20260102073000 +0700" stop="20260102080000 +0700" channel="boomerang">
-    <title lang="vi">alice và lewis</title>
-    <title lang="en">alice</title>
-  </programme>
-  <programme start="20260102080000 +0700" stop="20260102083000 +0700" channel="boomerang">
-    <title lang="vi">kiểm lâm rob</title>
-    <title lang="en">ranger rob</title>
-  </programme>
-  <programme start="20260102083000 +0700" stop="20260102090000 +0700" channel="boomerang">
-    <title lang="vi">gấu xám và những chú chuột lemmut</title>
-    <title lang="en">grizzy and the lemmings</title>
-  </programme>
-  <programme start="20260102090000 +0700" stop="20260102093000 +0700" channel="boomerang">
-    <title lang="vi">gấu xám và những chú chuột lemmut</title>
-    <title lang="en">grizzy and the lemmings</title>
-  </programme>
-  <programme start="20260102093000 +0700" stop="20260102100000 +0700" channel="boomerang">
-    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
-    <title lang="en">baby looney tunes</title>
-  </programme>
-  <programme start="20260102100000 +0700" stop="20260102103000 +0700" channel="boomerang">
-    <title lang="vi">biệt đội xe dơi</title>
-    <title lang="en">batwheels</title>
-  </programme>
-  <programme start="20260102103000 +0700" stop="20260102110000 +0700" channel="boomerang">
+  <programme start="20260103073000 +0700" stop="20260103080000 +0700" channel="boomerang">
     <title lang="vi">tom biết nói: tổ đội anh hùng</title>
     <title lang="en">talking tom heroes: suddenly super</title>
   </programme>
-  <programme start="20260102110000 +0700" stop="20260102113000 +0700" channel="boomerang">
-    <title lang="vi">chương trình tom và jerry</title>
-    <title lang="en">the tom and jerry show</title>
+  <programme start="20260103080000 +0700" stop="20260103083000 +0700" channel="boomerang">
+    <title lang="vi">kiểm lâm rob</title>
+    <title lang="en">ranger rob</title>
   </programme>
-  <programme start="20260102113000 +0700" stop="20260102120000 +0700" channel="boomerang">
-    <title lang="vi">dorothy và phù thủy xứ oz</title>
-    <title lang="en">dorothy and the wizard of oz</title>
+  <programme start="20260103083000 +0700" stop="20260103090000 +0700" channel="boomerang">
+    <title lang="vi">trang trại khủng long</title>
+    <title lang="en">dino ranch</title>
   </programme>
-  <programme start="20260102120000 +0700" stop="20260102123000 +0700" channel="boomerang">
-    <title lang="vi">chú nhện lucas</title>
-    <title lang="en">lucas the spider</title>
-  </programme>
-  <programme start="20260102123000 +0700" stop="20260102130000 +0700" channel="boomerang">
-    <title lang="vi">ban nhạc rock nhí</title>
-    <title lang="en">mini beat power rockers</title>
-  </programme>
-  <programme start="20260102130000 +0700" stop="20260102132500 +0700" channel="boomerang">
-    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
-    <title lang="en">baby looney tunes</title>
-  </programme>
-  <programme start="20260102132500 +0700" stop="20260102133000 +0700" channel="boomerang">
-    <title lang="vi">thế giới của barney- gặp gỡ barney</title>
-    <title lang="en">barney's world - meet barney</title>
-  </programme>
-  <programme start="20260102133000 +0700" stop="20260102140000 +0700" channel="boomerang">
+  <programme start="20260103090000 +0700" stop="20260103093000 +0700" channel="boomerang">
     <title lang="vi">đội thợ xây của thỏ bugs</title>
     <title lang="en">bugs bunny builders</title>
   </programme>
-  <programme start="20260102140000 +0700" stop="20260102143000 +0700" channel="boomerang">
+  <programme start="20260103093000 +0700" stop="20260103100000 +0700" channel="boomerang">
+    <title lang="vi">chương trình tom và jerry</title>
+    <title lang="en">the tom and jerry show</title>
+  </programme>
+  <programme start="20260103100000 +0700" stop="20260103103000 +0700" channel="boomerang">
     <title lang="vi">biệt đội xe dơi</title>
     <title lang="en">batwheels</title>
   </programme>
-  <programme start="20260102143000 +0700" stop="20260102150000 +0700" channel="boomerang">
-    <title lang="vi">chương trình tom và jerry</title>
-    <title lang="en">the tom and jerry show</title>
-  </programme>
-  <programme start="20260102150000 +0700" stop="20260102153000 +0700" channel="boomerang">
-    <title lang="vi">chương trình tom và jerry</title>
-    <title lang="en">the tom and jerry show</title>
-  </programme>
-  <programme start="20260102153000 +0700" stop="20260102160000 +0700" channel="boomerang">
-    <title lang="vi">gấu xám và những chú chuột lemmut</title>
-    <title lang="en">grizzy and the lemmings</title>
-  </programme>
-  <programme start="20260102160000 +0700" stop="20260102163000 +0700" channel="boomerang">
-    <title lang="vi">gấu xám và những chú chuột lemmut</title>
-    <title lang="en">grizzy and the lemmings</title>
-  </programme>
-  <programme start="20260102163000 +0700" stop="20260102170000 +0700" channel="boomerang">
-    <title lang="vi">alice và lewis</title>
-    <title lang="en">alice</title>
-  </programme>
-  <programme start="20260102170000 +0700" stop="20260102172500 +0700" channel="boomerang">
+  <programme start="20260103103000 +0700" stop="20260103105500 +0700" channel="boomerang">
     <title lang="vi">thế giới của barney</title>
     <title lang="en">barney's world</title>
   </programme>
-  <programme start="20260102172500 +0700" stop="20260102173000 +0700" channel="boomerang">
+  <programme start="20260103105500 +0700" stop="20260103110000 +0700" channel="boomerang">
     <title lang="vi">thế giới của barney- gặp gỡ barney</title>
     <title lang="en">barney's world - meet barney</title>
   </programme>
-  <programme start="20260102173000 +0700" stop="20260102175500 +0700" channel="boomerang">
-    <title lang="vi">đội thợ xây của thỏ bugs</title>
-    <title lang="en">bugs bunny builders</title>
-  </programme>
-  <programme start="20260102175500 +0700" stop="20260102180000 +0700" channel="boomerang">
-    <title lang="vi">đội thợ xây của thỏ bugs</title>
-    <title lang="en">bugs bunny builders: hard hat time</title>
-  </programme>
-  <programme start="20260102180000 +0700" stop="20260102183000 +0700" channel="boomerang">
+  <programme start="20260103110000 +0700" stop="20260103113000 +0700" channel="boomerang">
     <title lang="vi">ban nhạc rock nhí</title>
     <title lang="en">mini beat power rockers</title>
   </programme>
-  <programme start="20260102183000 +0700" stop="20260102190000 +0700" channel="boomerang">
-    <title lang="vi">biệt đội xe dơi</title>
-    <title lang="en">batwheels</title>
-  </programme>
-  <programme start="20260102190000 +0700" stop="20260102193000 +0700" channel="boomerang">
+  <programme start="20260103113000 +0700" stop="20260103120000 +0700" channel="boomerang">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
     <title lang="en">baby looney tunes</title>
   </programme>
-  <programme start="20260102193000 +0700" stop="20260102200000 +0700" channel="boomerang">
-    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
-    <title lang="en">baby looney tunes</title>
+  <programme start="20260103120000 +0700" stop="20260103123000 +0700" channel="boomerang">
+    <title lang="vi">tom biết nói: tổ đội anh hùng</title>
+    <title lang="en">talking tom heroes: suddenly super</title>
   </programme>
-  <programme start="20260102200000 +0700" stop="20260102203000 +0700" channel="boomerang">
-    <title lang="vi">gấu xám và những chú chuột lemmut</title>
-    <title lang="en">grizzy and the lemmings</title>
+  <programme start="20260103123000 +0700" stop="20260103130000 +0700" channel="boomerang">
+    <title lang="vi">kiểm lâm rob</title>
+    <title lang="en">ranger rob</title>
   </programme>
-  <programme start="20260102203000 +0700" stop="20260102210000 +0700" channel="boomerang">
-    <title lang="vi">gấu xám và những chú chuột lemmut</title>
-    <title lang="en">grizzy and the lemmings</title>
+  <programme start="20260103130000 +0700" stop="20260103133000 +0700" channel="boomerang">
+    <title lang="vi">trang trại khủng long</title>
+    <title lang="en">dino ranch</title>
   </programme>
-  <programme start="20260102210000 +0700" stop="20260102213000 +0700" channel="boomerang">
-    <title lang="vi">đội chế tạo mecha</title>
-    <title lang="en">mecha builders</title>
-  </programme>
-  <programme start="20260102213000 +0700" stop="20260102220000 +0700" channel="boomerang">
-    <title lang="vi">đội chế tạo mecha</title>
-    <title lang="en">mecha builders</title>
-  </programme>
-  <programme start="20260102220000 +0700" stop="20260102230000 +0700" channel="boomerang">
+  <programme start="20260103133000 +0700" stop="20260103140000 +0700" channel="boomerang">
     <title lang="vi">đội thợ xây của thỏ bugs</title>
     <title lang="en">bugs bunny builders</title>
   </programme>
-  <programme start="20260102230000 +0700" stop="20260102233000 +0700" channel="boomerang">
+  <programme start="20260103140000 +0700" stop="20260103143000 +0700" channel="boomerang">
+    <title lang="vi">biệt đội xe dơi</title>
+    <title lang="en">batwheels</title>
+  </programme>
+  <programme start="20260103143000 +0700" stop="20260103150000 +0700" channel="boomerang">
+    <title lang="vi">nhà máy mơ ước của anh em sáng chế</title>
+    <title lang="en">builder brothers' dream factory</title>
+  </programme>
+  <programme start="20260103150000 +0700" stop="20260103152500 +0700" channel="boomerang">
+    <title lang="vi">thế giới của barney</title>
+    <title lang="en">barney's world</title>
+  </programme>
+  <programme start="20260103152500 +0700" stop="20260103153000 +0700" channel="boomerang">
+    <title lang="vi">thế giới của barney- gặp gỡ barney</title>
+    <title lang="en">barney's world - meet barney</title>
+  </programme>
+  <programme start="20260103153000 +0700" stop="20260103160000 +0700" channel="boomerang">
+    <title lang="vi">đội chế tạo mecha</title>
+    <title lang="en">mecha builders</title>
+  </programme>
+  <programme start="20260103160000 +0700" stop="20260103163000 +0700" channel="boomerang">
+    <title lang="vi">tom biết nói: tổ đội anh hùng</title>
+    <title lang="en">talking tom heroes: suddenly super</title>
+  </programme>
+  <programme start="20260103163000 +0700" stop="20260103170000 +0700" channel="boomerang">
+    <title lang="vi">alice và lewis</title>
+    <title lang="en">alice</title>
+  </programme>
+  <programme start="20260103170000 +0700" stop="20260103173000 +0700" channel="boomerang">
+    <title lang="vi">chú nhện lucas</title>
+    <title lang="en">lucas the spider</title>
+  </programme>
+  <programme start="20260103173000 +0700" stop="20260103180000 +0700" channel="boomerang">
+    <title lang="vi">gấu xám và những chú chuột lemmut</title>
+    <title lang="en">grizzy and the lemmings</title>
+  </programme>
+  <programme start="20260103180000 +0700" stop="20260103183000 +0700" channel="boomerang">
+    <title lang="vi">ban nhạc rock nhí</title>
+    <title lang="en">mini beat power rockers</title>
+  </programme>
+  <programme start="20260103183000 +0700" stop="20260103190000 +0700" channel="boomerang">
+    <title lang="vi">biệt đội xe dơi</title>
+    <title lang="en">batwheels</title>
+  </programme>
+  <programme start="20260103190000 +0700" stop="20260103193000 +0700" channel="boomerang">
+    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
+    <title lang="en">baby looney tunes</title>
+  </programme>
+  <programme start="20260103193000 +0700" stop="20260103200000 +0700" channel="boomerang">
+    <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
+    <title lang="en">baby looney tunes</title>
+  </programme>
+  <programme start="20260103200000 +0700" stop="20260103203000 +0700" channel="boomerang">
+    <title lang="vi">đội thợ xây của thỏ bugs</title>
+    <title lang="en">bugs bunny builders</title>
+  </programme>
+  <programme start="20260103203000 +0700" stop="20260103210000 +0700" channel="boomerang">
+    <title lang="vi">dorothy và phù thủy xứ oz</title>
+    <title lang="en">dorothy and the wizard of oz</title>
+  </programme>
+  <programme start="20260103210000 +0700" stop="20260103213000 +0700" channel="boomerang">
+    <title lang="vi">đội chế tạo mecha</title>
+    <title lang="en">mecha builders</title>
+  </programme>
+  <programme start="20260103213000 +0700" stop="20260103220000 +0700" channel="boomerang">
+    <title lang="vi">đội chế tạo mecha</title>
+    <title lang="en">mecha builders</title>
+  </programme>
+  <programme start="20260103220000 +0700" stop="20260103230000 +0700" channel="boomerang">
+    <title lang="vi">đội thợ xây của thỏ bugs</title>
+    <title lang="en">bugs bunny builders</title>
+  </programme>
+  <programme start="20260103230000 +0700" stop="20260103233000 +0700" channel="boomerang">
     <title lang="vi">những giai điệu ngốc nghếch thời thơ ấu</title>
     <title lang="en">baby looney tunes</title>
   </programme>
