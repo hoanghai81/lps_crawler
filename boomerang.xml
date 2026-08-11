@@ -4,76 +4,72 @@
     <display-name>CARTOONITO</display-name>
     <url>https://info.msky.vn/vn/Boomerang.html</url>
   </channel>
-  <programme start="20260811000000 +0700" stop="20260811010000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg: balance of power</title>
-    <title lang="en">bloomberg: balance of power</title>
-  </programme>
-  <programme start="20260811010000 +0700" stop="20260811020000 +0700" channel="boomerang">
+  <programme start="20260812010000 +0700" stop="20260812020000 +0700" channel="boomerang">
     <title lang="vi">bloomberg businessweek daily</title>
     <title lang="en">bloomberg businessweek daily</title>
   </programme>
-  <programme start="20260811020000 +0700" stop="20260811040000 +0700" channel="boomerang">
+  <programme start="20260812020000 +0700" stop="20260812040000 +0700" channel="boomerang">
     <title lang="vi">bloomberg the close</title>
     <title lang="en">bloomberg the close</title>
   </programme>
-  <programme start="20260811040000 +0700" stop="20260811050000 +0700" channel="boomerang">
+  <programme start="20260812040000 +0700" stop="20260812050000 +0700" channel="boomerang">
     <title lang="vi">bloomberg: balance of power</title>
     <title lang="en">bloomberg: balance of power</title>
   </programme>
-  <programme start="20260811050000 +0700" stop="20260811053000 +0700" channel="boomerang">
-    <title lang="vi">leaders with francine lacqua: the podcast</title>
-    <title lang="en">leaders with francine lacqua: the podcast</title>
+  <programme start="20260812050000 +0700" stop="20260812053000 +0700" channel="boomerang">
+    <title lang="vi">the deal with alex rodriguez and jason kelly</title>
+    <title lang="en">the deal with alex rodriguez and jason kelly</title>
   </programme>
-  <programme start="20260811053000 +0700" stop="20260811060000 +0700" channel="boomerang">
-    <title lang="vi">leaders with francine lacqua: the podcast</title>
-    <title lang="en">leaders with francine lacqua: the podcast</title>
+  <programme start="20260812053000 +0700" stop="20260812060000 +0700" channel="boomerang">
+    <title lang="vi">the deal with alex rodriguez and jason kelly</title>
+    <title lang="en">the deal with alex rodriguez and jason kelly</title>
   </programme>
-  <programme start="20260811060000 +0700" stop="20260811080000 +0700" channel="boomerang">
+  <programme start="20260812060000 +0700" stop="20260812080000 +0700" channel="boomerang">
     <title lang="vi">bloomberg the asia trade</title>
     <title lang="en">bloomberg the asia trade</title>
   </programme>
-  <programme start="20260811080000 +0700" stop="20260811100000 +0700" channel="boomerang">
+  <programme start="20260812080000 +0700" stop="20260812100000 +0700" channel="boomerang">
     <title lang="vi">bloomberg: the china show</title>
     <title lang="en">bloomberg: the china show</title>
   </programme>
-  <programme start="20260811100000 +0700" stop="20260811110000 +0700" channel="boomerang">
+  <programme start="20260812100000 +0700" stop="20260812110000 +0700" channel="boomerang">
     <title lang="vi">insight with haslinda amin</title>
     <title lang="en">insight with haslinda amin</title>
   </programme>
-  <programme start="20260811110000 +0700" stop="20260811120000 +0700" channel="boomerang">
+  <programme start="20260812110000 +0700" stop="20260812120000 +0700" channel="boomerang">
     <title lang="vi">bloomberg horizons middle east</title>
     <title lang="en">bloomberg horizons middle east</title>
   </programme>
-  <programme start="20260811120000 +0700" stop="20260811130000 +0700" channel="boomerang">
+  <programme start="20260812120000 +0700" stop="20260812130000 +0700" channel="boomerang">
     <title lang="vi">bloomberg daybreak: europe</title>
     <title lang="en">bloomberg daybreak: europe</title>
   </programme>
-  <programme start="20260811130000 +0700" stop="20260811150000 +0700" channel="boomerang">
+  <programme start="20260812130000 +0700" stop="20260812150000 +0700" channel="boomerang">
     <title lang="vi">bloomberg: the opening trade</title>
     <title lang="en">bloomberg: the opening trade</title>
   </programme>
-  <programme start="20260811150000 +0700" stop="20260811160000 +0700" channel="boomerang">
+  <programme start="20260812150000 +0700" stop="20260812160000 +0700" channel="boomerang">
     <title lang="vi">the pulse with francine lacqua</title>
     <title lang="en">the pulse with francine lacqua</title>
   </programme>
-  <programme start="20260811160000 +0700" stop="20260811170000 +0700" channel="boomerang">
+  <programme start="20260812160000 +0700" stop="20260812170000 +0700" channel="boomerang">
     <title lang="vi">bloomberg brief</title>
     <title lang="en">bloomberg brief</title>
   </programme>
-  <programme start="20260811170000 +0700" stop="20260811200000 +0700" channel="boomerang">
+  <programme start="20260812170000 +0700" stop="20260812200000 +0700" channel="boomerang">
     <title lang="vi">bloomberg surveillance</title>
     <title lang="en">bloomberg surveillance</title>
   </programme>
-  <programme start="20260811200000 +0700" stop="20260811220000 +0700" channel="boomerang">
+  <programme start="20260812200000 +0700" stop="20260812220000 +0700" channel="boomerang">
     <title lang="vi">bloomberg open interest</title>
     <title lang="en">bloomberg open interest</title>
   </programme>
-  <programme start="20260811220000 +0700" stop="20260811230000 +0700" channel="boomerang">
+  <programme start="20260812220000 +0700" stop="20260812230000 +0700" channel="boomerang">
     <title lang="vi">bloomberg tech</title>
     <title lang="en">bloomberg tech</title>
   </programme>
-  <programme start="20260811230000 +0700" stop="20260811233000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg crypto</title>
-    <title lang="en">bloomberg crypto</title>
+  <programme start="20260812230000 +0700" stop="20260812233000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg deals</title>
+    <title lang="en">bloomberg deals</title>
   </programme>
 </tv>
