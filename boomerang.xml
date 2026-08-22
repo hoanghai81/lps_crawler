@@ -4,128 +4,148 @@
     <display-name>CARTOONITO</display-name>
     <url>https://info.msky.vn/vn/Boomerang.html</url>
   </channel>
-  <programme start="20260822000000 +0700" stop="20260822010000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg: balance of power</title>
-    <title lang="en">bloomberg: balance of power</title>
-  </programme>
-  <programme start="20260822010000 +0700" stop="20260822020000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg businessweek daily</title>
-    <title lang="en">bloomberg businessweek daily</title>
-  </programme>
-  <programme start="20260822020000 +0700" stop="20260822040000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg the close</title>
-    <title lang="en">bloomberg the close</title>
-  </programme>
-  <programme start="20260822040000 +0700" stop="20260822050000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg: balance of power</title>
-    <title lang="en">bloomberg: balance of power</title>
-  </programme>
-  <programme start="20260822050000 +0700" stop="20260822060000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg wall street week</title>
-    <title lang="en">bloomberg wall street week</title>
-  </programme>
-  <programme start="20260822060000 +0700" stop="20260822063000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg new economy: thriving in an age of extremes</title>
-    <title lang="en">bloomberg new economy: thriving in an age of extremes</title>
-  </programme>
-  <programme start="20260822063000 +0700" stop="20260822070000 +0700" channel="boomerang">
-    <title lang="vi">the mishal husain show</title>
-    <title lang="en">the mishal husain show</title>
-  </programme>
-  <programme start="20260822070000 +0700" stop="20260822073000 +0700" channel="boomerang">
+  <programme start="20260823000000 +0700" stop="20260823003000 +0700" channel="boomerang">
     <title lang="vi">leaders with francine lacqua: the podcast</title>
     <title lang="en">leaders with francine lacqua: the podcast</title>
   </programme>
-  <programme start="20260822073000 +0700" stop="20260822080000 +0700" channel="boomerang">
-    <title lang="vi">the circuit</title>
-    <title lang="en">the circuit</title>
-  </programme>
-  <programme start="20260822080000 +0700" stop="20260822083000 +0700" channel="boomerang">
+  <programme start="20260823003000 +0700" stop="20260823010000 +0700" channel="boomerang">
     <title lang="vi">the david rubenstein show</title>
     <title lang="en">the david rubenstein show</title>
   </programme>
-  <programme start="20260822083000 +0700" stop="20260822090000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg originals</title>
-    <title lang="en">bloomberg originals</title>
+  <programme start="20260823010000 +0700" stop="20260823013000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg investigates</title>
+    <title lang="en">bloomberg investigates</title>
   </programme>
-  <programme start="20260822090000 +0700" stop="20260822100000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg wall street week</title>
-    <title lang="en">bloomberg wall street week</title>
+  <programme start="20260823013000 +0700" stop="20260823020000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg primer</title>
+    <title lang="en">bloomberg primer</title>
   </programme>
-  <programme start="20260822100000 +0700" stop="20260822103000 +0700" channel="boomerang">
-    <title lang="vi">the circuit</title>
-    <title lang="en">the circuit</title>
+  <programme start="20260823020000 +0700" stop="20260823030000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg primer</title>
+    <title lang="en">bloomberg primer</title>
   </programme>
-  <programme start="20260822103000 +0700" stop="20260822110000 +0700" channel="boomerang">
-    <title lang="vi">posthuman</title>
-    <title lang="en">posthuman</title>
-  </programme>
-  <programme start="20260822110000 +0700" stop="20260822120000 +0700" channel="boomerang">
+  <programme start="20260823030000 +0700" stop="20260823040000 +0700" channel="boomerang">
     <title lang="vi">the deal with alex rodriguez and jason kelly</title>
     <title lang="en">the deal with alex rodriguez and jason kelly</title>
   </programme>
-  <programme start="20260822120000 +0700" stop="20260822123000 +0700" channel="boomerang">
-    <title lang="vi">posthuman</title>
-    <title lang="en">posthuman</title>
+  <programme start="20260823040000 +0700" stop="20260823043000 +0700" channel="boomerang">
+    <title lang="vi">leaders with francine lacqua: the podcast</title>
+    <title lang="en">leaders with francine lacqua: the podcast</title>
   </programme>
-  <programme start="20260822123000 +0700" stop="20260822130000 +0700" channel="boomerang">
+  <programme start="20260823043000 +0700" stop="20260823050000 +0700" channel="boomerang">
     <title lang="vi">the circuit</title>
     <title lang="en">the circuit</title>
   </programme>
-  <programme start="20260822130000 +0700" stop="20260822133000 +0700" channel="boomerang">
+  <programme start="20260823050000 +0700" stop="20260823053000 +0700" channel="boomerang">
     <title lang="vi">the mishal husain show</title>
     <title lang="en">the mishal husain show</title>
   </programme>
-  <programme start="20260822133000 +0700" stop="20260822140000 +0700" channel="boomerang">
+  <programme start="20260823053000 +0700" stop="20260823060000 +0700" channel="boomerang">
     <title lang="vi">the mishal husain show</title>
     <title lang="en">the mishal husain show</title>
   </programme>
-  <programme start="20260822140000 +0700" stop="20260822150000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg wall street week</title>
-    <title lang="en">bloomberg wall street week</title>
+  <programme start="20260823060000 +0700" stop="20260823063000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg investigates</title>
+    <title lang="en">bloomberg investigates</title>
   </programme>
-  <programme start="20260822150000 +0700" stop="20260822153000 +0700" channel="boomerang">
+  <programme start="20260823063000 +0700" stop="20260823070000 +0700" channel="boomerang">
     <title lang="vi">bloomberg originals</title>
     <title lang="en">bloomberg originals</title>
   </programme>
-  <programme start="20260822153000 +0700" stop="20260822160000 +0700" channel="boomerang">
-    <title lang="vi">posthuman</title>
-    <title lang="en">posthuman</title>
-  </programme>
-  <programme start="20260822160000 +0700" stop="20260822163000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg new economy: thriving in an age of extremes</title>
-    <title lang="en">bloomberg new economy: thriving in an age of extremes</title>
-  </programme>
-  <programme start="20260822163000 +0700" stop="20260822170000 +0700" channel="boomerang">
-    <title lang="vi">the mishal husain show</title>
-    <title lang="en">the mishal husain show</title>
-  </programme>
-  <programme start="20260822170000 +0700" stop="20260822180000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg wall street week</title>
-    <title lang="en">bloomberg wall street week</title>
-  </programme>
-  <programme start="20260822180000 +0700" stop="20260822210000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg this weekend</title>
-    <title lang="en">bloomberg this weekend</title>
-  </programme>
-  <programme start="20260822210000 +0700" stop="20260822220000 +0700" channel="boomerang">
-    <title lang="vi">bloomberg wall street week</title>
-    <title lang="en">bloomberg wall street week</title>
-  </programme>
-  <programme start="20260822220000 +0700" stop="20260822223000 +0700" channel="boomerang">
-    <title lang="vi">the mishal husain show</title>
-    <title lang="en">the mishal husain show</title>
-  </programme>
-  <programme start="20260822223000 +0700" stop="20260822230000 +0700" channel="boomerang">
-    <title lang="vi">the david rubenstein show</title>
-    <title lang="en">the david rubenstein show</title>
-  </programme>
-  <programme start="20260822230000 +0700" stop="20260822233000 +0700" channel="boomerang">
+  <programme start="20260823070000 +0700" stop="20260823073000 +0700" channel="boomerang">
     <title lang="vi">best of bloomberg invest 2026</title>
     <title lang="en">best of bloomberg invest 2026</title>
   </programme>
-  <programme start="20260822233000 +0700" stop="20260823000000 +0700" channel="boomerang">
+  <programme start="20260823073000 +0700" stop="20260823080000 +0700" channel="boomerang">
+    <title lang="vi">the deal with alex rodriguez and jason kelly</title>
+    <title lang="en">the deal with alex rodriguez and jason kelly</title>
+  </programme>
+  <programme start="20260823080000 +0700" stop="20260823083000 +0700" channel="boomerang">
     <title lang="vi">bloomberg originals</title>
     <title lang="en">bloomberg originals</title>
+  </programme>
+  <programme start="20260823083000 +0700" stop="20260823090000 +0700" channel="boomerang">
+    <title lang="vi">posthuman</title>
+    <title lang="en">posthuman</title>
+  </programme>
+  <programme start="20260823090000 +0700" stop="20260823093000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg primer</title>
+    <title lang="en">bloomberg primer</title>
+  </programme>
+  <programme start="20260823093000 +0700" stop="20260823100000 +0700" channel="boomerang">
+    <title lang="vi">best of the bloomberg women, money</title>
+    <title lang="en">best of the bloomberg women, money</title>
+  </programme>
+  <programme start="20260823100000 +0700" stop="20260823103000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg new economy: thriving in an age of extremes</title>
+    <title lang="en">bloomberg new economy: thriving in an age of extremes</title>
+  </programme>
+  <programme start="20260823103000 +0700" stop="20260823110000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg screentime: the business of pop culture</title>
+    <title lang="en">bloomberg screentime: the business of pop culture</title>
+  </programme>
+  <programme start="20260823110000 +0700" stop="20260823113000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg originals</title>
+    <title lang="en">bloomberg originals</title>
+  </programme>
+  <programme start="20260823113000 +0700" stop="20260823120000 +0700" channel="boomerang">
+    <title lang="vi">posthuman</title>
+    <title lang="en">posthuman</title>
+  </programme>
+  <programme start="20260823120000 +0700" stop="20260823130000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg investigates</title>
+    <title lang="en">bloomberg investigates</title>
+  </programme>
+  <programme start="20260823130000 +0700" stop="20260823133000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg primer</title>
+    <title lang="en">bloomberg primer</title>
+  </programme>
+  <programme start="20260823133000 +0700" stop="20260823140000 +0700" channel="boomerang">
+    <title lang="vi">the mishal husain show</title>
+    <title lang="en">the mishal husain show</title>
+  </programme>
+  <programme start="20260823140000 +0700" stop="20260823143000 +0700" channel="boomerang">
+    <title lang="vi">leaders with francine lacqua: the podcast</title>
+    <title lang="en">leaders with francine lacqua: the podcast</title>
+  </programme>
+  <programme start="20260823143000 +0700" stop="20260823150000 +0700" channel="boomerang">
+    <title lang="vi">best of the bloomberg women, money</title>
+    <title lang="en">best of the bloomberg women, money</title>
+  </programme>
+  <programme start="20260823150000 +0700" stop="20260823160000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg wall street week</title>
+    <title lang="en">bloomberg wall street week</title>
+  </programme>
+  <programme start="20260823160000 +0700" stop="20260823163000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg originals</title>
+    <title lang="en">bloomberg originals</title>
+  </programme>
+  <programme start="20260823163000 +0700" stop="20260823170000 +0700" channel="boomerang">
+    <title lang="vi">the circuit</title>
+    <title lang="en">the circuit</title>
+  </programme>
+  <programme start="20260823170000 +0700" stop="20260823180000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg wall street week</title>
+    <title lang="en">bloomberg wall street week</title>
+  </programme>
+  <programme start="20260823180000 +0700" stop="20260823210000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg this weekend</title>
+    <title lang="en">bloomberg this weekend</title>
+  </programme>
+  <programme start="20260823210000 +0700" stop="20260823213000 +0700" channel="boomerang">
+    <title lang="vi">the mishal husain show</title>
+    <title lang="en">the mishal husain show</title>
+  </programme>
+  <programme start="20260823213000 +0700" stop="20260823220000 +0700" channel="boomerang">
+    <title lang="vi">the david rubenstein show</title>
+    <title lang="en">the david rubenstein show</title>
+  </programme>
+  <programme start="20260823220000 +0700" stop="20260823230000 +0700" channel="boomerang">
+    <title lang="vi">the circuit</title>
+    <title lang="en">the circuit</title>
+  </programme>
+  <programme start="20260823230000 +0700" stop="20260823233000 +0700" channel="boomerang">
+    <title lang="vi">bloomberg wall street week</title>
+    <title lang="en">bloomberg wall street week</title>
   </programme>
 </tv>
